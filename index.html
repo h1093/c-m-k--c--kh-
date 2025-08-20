@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cấm Kỵ Cơ Khí</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --color-bg-dark: #0a0a0a;
+        --color-bg-medium: #1a1a1a;
+        --color-bg-light: #2a2a2a;
+        --color-primary-red: #b91c1c;
+        --color-primary-red-dark: #7f1d1d;
+        --color-accent-blood: #ef4444;
+        --color-text-light: #f3f4f6;
+        --color-text-medium: #9ca3af;
+        --color-text-dark: #4b5563;
+        --font-primary: 'Inter', sans-serif;
+        --font-display: 'Playfair Display SC', serif;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--color-bg-dark);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--color-primary-red-dark);
+        border-radius: 4px;
+        border: 2px solid var(--color-bg-dark);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-primary-red);
+      }
+
+      body {
+        font-family: var(--font-primary);
+        background-color: var(--color-bg-dark);
+        color: var(--color-text-light);
+        /* Add a subtle noise background for horror effect */
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJhbSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZHRoPSIxMDAlIiBmaWx0ZXI9InVybCgjYW0pIiBvcGFjaXR5PSIwLjA1NSIvPjwvc3ZnPg==');
+      }
+      
+      .font-cinzel {
+        font-family: var(--font-display), serif;
+      }
+
+      /* Animations */
+      @keyframes text-glow {
+        0%, 100% { text-shadow: 0 0 5px var(--color-primary-red), 0 0 10px var(--color-primary-red); }
+        50% { text-shadow: 0 0 10px var(--color-primary-red), 0 0 20px var(--color-primary-red); }
+      }
+       @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+      }
+
+       .save-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--color-bg-medium);
+        color: var(--color-primary-red);
+        padding: 12px 24px;
+        border: 1px solid var(--color-primary-red-dark);
+        box-shadow: 0 0 15px rgba(127, 29, 29, 0.3);
+        z-index: 100;
+        animation: fade-in-out 3s ease-in-out forwards;
+      }
+
+      @keyframes fade-in-out {
+        0% { opacity: 0; transform: translate(-50%, 20px); }
+        15% { opacity: 1; transform: translate(-50%, 0); }
+        85% { opacity: 1; transform: translate(-50%, 0); }
+        100% { opacity: 0; transform: translate(-50%, 20px); }
+      }
+
+
+      /* General UI element styling */
+      .ui-panel {
+        background-color: rgba(10, 10, 10, 0.8);
+        border: 1px solid rgba(185, 28, 28, 0.2);
+        backdrop-filter: blur(5px);
+        box-shadow: 0 0 15px rgba(127, 29, 29, 0.1), inset 0 0 10px rgba(0,0,0,0.5);
+        border-radius: 0px; /* Sharp edges for horror */
+      }
+      .ui-button {
+        background-color: var(--color-primary-red-dark);
+        color: var(--color-text-light);
+        font-family: var(--font-display);
+        border: 1px solid var(--color-primary-red);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 5px rgba(185, 28, 28, 0.5), inset 0 0 5px rgba(185, 28, 28, 0.3);
+        border-radius: 0px;
+      }
+      .ui-button:hover:not(:disabled) {
+        background-color: var(--color-primary-red);
+        color: var(--color-bg-dark);
+        box-shadow: 0 0 15px var(--color-primary-red), inset 0 0 10px rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+      .ui-button:disabled {
+        background-color: var(--color-text-dark);
+        border-color: var(--color-text-dark);
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      .ui-input {
+        background-color: var(--color-bg-medium);
+        border: 1px solid var(--color-primary-red-dark);
+        color: var(--color-text-light);
+        transition: all 0.3s ease;
+        border-radius: 0px;
+      }
+      .ui-input:focus {
+        outline: none;
+        border-color: var(--color-primary-red);
+        box-shadow: 0 0 10px rgba(185, 28, 28, 0.7);
+      }
+      
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.14.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
