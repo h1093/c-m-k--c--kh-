@@ -1,10 +1,27 @@
+
 import React, { useState } from 'react';
 import { DEFAULT_QUESTS } from '../data/quests';
-import type { StartingScenario } from '../types';
+import type { StartingScenario, Difficulty } from '../types';
 
 interface CharacterCreationProps {
-  onStart: (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario) => void;
+  onStart: (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, difficulty: Difficulty) => void;
 }
+
+interface DifficultyOptionProps {
+    label: string;
+    description: string;
+    value: Difficulty;
+    current: Difficulty;
+    setter: (value: Difficulty) => void;
+}
+
+const DifficultyOption: React.FC<DifficultyOptionProps> = ({ label, description, value, current, setter }) => (
+    <label className={`p-3 border-2 transition-all duration-200 cursor-pointer block text-center ${current === value ? 'bg-red-900/40 border-red-500' : 'bg-black/30 border-gray-700 hover:border-red-600'}`}>
+        <input type="radio" name="difficulty" value={value} checked={current === value} onChange={() => setter(value)} className="sr-only" />
+        <p className="font-bold text-red-300">{label}</p>
+        <p className="text-sm text-gray-400">{description}</p>
+    </label>
+);
 
 const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
   const [masterName, setMasterName] = useState('');
@@ -16,6 +33,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
   const [questSelection, setQuestSelection] = useState(DEFAULT_QUESTS[0].description);
   const [customQuest, setCustomQuest] = useState('');
   const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
+  const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   
   const handleStart = () => {
     if (!masterName.trim()) {
@@ -43,7 +61,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
     }
 
     setError('');
-    onStart(masterName.trim(), biography, finalQuest, startingScenario);
+    onStart(masterName.trim(), biography, finalQuest, startingScenario, difficulty);
   };
   
   const isHumanScenario = startingScenario === 'human';
@@ -114,6 +132,17 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
                   <p className="font-bold text-red-300">Giữa Cơn Hỗn Loạn</p>
                   <p className="text-sm text-gray-400">Bắt đầu giữa một nghi thức thảm họa.</p>
               </label>
+          </div>
+        </div>
+
+        {/* Difficulty Selection */}
+        <div>
+          <h3 className="text-xl font-cinzel text-red-400 mb-3">Độ Khó</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <DifficultyOption label="Dễ" description="Tận hưởng câu chuyện." value="easy" current={difficulty} setter={setDifficulty} />
+            <DifficultyOption label="Thường" description="Cân bằng & thử thách." value="normal" current={difficulty} setter={setDifficulty} />
+            <DifficultyOption label="Khó" description="Kẻ địch mạnh hơn." value="hard" current={difficulty} setter={setDifficulty} />
+            <DifficultyOption label="Ác Mộng" description="Không khoan nhượng." value="nightmare" current={difficulty} setter={setDifficulty} />
           </div>
         </div>
 

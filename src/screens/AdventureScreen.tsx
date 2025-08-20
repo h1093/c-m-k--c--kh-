@@ -39,6 +39,8 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     loreSummaries={gameState.loreSummaries}
                     factionRelations={gameState.factionRelations}
                     apiCalls={apiCalls}
+                    kimLenh={gameState.kimLenh}
+                    dauAnDongThau={gameState.dauAnDongThau}
                 />
                 : <PlayerStatus
                     name={gameState.puppetMasterName}
@@ -52,6 +54,8 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     loreSummaries={gameState.loreSummaries}
                     factionRelations={gameState.factionRelations}
                     apiCalls={apiCalls}
+                    kimLenh={gameState.kimLenh}
+                    dauAnDongThau={gameState.dauAnDongThau}
                 />
             }
             {gameState.clues.length > 0 && <ClueJournal clues={gameState.clues} />}

@@ -78,6 +78,21 @@
         z-index: 100;
         animation: fade-in-out 3s ease-in-out forwards;
       }
+      
+      @keyframes glow-yellow {
+        0%, 100% { text-shadow: 0 0 4px #fef08a, 0 0 8px #fef08a; }
+        50% { text-shadow: 0 0 8px #fde047, 0 0 16px #fde047; }
+      }
+      .animate-glow-yellow {
+        animation: glow-yellow 2s ease-in-out infinite;
+      }
+      @keyframes glow-purple {
+        0%, 100% { text-shadow: 0 0 4px #c084fc, 0 0 8px #c084fc; }
+        50% { text-shadow: 0 0 8px #a855f7, 0 0 16px #a855f7; }
+      }
+      .animate-glow-purple {
+        animation: glow-purple 2s ease-in-out infinite;
+      }
 
       @keyframes fade-in-out {
         0% { opacity: 0; transform: translate(-50%, 20px); }

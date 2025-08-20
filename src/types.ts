@@ -107,7 +107,7 @@ export interface Puppet {
   equippedComponents: Component[];
 }
 
-export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences';
+export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences' | 'currency';
 
 export interface Explanation {
   id: ExplanationId;
@@ -137,6 +137,10 @@ export interface StorySegment {
   resonanceChange?: number; // Sự thay đổi về Cộng Hưởng dựa trên lựa chọn
   explanation?: Explanation; // Giải thích cơ chế game được lồng ghép
 
+  // Economy
+  kimLenhChange?: number; // Tiền tệ thế giới bề nổi
+  dauAnDongThauChange?: number; // Tiền tệ thế giới ngầm
+
   // New Features
   newMemoryFragment?: MemoryFragment;
   newMutation?: Mutation;
@@ -160,6 +164,7 @@ export interface CombatTurnResult {
     isCombatOver: boolean;
     outcome: 'win' | 'loss' | 'ongoing';
     essenceGainedOnWin?: number;
+    dauAnDongThauGainedOnWin?: number; // Thêm tiền tệ thế giới ngầm khi thắng
     explanation?: Explanation;
     updatedCompanions?: Companion[];
 }
@@ -178,6 +183,8 @@ export interface WorkshopData {
 }
 
 export type StartingScenario = 'complete' | 'ritual' | 'chaos' | 'human';
+
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
 
 export enum GameStage {
   START_SCREEN,
@@ -212,6 +219,10 @@ export interface GameState {
   sideQuests: Quest[];
   companions: Companion[];
   
+  // Economy
+  kimLenh: number; // Tiền tệ thế giới bề nổi
+  dauAnDongThau: number; // Tiền tệ thế giới ngầm
+
   // Dynamic World Features
   npcs: NPC[];
   worldState: { [key: string]: string };
@@ -219,4 +230,5 @@ export interface GameState {
   loreSummaries: LoreSummary[];
   factionRelations: FactionRelations; // Mối quan hệ của người chơi với các phe phái
   apiCalls: number;
+  difficulty: Difficulty;
 }

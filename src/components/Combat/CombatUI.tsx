@@ -23,6 +23,8 @@ interface CombatUIProps {
     onExitToMenu: () => void;
     turnCount: number;
     apiCalls: number;
+    kimLenh: number;
+    dauAnDongThau: number;
 }
 
 const StatBar: React.FC<{ value: number; maxValue: number; color: string; glowColor: string; }> = ({ value, maxValue, color, glowColor }) => {
@@ -123,7 +125,7 @@ const CombatLog: React.FC<{ log: string[] }> = ({ log }) => {
 };
 
 
-const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, turnCount, apiCalls }) => {
+const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, turnCount, apiCalls, kimLenh, dauAnDongThau }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -139,6 +141,8 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
             loreSummaries={loreSummaries}
             factionRelations={factionRelations}
             apiCalls={apiCalls}
+            kimLenh={kimLenh}
+            dauAnDongThau={dauAnDongThau}
         />
     );
 

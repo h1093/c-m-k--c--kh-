@@ -48,10 +48,24 @@ interface PlayerStatusProps {
   loreSummaries: LoreSummary[];
   factionRelations: FactionRelations;
   apiCalls: number;
+  kimLenh: number;
+  dauAnDongThau: number;
 }
 
+const StatDisplay: React.FC<{ label: string; value: string | number; icon: React.ReactNode; className?: string; valueClassName?: string }> = ({ label, value, icon, className = '', valueClassName = '' }) => (
+    <div className={`bg-black/30 p-3 flex flex-col items-center justify-center text-center transition-colors duration-300 border border-gray-700/50 ${className}`}>
+        <div className="flex items-center gap-2 text-gray-400">
+            {icon}
+            <p className="text-sm uppercase tracking-wider">{label}</p>
+        </div>
+        <p className={`text-2xl font-bold mt-1 font-cinzel ${valueClassName}`}>{value}</p>
+    </div>
+);
 
-const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, apiCalls }) => {
+const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a3.242 3.242 0 01.378-.162.75.75 0 01.622 1.258l-1.12 2.238a.75.75 0 01-1.286-.644l.433-.866a1.745 1.745 0 00-.56-.252.75.75 0 01.12-.48z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.546l-.326-.42a.75.75 0 10-1.198.922l2.001 2.599a.75.75 0 001.147-.043l2-3a.75.75 0 10-1.15-1.076l-1.174 1.761V6.75z" clipRule="evenodd" /></svg>;
+const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a.75.75 0 01.688.45l1.823 3.645.11.22a.75.75 0 00.518.518l.22.11 3.645 1.823a.75.75 0 010 1.376l-3.645 1.823-.22.11a.75.75 0 00-.518.518l-.11.22-1.823 3.645a.75.75 0 01-1.376 0l-1.823-3.645-.11-.22a.75.75 0 00-.518-.518l-.22-.11-3.645-1.823a.75.75 0 010-1.376l3.645-1.823.22-.11a.75.75 0 00.518-.518l.11-.22L9.312 2.45A.75.75 0 0110 2z" clipRule="evenodd" /></svg>;
+
+const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, apiCalls, kimLenh, dauAnDongThau }) => {
   const [activeView, setActiveView] = useState<PlayerView>('bio');
 
   const bioParts = {
@@ -84,7 +98,13 @@ const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, 
     switch (activeView) {
       case 'bio':
         return (
-          <div className="animate-fade-in">
+          <div className="animate-fade-in space-y-4">
+            <Section title="Tài Sản" titleColor="text-yellow-400">
+               <div className="grid grid-cols-2 gap-3">
+                    <StatDisplay label="Kim Lệnh" value={kimLenh} icon={<KimLenhIcon />} valueClassName="text-yellow-300" />
+                    <StatDisplay label="Dấu Ấn" value={dauAnDongThau} icon={<DauAnIcon />} valueClassName="text-amber-500" />
+               </div>
+            </Section>
             <Section title="Tiểu Sử">
               {hasStructuredBio ? (
                  <div className="text-sm text-gray-300 bg-black/30 p-3 mt-2 space-y-2 border border-gray-700/50">

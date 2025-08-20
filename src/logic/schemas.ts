@@ -161,7 +161,7 @@ export const explanationSchema = {
     type: Type.OBJECT,
     description: "Một đoạn giải thích về một cơ chế game mới, được lồng ghép vào câu chuyện. Chỉ bao gồm khi một cơ chế được giới thiệu lần đầu.",
     properties: {
-        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences'." },
+        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency'." },
         title: { type: Type.STRING, description: "Tiêu đề của phần giải thích, ví dụ: 'Về Cộng Hưởng và Nhân Cách'." },
         text: { type: Type.STRING, description: "Nội dung giải thích chi tiết, được viết theo phong cách phù hợp với bối cảnh." }
     }
@@ -219,6 +219,14 @@ export const storySegmentSchema = {
         resonanceChange: {
             type: Type.INTEGER,
             description: "Sự thay đổi về điểm Cộng Hưởng. Dương nếu lựa chọn phù hợp với Nhân Cách, âm nếu không. Bỏ qua nếu không liên quan."
+        },
+        kimLenhChange: {
+            type: Type.INTEGER,
+            description: "Sự thay đổi về 'Kim Lệnh' (tiền tệ bề nổi). Dương là nhận, âm là mất."
+        },
+        dauAnDongThauChange: {
+            type: Type.INTEGER,
+            description: "Sự thay đổi về 'Dấu Ấn Đồng Thau' (tiền tệ thế giới ngầm). Dương là nhận, âm là mất."
         },
         explanation: explanationSchema,
         newMemoryFragment: { ...memoryFragmentSchema, description: "Một mảnh ký ức mới được mở khóa nếu Cộng Hưởng đạt ngưỡng cao." },
@@ -291,6 +299,7 @@ export const combatTurnSchema = {
         isCombatOver: { type: Type.BOOLEAN, description: "True nếu một trong hai bên bị đánh bại (HP <= 0)." },
         outcome: { type: Type.STRING, description: "Kết quả của trận chiến nếu nó đã kết thúc: 'win', 'loss', hoặc 'ongoing'." },
         essenceGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Tinh Hoa Cơ Khí' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
+        dauAnDongThauGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Dấu Ấn Đồng Thau' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
         explanation: explanationSchema,
         updatedCompanions: { type: Type.ARRAY, items: companionSchema, description: "Trạng thái được cập nhật của các đồng đội sau lượt chiến đấu."}
     },

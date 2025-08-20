@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary } from './types';
+import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty } from './types';
 import { generateInitialStory, generateNextStorySegment, generateLoreSummary } from './logic/storyService';
 import { handleCombatTurn } from './logic/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from './logic/workshopService';
@@ -53,6 +53,9 @@ const App: React.FC = () => {
     loreSummaries: [],
     factionRelations: {},
     apiCalls: 0,
+    difficulty: 'normal',
+    kimLenh: 0,
+    dauAnDongThau: 0,
   });
   
   const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
@@ -132,11 +135,11 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleCharacterCreation = async (puppetMasterName: string, biography: string, mainQuest: string, scenario: StartingScenario) => {
+  const handleCharacterCreation = async (puppetMasterName: string, biography: string, mainQuest: string, scenario: StartingScenario, difficulty: Difficulty) => {
     setStartingScenario(scenario);
-    setGameState(prev => ({ ...prev, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, stage: GameStage.PLAYING }));
+    setGameState(prev => ({ ...prev, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, difficulty, stage: GameStage.PLAYING }));
     try {
-      const initialSegment = await generateInitialStory(puppetMasterName, biography, mainQuest, scenario, gameState.customWorldPrompt);
+      const initialSegment = await generateInitialStory(puppetMasterName, biography, mainQuest, scenario, gameState.customWorldPrompt, difficulty);
       
       const newShownExplanations = new Set<ExplanationId>();
       if (initialSegment.explanation) {
@@ -160,6 +163,8 @@ const App: React.FC = () => {
         worldState: initialSegment.updatedWorldState || {},
         loreEntries: initialSegment.newLoreEntries || [],
         apiCalls: prev.apiCalls + 1,
+        kimLenh: (prev.kimLenh || 0) + (initialSegment.kimLenhChange || 0),
+        dauAnDongThau: (prev.dauAnDongThau || 0) + (initialSegment.dauAnDongThauChange || 0),
       }));
     } catch (error) {
       console.error(error);
@@ -172,6 +177,8 @@ const App: React.FC = () => {
     setGameState(prev => ({ ...prev, isLoading: true, error: null }));
     try {
         let apiCallCount = 1;
+        const { difficulty } = gameState;
+
         const nextSegment = await generateNextStorySegment(
             gameState.puppetMasterName,
             gameState.puppet,
@@ -187,8 +194,51 @@ const App: React.FC = () => {
             gameState.npcs,
             gameState.worldState,
             gameState.loreEntries,
-            gameState.factionRelations
+            gameState.factionRelations,
+            difficulty
         );
+
+        // APPLY DIFFICULTY MODIFIERS
+        if (nextSegment.enemy) {
+            const stats = nextSegment.enemy.stats;
+            switch(difficulty) {
+                case 'easy':
+                    stats.hp = Math.round(stats.hp * 0.8);
+                    stats.maxHp = Math.round(stats.maxHp * 0.8);
+                    stats.attack = Math.round(stats.attack * 0.8);
+                    stats.defense = Math.round(stats.defense * 0.9);
+                    break;
+                case 'hard':
+                    stats.hp = Math.round(stats.hp * 1.25);
+                    stats.maxHp = Math.round(stats.maxHp * 1.25);
+                    stats.attack = Math.round(stats.attack * 1.2);
+                    stats.defense = Math.round(stats.defense * 1.1);
+                    break;
+                case 'nightmare':
+                    stats.hp = Math.round(stats.hp * 1.5);
+                    stats.maxHp = Math.round(stats.maxHp * 1.5);
+                    stats.attack = Math.round(stats.attack * 1.4);
+                    stats.defense = Math.round(stats.defense * 1.2);
+                    break;
+            }
+            stats.hp = Math.max(1, stats.hp);
+            stats.maxHp = Math.max(1, stats.maxHp);
+            stats.attack = Math.max(1, stats.attack);
+        }
+
+        if (nextSegment.essenceGained) {
+            switch(difficulty) {
+                case 'easy':
+                    nextSegment.essenceGained = Math.round(nextSegment.essenceGained * 1.25);
+                    break;
+                case 'hard':
+                    nextSegment.essenceGained = Math.round(nextSegment.essenceGained * 0.75);
+                    break;
+                case 'nightmare':
+                    nextSegment.essenceGained = Math.round(nextSegment.essenceGained * 0.5);
+                    break;
+            }
+        }
 
         const newClues = [...gameState.clues];
         if (nextSegment.newClues) {
@@ -319,6 +369,8 @@ const App: React.FC = () => {
             loreEntries: newLoreEntries,
             loreSummaries: newLoreSummaries,
             factionRelations: newFactionRelations,
+            kimLenh: (prev.kimLenh || 0) + (nextSegment.kimLenhChange || 0),
+            dauAnDongThau: (prev.dauAnDongThau || 0) + (nextSegment.dauAnDongThauChange || 0),
             apiCalls: prev.apiCalls + apiCallCount,
         }));
     } catch (error) {
@@ -343,15 +395,35 @@ const handleCombatAction = async (action: string) => {
 
         if (result.isCombatOver) {
             if (result.outcome === 'win') {
-                const finalPuppetState = result.updatedPuppet;
-                if(result.essenceGainedOnWin) {
-                    finalPuppetState.mechanicalEssence += result.essenceGainedOnWin;
+                let essenceOnWin = result.essenceGainedOnWin || 0;
+                let dauAnOnWin = result.dauAnDongThauGainedOnWin || 0;
+
+                switch(gameState.difficulty) {
+                    case 'easy':
+                        essenceOnWin = Math.round(essenceOnWin * 1.25);
+                        dauAnOnWin = Math.round(dauAnOnWin * 1.25);
+                        break;
+                    case 'hard':
+                        essenceOnWin = Math.round(essenceOnWin * 0.75);
+                        dauAnOnWin = Math.round(dauAnOnWin * 0.75);
+                        break;
+                    case 'nightmare':
+                        essenceOnWin = Math.round(essenceOnWin * 0.5);
+                         dauAnOnWin = Math.round(dauAnOnWin * 0.5);
+                        break;
                 }
+
+                const finalPuppetState = result.updatedPuppet;
+                if(essenceOnWin) {
+                    finalPuppetState.mechanicalEssence += essenceOnWin;
+                }
+                
                 const victorySegment: StorySegment = {
                     scene: `Sau một trận chiến ác liệt, ${gameState.enemy.name} cuối cùng đã bị đánh bại. Bạn đã chiến thắng.`,
                     choices: ['Tiếp tục'],
                     updatedPuppet: finalPuppetState,
-                    essenceGained: result.essenceGainedOnWin || 0,
+                    essenceGained: essenceOnWin,
+                    dauAnDongThauChange: dauAnOnWin,
                 };
                 setGameState(prev => ({
                     ...prev,
@@ -364,6 +436,7 @@ const handleCombatAction = async (action: string) => {
                     isLoading: false,
                     shownExplanations: newShownExplanations,
                     companions: result.updatedCompanions || prev.companions,
+                    dauAnDongThau: (prev.dauAnDongThau || 0) + dauAnOnWin,
                     apiCalls: prev.apiCalls + 1,
                 }));
             } else { // loss
@@ -534,6 +607,9 @@ const restartGame = () => {
         loreSummaries: [],
         factionRelations: {},
         apiCalls: 0,
+        difficulty: 'normal',
+        kimLenh: 0,
+        dauAnDongThau: 0,
     });
 };
 
@@ -579,6 +655,8 @@ const renderContent = () => {
             onExitToMenu={handleExitToMenu}
             turnCount={turnCount}
             apiCalls={gameState.apiCalls}
+            kimLenh={gameState.kimLenh}
+            dauAnDongThau={gameState.dauAnDongThau}
             />;
       case GameStage.WORKSHOP:
           if (!gameState.puppet) {

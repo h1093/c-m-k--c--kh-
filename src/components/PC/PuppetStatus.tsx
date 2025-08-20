@@ -8,7 +8,7 @@ const InfoTooltip: React.FC<{ text: string }> = ({ text }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 cursor-pointer" viewBox="0 0 20 20" fill="currentColor">
       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
     </svg>
-    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-none py-2 px-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 border border-red-500/50">
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-900 text-white text-xs rounded-none py-2 px-3 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 border border-red-500/50 whitespace-pre-wrap">
       {text}
     </div>
   </div>
@@ -67,6 +67,8 @@ const Section: React.FC<{ title: string, children: React.ReactNode, titleColor?:
 const AttackIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
 const DefenseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>;
 const EssenceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-200" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.17c-1.56.38-1.56 2.6 0 2.98L8 11.75v5.08c.38 1.56 2.6 1.56 2.98 0L11.5 11.75h4.83c1.56-.38 1.56-2.6 0-2.98L11.5 8.25V3.17z" clipRule="evenodd" /></svg>;
+const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a3.242 3.242 0 01.378-.162.75.75 0 01.622 1.258l-1.12 2.238a.75.75 0 01-1.286-.644l.433-.866a1.745 1.745 0 00-.56-.252.75.75 0 01.12-.48z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.546l-.326-.42a.75.75 0 10-1.198.922l2.001 2.599a.75.75 0 001.147-.043l2-3a.75.75 0 10-1.15-1.076l-1.174 1.761V6.75z" clipRule="evenodd" /></svg>;
+const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a.75.75 0 01.688.45l1.823 3.645.11.22a.75.75 0 00.518.518l.22.11 3.645 1.823a.75.75 0 010 1.376l-3.645 1.823-.22.11a.75.75 0 00-.518.518l-.11.22-1.823 3.645a.75.75 0 01-1.376 0l-1.823-3.645-.11-.22a.75.75 0 00-.518-.518l-.22-.11-3.645-1.823a.75.75 0 010-1.376l3.645-1.823.22-.11a.75.75 0 00.518-.518l.11-.22L9.312 2.45A.75.75 0 0110 2z" clipRule="evenodd" /></svg>;
 
 type PuppetView = 'stats' | 'skills' | 'components' | 'mutations' | 'memories' | 'design' | 'inventory' | 'quests' | 'companions' | 'world' | 'lore' | 'journal' | 'factions' | 'codex';
 
@@ -107,9 +109,11 @@ interface PuppetStatusProps {
   loreSummaries: LoreSummary[];
   factionRelations: FactionRelations;
   apiCalls: number;
+  kimLenh: number;
+  dauAnDongThau: number;
 }
 
-const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, apiCalls }) => {
+const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, apiCalls, kimLenh, dauAnDongThau }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
   const hasWorldInfo = npcs.length > 0 || Object.keys(worldState).length > 0;
   const hasFactions = Object.keys(factionRelations).length > 0;
@@ -122,27 +126,44 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
     return 'bg-gray-700';
   }
 
+  const resonance = puppet.stats.resonance;
+  let resonanceState: { name: string; color: string; glow: string } | null = null;
+  if (resonance > 70) {
+    resonanceState = { name: 'CỘNG HƯỞNG', color: 'text-yellow-300', glow: 'animate-glow-yellow' };
+  } else if (resonance < 30) {
+    resonanceState = { name: 'BẤT HÒA', color: 'text-purple-400', glow: 'animate-glow-purple' };
+  }
+
+  const resonanceTooltip = `Trạng thái Cộng Hưởng ảnh hưởng trực tiếp đến chiến đấu.
+• CỘNG HƯỞNG (>70): +2 Tấn Công & +2 Phòng Thủ. Các hành động trở nên cực kỳ hiệu quả.
+• HÒA HỢP (30-70): Trạng thái cân bằng, không có thay đổi chỉ số.
+• BẤT HÒA (<30): -2 Tấn Công & -2 Phòng Thủ. Các hành động trở nên vụng về, do dự.`;
+
   const renderContent = () => {
     switch (activeView) {
         case 'stats':
             return (
                 <div className="space-y-4 animate-fade-in">
-                    <div className="ui-panel p-4">
-                        <h3 className="font-cinzel font-bold text-lg text-red-500 mb-3 border-b-2 border-red-500/20 pb-2">Trạng Thái Cốt Lõi</h3>
+                    <Section title="Trạng Thái Cốt Lõi">
                         <div className="space-y-3">
                             <StatBar value={puppet.stats.hp} maxValue={puppet.stats.maxHp} label="Độ Bền" color="bg-gradient-to-r from-red-600 to-red-500" glowColor="#f87171" />
                             <StatBar value={puppet.stats.aberrantEnergy} maxValue={puppet.stats.maxAberrantEnergy} label="Tà Năng" color="bg-gradient-to-r from-purple-600 to-purple-500" glowColor="#c084fc" tooltip="Năng lượng hỗn loạn chưa được tinh lọc. Nếu quá cao, nó có thể gây ra những đột biến không mong muốn và ảnh hưởng tiêu cực đến hoạt động của con rối." />
-                            <StatBar value={puppet.stats.resonance} maxValue={100} label="Cộng Hưởng" color="bg-gradient-to-r from-slate-500 to-slate-400" glowColor="#94a3b8" tooltip="Mức độ đồng điệu giữa hành động của bạn và 'Nhân Cách' của con rối. Cộng hưởng cao giúp tăng hiệu quả chiến đấu và mở khóa những khả năng tiềm ẩn." />
+                            <StatBar value={puppet.stats.resonance} maxValue={100} label="Cộng Hưởng" color="bg-gradient-to-r from-slate-500 to-slate-400" glowColor="#94a3b8" tooltip={resonanceTooltip} />
                         </div>
-                    </div>
-                     <div className="ui-panel p-4">
-                        <h3 className="font-cinzel font-bold text-lg text-red-500 mb-3 border-b-2 border-red-500/20 pb-2">Thuộc Tính Chiến Đấu</h3>
+                    </Section>
+                    <Section title="Thuộc Tính Chiến Đấu">
                        <div className="grid grid-cols-2 gap-3">
                             <StatDisplay label="Tấn Công" value={puppet.stats.attack} icon={<AttackIcon />} />
                             <StatDisplay label="Phòng Thủ" value={puppet.stats.defense} icon={<DefenseIcon />} />
-                            <StatDisplay label="Tinh Hoa Cơ Khí" value={puppet.mechanicalEssence} icon={<EssenceIcon />} className="col-span-2" valueClassName="text-gray-100" />
                        </div>
-                    </div>
+                    </Section>
+                     <Section title="Tài Sản" titleColor="text-yellow-400">
+                       <div className="space-y-3">
+                            <StatDisplay label="Kim Lệnh" value={kimLenh} icon={<KimLenhIcon />} valueClassName="text-yellow-300" />
+                            <StatDisplay label="Dấu Ấn Đồng Thau" value={dauAnDongThau} icon={<DauAnIcon />} valueClassName="text-amber-500" />
+                            <StatDisplay label="Tinh Hoa Cơ Khí" value={puppet.mechanicalEssence} icon={<EssenceIcon />} valueClassName="text-gray-100" />
+                       </div>
+                    </Section>
                 </div>
             );
         case 'skills':
@@ -376,6 +397,11 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
       <div className="text-center mb-4 flex-shrink-0">
         <h2 className="text-2xl font-cinzel text-red-400">{puppet.name}</h2>
         <p className="text-sm text-gray-400">{`Thứ Tự ${puppet.sequence}: ${puppet.sequenceName}`}</p>
+        {resonanceState && (
+            <p className={`mt-1 text-lg font-bold font-cinzel uppercase tracking-widest ${resonanceState.color} ${resonanceState.glow}`}>
+                [{resonanceState.name}]
+            </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-4 border-y border-red-500/20 py-2 flex-shrink-0">

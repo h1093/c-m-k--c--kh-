@@ -3,16 +3,16 @@ import { generateContentWithSchema } from './aiService';
 import { getInitialStoryPrompt, getNextStorySegmentPrompt } from './prompts/chroniclerPrompts';
 import { getLoreSummaryPrompt } from './prompts/archivistPrompts';
 import { storySegmentSchema, loreSummarySchema } from './schemas';
-import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations } from '../types';
+import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../types';
 
 
-export const generateInitialStory = async (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, customWorldPrompt: string | null): Promise<StorySegment> => {
-    const prompt = getInitialStoryPrompt(puppetMasterName, biography, mainQuest, startingScenario, customWorldPrompt);
+export const generateInitialStory = async (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, customWorldPrompt: string | null, difficulty: Difficulty): Promise<StorySegment> => {
+    const prompt = getInitialStoryPrompt(puppetMasterName, biography, mainQuest, startingScenario, customWorldPrompt, difficulty);
     return await generateContentWithSchema<StorySegment>(prompt, storySegmentSchema);
 };
 
-export const generateNextStorySegment = async (puppetMasterName: string, puppet: Puppet | null, history: StorySegment[], choice: string, knownClues: Clue[], mainQuest: string, sideQuests: Quest[], companions: Companion[], shownExplanations: ExplanationId[], startingScenario: StartingScenario, customWorldPrompt: string | null, npcs: NPC[], worldState: { [locationId: string]: string }, loreEntries: LoreEntry[], factionRelations: FactionRelations): Promise<StorySegment> => {
-    const prompt = getNextStorySegmentPrompt(puppetMasterName, puppet, history, choice, knownClues, mainQuest, sideQuests, companions, shownExplanations, startingScenario, customWorldPrompt, npcs, worldState, loreEntries, factionRelations);
+export const generateNextStorySegment = async (puppetMasterName: string, puppet: Puppet | null, history: StorySegment[], choice: string, knownClues: Clue[], mainQuest: string, sideQuests: Quest[], companions: Companion[], shownExplanations: ExplanationId[], startingScenario: StartingScenario, customWorldPrompt: string | null, npcs: NPC[], worldState: { [locationId: string]: string }, loreEntries: LoreEntry[], factionRelations: FactionRelations, difficulty: Difficulty): Promise<StorySegment> => {
+    const prompt = getNextStorySegmentPrompt(puppetMasterName, puppet, history, choice, knownClues, mainQuest, sideQuests, companions, shownExplanations, startingScenario, customWorldPrompt, npcs, worldState, loreEntries, factionRelations, difficulty);
     return await generateContentWithSchema<StorySegment>(prompt, storySegmentSchema);
 };
 
