@@ -135,7 +135,16 @@ export const useGameState = () => {
             const newShownExplanations = new Set(gameState.shownExplanations);
             if (nextSegment.explanation) { newShownExplanations.add(nextSegment.explanation.id); }
 
-            const newInventory = [...gameState.componentInventory, ...(nextSegment.newComponent ? [nextSegment.newComponent] : [])];
+            const newInventory = [...gameState.componentInventory];
+            if (nextSegment.newComponent) {
+                const componentId = nextSegment.newComponent.id;
+                const alreadyInInventory = newInventory.some(c => c.id === componentId);
+                const alreadyEquipped = gameState.puppet?.equippedComponents.some(c => c.id === componentId);
+
+                if (!alreadyInInventory && !alreadyEquipped) {
+                    newInventory.push(nextSegment.newComponent);
+                }
+            }
             
             const newSideQuests = [...gameState.sideQuests];
             if (nextSegment.newQuests) { nextSegment.newQuests.forEach(q => { if (!newSideQuests.find(sq => sq.id === q.id)) newSideQuests.push(q); }); }
