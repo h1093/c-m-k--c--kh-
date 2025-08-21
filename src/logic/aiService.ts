@@ -1,4 +1,5 @@
-import { GoogleGenAI, type Type } from "@google/genai";
+import { type Type } from "@google/genai";
+import { apiKeyManager } from './aiClient';
 
 // Local definition for the response schema type since it's not exported from @google/genai.
 type ResponseSchema = {
@@ -11,12 +12,6 @@ type ResponseSchema = {
     [key: string]: any;
 };
 
-if (!process.env.API_KEY) {
-    console.error("Biến môi trường API_KEY chưa được thiết lập. Ứng dụng sẽ không hoạt động chính xác.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-
 const modelConfig = {
     model: "gemini-2.5-flash",
     config: {
@@ -27,6 +22,11 @@ const modelConfig = {
 };
 
 export const generateContentWithSchema = async <T>(prompt: string, schema: ResponseSchema): Promise<T> => {
+    const ai = apiKeyManager.getClient();
+    if (!ai) {
+        throw new Error("Khóa API chưa được thiết lập. Vui lòng thiết lập khóa API để tiếp tục.");
+    }
+
     try {
         const response = await ai.models.generateContent({
             ...modelConfig,

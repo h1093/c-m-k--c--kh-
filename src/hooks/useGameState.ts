@@ -4,10 +4,14 @@ import { generateInitialStory, generateNextStorySegment, generateLoreSummary } f
 import { handleCombatTurn } from '../logic/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../logic/workshopService';
 import * as saveService from '../logic/saveService';
+import { apiKeyManager } from '../logic/aiClient';
 
+const getInitialStage = (): GameStage => {
+    return apiKeyManager.getApiKey() ? GameStage.START_SCREEN : GameStage.API_SETUP;
+};
 
 const initialState: GameState = {
-    stage: GameStage.START_SCREEN,
+    stage: getInitialStage(),
     puppetMasterName: '',
     puppetMasterBiography: '',
     mainQuest: '',
@@ -51,14 +55,14 @@ export const useGameState = () => {
     const handleCustomGameStart = (prompt: string) => {
         setGameState(prev => ({
             ...initialState,
+            stage: GameStage.CREATION, // Move to creation after world prompt
             customWorldPrompt: prompt,
-            stage: GameStage.CREATION,
         }));
     };
 
     const handleCharacterCreation = async (puppetMasterName: string, biography: string, mainQuest: string, scenario: StartingScenario, difficulty: Difficulty) => {
         setStartingScenario(scenario);
-        setGameState(prev => ({ ...initialState, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, stage: GameStage.PLAYING, customWorldPrompt: prev.customWorldPrompt, difficulty, apiCalls: prev.apiCalls + 1 }));
+        setGameState(prev => ({ ...initialState, stage: GameStage.PLAYING, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, customWorldPrompt: prev.customWorldPrompt, difficulty, apiCalls: prev.apiCalls + 1 }));
         try {
             const initialSegment = await generateInitialStory(puppetMasterName, biography, mainQuest, scenario, gameState.customWorldPrompt, difficulty);
 
@@ -324,7 +328,7 @@ export const useGameState = () => {
     };
 
     const handleExitToMenu = () => {
-        setGameState(prev => ({ ...initialState, customWorldPrompt: prev.customWorldPrompt }));
+        setGameState(prev => ({ ...initialState, stage: getInitialStage(), customWorldPrompt: prev.customWorldPrompt }));
     };
 
     return {

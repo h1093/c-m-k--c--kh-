@@ -186,6 +186,7 @@ export interface WorkshopData {
 export type StartingScenario = 'complete' | 'ritual' | 'chaos' | 'human';
 
 export enum GameStage {
+  API_SETUP,
   START_SCREEN,
   WORLD_CREATION,
   CREATION,

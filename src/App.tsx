@@ -8,6 +8,7 @@ import WorkshopUI from './components/Workshop/WorkshopUI';
 import StartScreen from './screens/StartScreen';
 import WorldCreation from './screens/WorldCreation';
 import AdventureScreen from './screens/AdventureScreen';
+import ApiKeySetup from './screens/ApiKeySetup';
 
 const App: React.FC = () => {
     const {
@@ -23,9 +24,15 @@ const App: React.FC = () => {
         }
     };
 
+    const handleKeyProvided = () => {
+        setGameState(prev => ({ ...prev, stage: GameStage.START_SCREEN }));
+    };
+
     const renderContent = () => {
         const turnCount = gameState.storyHistory.length;
         switch (gameState.stage) {
+            case GameStage.API_SETUP:
+                return <ApiKeySetup onKeyProvided={handleKeyProvided} />;
             case GameStage.START_SCREEN:
                 return <StartScreen onStart={() => setGameState(prev => ({ ...prev, stage: GameStage.CREATION, customWorldPrompt: null }))} onWorldCreation={() => setGameState(prev => ({ ...prev, stage: GameStage.WORLD_CREATION }))} onLoadGame={handleLoadGame} />;
             case GameStage.WORLD_CREATION:
