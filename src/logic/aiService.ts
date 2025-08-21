@@ -11,22 +11,11 @@ type ResponseSchema = {
     [key: string]: any;
 };
 
-let ai: GoogleGenAI | null = null;
+if (!process.env.API_KEY) {
+    console.error("Biến môi trường API_KEY chưa được thiết lập. Ứng dụng sẽ không hoạt động chính xác.");
+}
 
-export const initializeAI = (apiKey: string) => {
-    if (!apiKey) {
-        throw new Error("API Key không được cung cấp.");
-    }
-    ai = new GoogleGenAI({ apiKey });
-};
-
-export const getAI = (): GoogleGenAI => {
-    if (!ai) {
-        throw new Error("AI client chưa được khởi tạo. Vui lòng gọi initializeAI trước.");
-    }
-    return ai;
-};
-
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
 
 const modelConfig = {
     model: "gemini-2.5-flash",
@@ -39,7 +28,7 @@ const modelConfig = {
 
 export const generateContentWithSchema = async <T>(prompt: string, schema: ResponseSchema): Promise<T> => {
     try {
-        const response = await getAI().models.generateContent({
+        const response = await ai.models.generateContent({
             ...modelConfig,
             contents: prompt,
             config: {

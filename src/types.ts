@@ -1,3 +1,4 @@
+
 export interface PuppetAbility {
   name: string;
   description: string;
@@ -151,7 +152,7 @@ export interface StorySegment {
   
   // Dynamic World Features
   worldEvent?: string;
-  updatedWorldState?: { [key: string]: string }; // Gồm cả FactionInfluence và các trạng thái địa điểm khác
+  updatedWorldState?: { [key: string]: string };
   newOrUpdatedNPCs?: NPC[];
   newLoreEntries?: LoreEntry[]; // Tri thức động mới được khám phá
   updatedFactionRelations?: { [faction: string]: number }; // Các thay đổi về mối quan hệ của người chơi với phe phái
@@ -184,8 +185,6 @@ export interface WorkshopData {
 
 export type StartingScenario = 'complete' | 'ritual' | 'chaos' | 'human';
 
-export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
-
 export enum GameStage {
   START_SCREEN,
   WORLD_CREATION,
@@ -198,6 +197,8 @@ export enum GameStage {
 
 // Key là tên phe phái, value là điểm quan hệ từ -100 đến 100
 export type FactionRelations = { [faction: string]: number };
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
+
 
 export interface GameState {
   stage: GameStage;
@@ -229,6 +230,6 @@ export interface GameState {
   loreEntries: LoreEntry[];
   loreSummaries: LoreSummary[];
   factionRelations: FactionRelations; // Mối quan hệ của người chơi với các phe phái
-  apiCalls: number;
   difficulty: Difficulty;
+  apiCalls: number;
 }

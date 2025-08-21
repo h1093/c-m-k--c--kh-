@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { DEFAULT_QUESTS } from '../data/quests';
 import type { StartingScenario, Difficulty } from '../types';
+import { generateBiography } from '../logic/storyService';
 
 interface CharacterCreationProps {
   onStart: (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, difficulty: Difficulty) => void;
@@ -34,6 +35,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
   const [customQuest, setCustomQuest] = useState('');
   const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   
   const handleStart = () => {
     if (!masterName.trim()) {
@@ -63,6 +65,21 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
     setError('');
     onStart(masterName.trim(), biography, finalQuest, startingScenario, difficulty);
   };
+
+  const handleGenerateBio = async () => {
+    setIsGeneratingBio(true);
+    setError('');
+    try {
+        const result = await generateBiography(origin, incident, goal, startingScenario);
+        setOrigin(result.origin);
+        setIncident(result.incident);
+        setGoal(result.goal);
+    } catch (e) {
+        setError(e instanceof Error ? e.message : 'Không thể tạo tiểu sử. Vui lòng thử lại.');
+    } finally {
+        setIsGeneratingBio(false);
+    }
+};
   
   const isHumanScenario = startingScenario === 'human';
 
@@ -91,7 +108,33 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
 
         {/* Biography */}
         <div>
-          <h3 className="text-xl font-cinzel text-red-400 mb-3">Tiểu Sử Của Bạn</h3>
+          <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xl font-cinzel text-red-400">Tiểu Sử Của Bạn</h3>
+              <button 
+                  onClick={handleGenerateBio} 
+                  disabled={isGeneratingBio}
+                  className="ui-button text-xs py-1 px-3 bg-gray-700 border-gray-600 hover:bg-gray-600 disabled:opacity-50 flex items-center gap-2"
+                  title="Tạo ngẫu nhiên hoặc hoàn thành tiểu sử dựa trên thông tin đã nhập"
+                  aria-label="Tạo tiểu sử ngẫu nhiên"
+              >
+                  {isGeneratingBio ? (
+                      <>
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Đang tạo...
+                      </>
+                  ) : (
+                      <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          Ngẫu Nhiên
+                      </>
+                  )}
+              </button>
+          </div>
           <div className="space-y-3 bg-black/20 p-4 border-l-4 border-red-500/30">
             <div>
                 <label htmlFor="origin" className="block text-sm font-semibold text-gray-300 mb-1">Nguồn Gốc</label>

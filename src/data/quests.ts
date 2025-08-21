@@ -1,4 +1,3 @@
-
 export const DEFAULT_QUESTS = [
     {
         id: 'master-legacy',

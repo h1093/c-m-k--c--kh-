@@ -2,7 +2,8 @@
 import { generateContentWithSchema } from './aiService';
 import { getInitialStoryPrompt, getNextStorySegmentPrompt } from './prompts/chroniclerPrompts';
 import { getLoreSummaryPrompt } from './prompts/archivistPrompts';
-import { storySegmentSchema, loreSummarySchema } from './schemas';
+import { getBiographyGenerationPrompt } from './prompts/creatorPrompts';
+import { storySegmentSchema, loreSummarySchema, biographySchema } from './schemas';
 import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../types';
 
 
@@ -22,4 +23,14 @@ export const generateLoreSummary = async (history: StorySegment[]): Promise<stri
     const prompt = getLoreSummaryPrompt(segmentsToSummarize);
     const result = await generateContentWithSchema<{ summary: string }>(prompt, loreSummarySchema);
     return result.summary;
+};
+
+export const generateBiography = async (
+    origin: string,
+    incident: string,
+    goal: string,
+    startingScenario: StartingScenario
+): Promise<{ origin: string; incident: string; goal: string }> => {
+    const prompt = getBiographyGenerationPrompt(origin, incident, goal, startingScenario);
+    return await generateContentWithSchema<{ origin: string; incident: string; goal: string }>(prompt, biographySchema);
 };

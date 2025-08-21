@@ -47,9 +47,9 @@ interface PlayerStatusProps {
   loreEntries: LoreEntry[];
   loreSummaries: LoreSummary[];
   factionRelations: FactionRelations;
-  apiCalls: number;
   kimLenh: number;
   dauAnDongThau: number;
+  apiCalls: number;
 }
 
 const StatDisplay: React.FC<{ label: string; value: string | number; icon: React.ReactNode; className?: string; valueClassName?: string }> = ({ label, value, icon, className = '', valueClassName = '' }) => (
@@ -62,223 +62,82 @@ const StatDisplay: React.FC<{ label: string; value: string | number; icon: React
     </div>
 );
 
-const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a3.242 3.242 0 01.378-.162.75.75 0 01.622 1.258l-1.12 2.238a.75.75 0 01-1.286-.644l.433-.866a1.745 1.745 0 00-.56-.252.75.75 0 01.12-.48z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.546l-.326-.42a.75.75 0 10-1.198.922l2.001 2.599a.75.75 0 001.147-.043l2-3a.75.75 0 10-1.15-1.076l-1.174 1.761V6.75z" clipRule="evenodd" /></svg>;
-const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a.75.75 0 01.688.45l1.823 3.645.11.22a.75.75 0 00.518.518l.22.11 3.645 1.823a.75.75 0 010 1.376l-3.645 1.823-.22.11a.75.75 0 00-.518.518l-.11.22-1.823 3.645a.75.75 0 01-1.376 0l-1.823-3.645-.11-.22a.75.75 0 00-.518-.518l-.22-.11-3.645-1.823a.75.75 0 010-1.376l3.645-1.823.22-.11a.75.75 0 00.518-.518l.11-.22L9.312 2.45A.75.75 0 0110 2z" clipRule="evenodd" /></svg>;
+const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a.75.75 0 001.06 0l1.836-1.836a.75.75 0 011.06 1.06L11 7.127c.231.096.419.188.577.291a.75.75 0 010 1.164c-.158.103-.346.195-.577.291l2.252 2.252a.75.75 0 01-1.06 1.06l-1.836-1.836a.75.75 0 00-1.06 0l-1.836 1.836a.75.75 0 01-1.06-1.06l2.252-2.252c-.231-.096-.419-.188-.577-.291a.75.75 0 010-1.164z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM3 10a7 7 0 1114 0 7 7 0 01-14 0z" clipRule="evenodd" /></svg>;
+const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 10a1 1 0 00-1-1H2a1 1 0 000 2h1a1 1 0 001-1zm1 5a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm9-5a1 1 0 100 2h1a1 1 0 100-2h-1zM6 5a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm8 0a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm9 10a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM9 10a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, apiCalls, kimLenh, dauAnDongThau }) => {
-  const [activeView, setActiveView] = useState<PlayerView>('bio');
+const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau }) => {
+    const [activeView, setActiveView] = useState<PlayerView>('bio');
+    const hasWorldInfo = npcs.length > 0 || Object.keys(worldState).length > 0;
 
-  const bioParts = {
-    origin: 'Chưa rõ',
-    incident: 'Chưa rõ',
-    goal: 'Chưa rõ',
-  };
+    const renderContent = () => {
+        switch (activeView) {
+            case 'bio':
+                const bioParts = { origin: 'Chưa rõ', incident: 'Chưa rõ', goal: 'Chưa rõ' };
+                const originMatch = biography.match(/Nguồn gốc: (.*?)\. Biến cố:/);
+                const incidentMatch = biography.match(/Biến cố: (.*?)\. Mục tiêu:/);
+                const goalMatch = biography.match(/Mục tiêu: (.*)/);
+                if (originMatch) bioParts.origin = originMatch[1];
+                if (incidentMatch) bioParts.incident = incidentMatch[1];
+                if (goalMatch) bioParts.goal = goalMatch[1];
+                const hasStructuredBio = originMatch && incidentMatch && goalMatch;
 
-  const originMatch = biography.match(/Nguồn gốc: (.*?)\. Biến cố:/);
-  const incidentMatch = biography.match(/Biến cố: (.*?)\. Mục tiêu:/);
-  const goalMatch = biography.match(/Mục tiêu: (.*)/);
-
-  if (originMatch) bioParts.origin = originMatch[1];
-  if (incidentMatch) bioParts.incident = incidentMatch[1];
-  if (goalMatch) bioParts.goal = goalMatch[1];
-  
-  const hasStructuredBio = originMatch && incidentMatch && goalMatch;
-  const hasWorldInfo = npcs.length > 0 || Object.keys(worldState).length > 0;
-  const hasFactions = Object.keys(factionRelations).length > 0;
-
-  const getRelationColor = (score: number) => {
-    if (score > 50) return 'bg-green-600';
-    if (score > 10) return 'bg-green-800';
-    if (score < -50) return 'bg-red-600';
-    if (score < -10) return 'bg-red-800';
-    return 'bg-gray-700';
-  }
-
-  const renderContent = () => {
-    switch (activeView) {
-      case 'bio':
-        return (
-          <div className="animate-fade-in space-y-4">
-            <Section title="Tài Sản" titleColor="text-yellow-400">
-               <div className="grid grid-cols-2 gap-3">
-                    <StatDisplay label="Kim Lệnh" value={kimLenh} icon={<KimLenhIcon />} valueClassName="text-yellow-300" />
-                    <StatDisplay label="Dấu Ấn" value={dauAnDongThau} icon={<DauAnIcon />} valueClassName="text-amber-500" />
-               </div>
-            </Section>
-            <Section title="Tiểu Sử">
-              {hasStructuredBio ? (
-                 <div className="text-sm text-gray-300 bg-black/30 p-3 mt-2 space-y-2 border border-gray-700/50">
-                    <div>
-                        <span className="font-semibold text-gray-400">Nguồn gốc:</span>
-                        <p className="italic">{bioParts.origin}</p>
+                return (
+                    <div className="animate-fade-in space-y-4">
+                        <Section title="Tiểu Sử">
+                            {hasStructuredBio ? (
+                                <div className="text-sm text-gray-300 bg-black/30 p-3 mt-2 space-y-2 border border-gray-700/50">
+                                    <p><span className="font-semibold text-gray-400">Nguồn gốc:</span> <span className="italic">{bioParts.origin}</span></p>
+                                    <p><span className="font-semibold text-gray-400">{scenario === 'human' ? 'Chi Tiết Bất Thường:' : 'Biến cố khởi đầu:'}</span> <span className="italic">{bioParts.incident}</span></p>
+                                    <p><span className="font-semibold text-gray-400">Mục tiêu cá nhân:</span> <span className="italic">{bioParts.goal}</span></p>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-300 bg-black/30 p-3 mt-2 italic border border-gray-700/50">{biography}</p>
+                            )}
+                        </Section>
+                         <p className="text-center pt-4 text-gray-500 italic">Bạn vẫn chỉ là một con người. Sinh vật đầu tiên của bạn vẫn chưa được sinh ra từ máu và nỗi kinh hoàng. Con đường phía trước đầy rẫy những ám ảnh.</p>
                     </div>
-                     <div>
-                        <span className="font-semibold text-gray-400">
-                          {scenario === 'human' ? 'Chi Tiết Bất Thường:' : 'Biến cố khởi đầu:'}
-                        </span>
-                        <p className="italic">{bioParts.incident}</p>
-                    </div>
-                     <div>
-                        <span className="font-semibold text-gray-400">Mục tiêu cá nhân:</span>
-                        <p className="italic">{bioParts.goal}</p>
-                    </div>
-                 </div>
-              ) : (
-                 <p className="text-sm text-gray-300 bg-black/30 p-3 mt-2 italic border border-gray-700/50">{biography}</p>
-              )}
-            </Section>
-            <div className="text-center pt-4 mt-4">
-              <p className="text-gray-500 italic text-sm">Bạn vẫn chỉ là một con người. Sinh vật đầu tiên của bạn vẫn chưa được sinh ra từ máu và nỗi kinh hoàng. Con đường phía trước đầy rẫy những ám ảnh.</p>
+                );
+            case 'quests': return (<div className="animate-fade-in"><Section title="Nhật Ký Nhiệm Vụ">{sideQuests.map(q => <div key={q.id} className="text-sm bg-black/30 p-3 border-l-4 mb-2"><p className={`${q.status === 'active' ? 'text-red-300' : 'text-gray-500 line-through'}`}>{q.title}</p></div>)}</Section></div>);
+            case 'journal': return (<div className="animate-fade-in"><Section title="Nhật Ký Tóm Tắt">{loreSummaries.map(s => <div key={s.id} className="text-sm bg-black/30 p-3 border-l-4 mb-2"><p className="font-semibold">Lượt {s.turnNumber}:</p><p className="italic text-gray-400">{s.summary}</p></div>)}</Section></div>);
+            case 'companions': return (<div className="animate-fade-in"><Section title="Đồng Đội">{companions.map(c => <div key={c.id} className="bg-black/30 p-3 mb-2"><p className="font-semibold text-green-300">{c.name}</p><p className="text-xs italic text-gray-400">{c.description}</p></div>)}</Section></div>);
+            case 'factions': return (<div className="animate-fade-in"><Section title="Quan Hệ Phe Phái">{Object.entries(factionRelations).map(([factionName, score]) => <div key={factionName} className="flex justify-between items-center bg-black/30 p-2 mb-2"><p>{factionName}</p><p className={`${score > 20 ? 'text-green-400' : score < -20 ? 'text-red-400' : 'text-gray-300'}`}>{score}</p></div>)}</Section></div>);
+            case 'world': return (<div className="animate-fade-in"><Section title="Tình Hình Thế Giới">{npcs.map(n => <div key={n.id} className="bg-black/30 p-2 mb-2"><p className="font-semibold">{n.name} <span className="text-xs text-gray-500">({n.relationship})</span></p></div>)}</Section></div>);
+            case 'lore': return (<div className="animate-fade-in"><Section title="Tri Thức Đã Thu Thập">{loreEntries.map(l => <details key={l.id} className="bg-black/30 p-3 cursor-pointer mb-2"><summary className="font-semibold text-gray-200 list-none">{l.title}</summary><p className="italic mt-2 pt-2 border-t border-red-500/10 text-gray-400">{l.content}</p></details>)}</Section></div>);
+            case 'codex': return (<div className="animate-fade-in h-full"><CodexDisplay /></div>);
+            default: return null;
+        }
+    };
+
+    return (
+        <aside className="ui-panel p-4 h-full flex flex-col">
+            <div className="text-center mb-4 flex-shrink-0">
+                <h2 className="text-2xl font-cinzel text-red-400">{name}</h2>
+                <p className="text-sm text-gray-500">Một con người giữa thế giới méo mó</p>
             </div>
-          </div>
-        );
-      case 'quests':
-        return (
-          <Section title="Nhật Ký Nhiệm Vụ" className="animate-fade-in">
-               <div className="space-y-2">
-                  {sideQuests.map(quest => (
-                      <div key={quest.id} className={`text-sm bg-black/30 p-3 border-l-4 ${quest.status === 'active' ? 'border-red-500' : 'border-gray-600'}`}>
-                          <p className={`font-semibold ${quest.status === 'active' ? 'text-red-300' : 'text-gray-500 line-through'}`}>{quest.title}</p>
-                          {quest.status === 'active' && <p className="italic text-gray-400 text-xs mt-1">{quest.description}</p>}
-                      </div>
-                  ))}
-              </div>
-          </Section>
-        );
-      case 'journal':
-        return (
-            <Section title="Nhật Ký Tóm Tắt" titleColor="text-gray-300" className="animate-fade-in">
-                 <div className="space-y-3">
-                    {loreSummaries.map(entry => (
-                        <div key={entry.id} className="text-sm bg-black/30 p-3 border-l-4 border-gray-500">
-                            <p className="font-semibold text-gray-300">Tóm tắt đến lượt {entry.turnNumber}:</p>
-                            <p className="italic text-gray-400 mt-1">{entry.summary}</p>
-                        </div>
-                    ))}
-                </div>
-            </Section>
-        );
-      case 'companions':
-        return (
-          <Section title="Đồng Đội" className="animate-fade-in">
-               <div className="space-y-2">
-                  {companions.map(companion => (
-                      <div key={companion.id} className="text-sm bg-black/30 p-3 border border-gray-700/50">
-                          <p className="font-semibold text-gray-200">{companion.name}</p>
-                          <p className="italic text-gray-400 text-xs mt-1">{companion.description}</p>
-                           <div className="text-xs mt-2">HP: {companion.stats.hp} / {companion.stats.maxHp}</div>
-                      </div>
-                  ))}
-              </div>
-          </Section>
-        );
-      case 'factions':
-        return (
-           <Section title="Thế Lực" titleColor="text-gray-300" className="animate-fade-in">
-              <div className="space-y-2">
-                  {Object.entries(factionRelations).map(([faction, score]) => (
-                      <div key={faction} className="bg-black/30 p-3 border border-gray-700/50">
-                          <div className="flex justify-between items-center">
-                              <p className="font-semibold text-gray-200">{faction}</p>
-                              <p className="font-bold text-white">{score}</p>
-                          </div>
-                          <div className="w-full bg-black/50 h-2 mt-2 border border-gray-600">
-                              <div className="h-full relative flex items-center justify-center transition-all duration-500" style={{ background: getRelationColor(score)}}>
-                              </div>
-                          </div>
-                      </div>
-                  ))}
-              </div>
-          </Section>
-        );
-      case 'lore':
-        return (
-          <Section title="Tri Thức Đã Thu Thập" titleColor="text-gray-300" className="animate-fade-in">
-               <div className="space-y-2">
-                  {loreEntries.map(entry => (
-                      <details key={entry.id} className="text-sm bg-black/30 p-3 cursor-pointer transition-colors hover:bg-black/50 border-l-4 border-gray-500">
-                          <summary className="font-semibold list-none focus:outline-none text-gray-300">{entry.title}</summary>
-                          <p className="italic text-gray-400 mt-2 border-t border-red-500/20 pt-2">{entry.content}</p>
-                      </details>
-                  ))}
-              </div>
-          </Section>
-        );
-      case 'world':
-        return (
-           <Section title="Tình Hình Thế Giới" titleColor="text-gray-300" className="animate-fade-in">
-              {npcs.length > 0 && (
-                <div className="mb-3">
-                   <h4 className="font-semibold text-gray-400 mb-1">Nhân Vật Đã Gặp</h4>
-                   <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                      {npcs.map(npc => (
-                         <details key={npc.id} className="text-sm bg-black/30 p-2 border border-gray-700/50 cursor-pointer">
-                            <summary className="font-semibold text-gray-200 list-none focus:outline-none">{npc.name} <span className="text-xs text-gray-500">({npc.relationship}) - {npc.location}</span></summary>
-                            <div className="mt-2 pt-2 border-t border-red-500/20 space-y-1">
-                                <p className="italic text-gray-400 text-xs">{npc.description}</p>
-                                {npc.goal && <p className="text-xs text-purple-300"><span className="font-semibold">Mục tiêu:</span> {npc.goal}</p>}
-                                {npc.knowledge && npc.knowledge.length > 0 && (
-                                    <div className="text-xs text-gray-400">
-                                        <p className="font-semibold text-gray-300">Biết về bạn:</p>
-                                        <ul className="list-disc list-inside pl-2">
-                                            {npc.knowledge.map((fact, i) => <li key={i}>{fact}</li>)}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        </details>
-                      ))}
-                   </div>
-                </div>
-              )}
-               {Object.keys(worldState).length > 0 && (
-                 <div>
-                   <h4 className="font-semibold text-gray-400 mb-1">Trạng Thái Địa Điểm</h4>
-                   <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                      {Object.entries(worldState).map(([loc, status]) => (
-                         <div key={loc} className="text-sm bg-black/30 p-2 border border-gray-700/50">
-                            <p className="font-semibold text-gray-200 capitalize">{loc.replace(/-/g, ' ')}: <span className="text-red-300">{status}</span></p>
-                         </div>
-                      ))}
-                   </div>
-                </div>
-              )}
-           </Section>
-        );
-      case 'codex':
-          return <div className="h-full"><CodexDisplay /></div>;
-      default:
-        return null;
-    }
-  }
 
-  return (
-    <aside className="ui-panel p-4 h-full flex flex-col">
-      <div className="text-center mb-4 flex-shrink-0">
-        <h2 className="text-2xl font-cinzel text-red-400">{name}</h2>
-        <p className="text-sm text-gray-500">Một con người giữa thế giới méo mó</p>
-      </div>
+            <div className="mb-4 flex-shrink-0">
+                 <div className="grid grid-cols-2 gap-3">
+                    <StatDisplay label="Kim Lệnh" value={kimLenh} icon={<KimLenhIcon />} valueClassName="text-yellow-300"/>
+                    <StatDisplay label="Dấu Ấn" value={dauAnDongThau} icon={<DauAnIcon />} valueClassName="text-gray-300"/>
+                </div>
+            </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-4 border-y border-red-500/20 py-2 flex-shrink-0">
-          <NavButton label="Tiểu Sử" view="bio" activeView={activeView} setActiveView={setActiveView} />
-          <NavButton label="Nhiệm Vụ" view="quests" activeView={activeView} setActiveView={setActiveView} disabled={sideQuests.length === 0} />
-          <NavButton label="Nhật Ký" view="journal" activeView={activeView} setActiveView={setActiveView} disabled={loreSummaries.length === 0} />
-          <NavButton label="Thế Lực" view="factions" activeView={activeView} setActiveView={setActiveView} disabled={!hasFactions} />
-          <NavButton label="Đồng Đội" view="companions" activeView={activeView} setActiveView={setActiveView} disabled={companions.length === 0} />
-          <NavButton label="Thế Giới" view="world" activeView={activeView} setActiveView={setActiveView} disabled={!hasWorldInfo} />
-          <NavButton label="Tri Thức" view="lore" activeView={activeView} setActiveView={setActiveView} disabled={loreEntries.length === 0} />
-          <NavButton label="Sổ Tay" view="codex" activeView={activeView} setActiveView={setActiveView} />
-      </div>
-      
-      <div className="mt-2 flex-grow overflow-y-auto pr-2">
-        {renderContent()}
-      </div>
+            <div className="grid grid-cols-4 gap-1 mb-4 border-y border-red-500/20 py-2 flex-shrink-0">
+                <NavButton label="Tiểu Sử" view="bio" activeView={activeView} setActiveView={setActiveView} />
+                <NavButton label="Nhiệm Vụ" view="quests" activeView={activeView} setActiveView={setActiveView} disabled={sideQuests.length === 0} />
+                <NavButton label="Nhật Ký" view="journal" activeView={activeView} setActiveView={setActiveView} disabled={loreSummaries.length === 0} />
+                <NavButton label="Đồng Đội" view="companions" activeView={activeView} setActiveView={setActiveView} disabled={companions.length === 0} />
+                <NavButton label="Phe Phái" view="factions" activeView={activeView} setActiveView={setActiveView} disabled={Object.keys(factionRelations).length === 0} />
+                <NavButton label="Thế Giới" view="world" activeView={activeView} setActiveView={setActiveView} disabled={!hasWorldInfo} />
+                <NavButton label="Tri Thức" view="lore" activeView={activeView} setActiveView={setActiveView} disabled={loreEntries.length === 0} />
+                <NavButton label="Sổ Tay" view="codex" activeView={activeView} setActiveView={setActiveView} />
+            </div>
 
-      <div className="mt-auto pt-4 text-center text-xs text-gray-600 border-t border-red-500/10 flex-shrink-0">
-        <p>Lượt Tương Tác AI: {apiCalls}</p>
-      </div>
-    </aside>
-  );
+            <div className="mt-2 flex-grow overflow-y-auto pr-2">
+                {renderContent()}
+            </div>
+        </aside>
+    );
 };
 
 export default PlayerStatus;

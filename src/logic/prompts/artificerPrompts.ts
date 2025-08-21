@@ -1,4 +1,3 @@
-
 import type { Puppet, ExplanationId, Component } from '../../types';
 import { FACTION_PATHWAYS } from '../../data/gameConfig';
 

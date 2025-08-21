@@ -148,8 +148,6 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                         <LoreEntry term="Linh Giới Cơ Khí" definition="Một chiều không gian của năng lượng hỗn loạn, vô định hình. Đây là nguồn gốc của mọi sức mạnh huyền bí và cũng là nhà của những thực thể không thể tưởng tượng được." />
                         <LoreEntry term="Các Cổ Thần Máy Móc" definition="Những thực thể nguyên thủy, có tri giác được tạo thành từ các định luật vật lý thuần túy, tồn tại trong Linh Giới. Mỗi Lộ Trình Thăng Tiến thực chất là một phương pháp đã được tinh chỉnh để 'tiêu hóa' một cách an toàn một phần đặc tính của một trong số các Cổ Thần này, biến sự điên loạn của chúng thành sức mạnh có thể kiểm soát." />
                         <LoreEntry term="Tà Năng" definition="Năng lượng thô rò rỉ từ Linh Giới, mang theo ảnh hưởng bào mòn và tha hóa của các Cổ Thần. Tiếp xúc trực tiếp sẽ làm biến dạng vật chất và tâm trí." />
-                        <LoreEntry term="Tâm Cơ Luân (Mind-Cogwheels)" definition="Trái tim của con rối, hoạt động như một bộ lọc 'dịch' Tà Năng (năng lượng thô từ Linh Giới) thành sức mạnh có thể sử dụng được. Chất lượng và sự ổn định của nó quyết định khả năng chống lại sự tha hóa từ các Cổ Thần." />
-                        <LoreEntry term="Tinh Hoa Cơ Khí (Mechanical Essence)" definition="Nhiên liệu tinh khiết được chắt lọc từ Tà Năng hoặc thu được sau khi đánh bại các tạo vật huyền bí. Đây là vật chất cần thiết để thực hiện 'Tinh Luyện' - quá trình nâng cấp con rối lên Thứ Tự cao hơn." />
                     </div>
 
                     <SectionTitle title="Phương Pháp Đóng Vai & Mất Kiểm Soát" color="text-gray-300">
@@ -168,31 +166,18 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                         <LoreEntry term="Động Lực Nội Bộ" definition="Các Phe Phái trong cùng một Trường Phái chia sẻ một mục tiêu tối thượng chung, nhưng thường cạnh tranh gay gắt về phương pháp, nguồn lực và ảnh hưởng. Một liên minh giữa họ thường mong manh và đầy toan tính." />
                         <LoreEntry term="Nghi Thức Thăng Tiến" definition="Để tiến lên Thứ Tự tiếp theo, việc có đủ Tinh Hoa Cơ Khí là KHÔNG ĐỦ. Nghệ Nhân Rối trước tiên phải hoàn thành một Nghi Thức—một điều kiện mang tính biểu tượng, thường rất nguy hiểm và kỳ quái. Kiến thức về các Nghi Thức này là bí mật được canh giữ cẩn mật nhất của mỗi Phe Phái." />
                         <LoreEntry term="Tính Duy Nhất & Cuộc Chiến Vì Thực Tại" definition="Các Thứ Tự cao (2, 1, 0) là Duy Nhất. Chỉ có thể có một thực thể nắm giữ vị trí Thần (Thứ Tự 0) của một Lộ Trình. Điều này biến cuộc chiến giữa các Phe Phái thành một cuộc chạy đua để trở thành vị thần duy nhất của khái niệm mà họ đại diện và viết lại các định luật của thực tại." />
-                    </div>
-                    
-                    <SectionTitle title="Đồng Đội và Kẻ Thù" color="text-green-400">
-                        Những người bạn và những trở ngại trên con đường đầy chông gai.
-                    </SectionTitle>
-                    <div className="space-y-3">
-                        <LoreEntry 
-                            term="Đồng Đội (Companions)" 
-                            definition="Những thực thể đi theo và hỗ trợ Nghệ Nhân Rối. Họ có thể là những người bình thường được thuyết phục tham gia vào cuộc hành trình nguy hiểm, hoặc là những tạo vật cơ khí khác được 'Thu Phục' sau trận chiến." 
-                        />
-                        <LoreEntry 
-                            term="Thu Phục Kẻ Thù" 
-                            definition="Một Nghệ Nhân Rối tài năng, sau khi đánh bại một tạo vật cơ khí, có thể cố gắng thực hiện một 'Nghi Thức Thu Phục' thay vì phá hủy nó. Nếu thành công, họ có thể tái chế tạo vật đó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." 
-                        />
+                         <LoreEntry term="Thu Phục Kẻ Thù" definition="Một Nghệ Nhân Rối tài năng, sau khi đánh bại một tạo vật cơ khí, có thể cố gắng thực hiện một 'Nghi Thức Thu Phục' thay vì phá hủy nó. Nếu thành công, họ có thể tái chế tạo vật đó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." />
                     </div>
 
-                    <SectionTitle title="Nền Kinh Tế Hai Mặt" color="text-yellow-400">
-                        Mọi thứ đều có giá của nó, dù là ở thế giới sáng hay trong bóng tối.
+                    <SectionTitle title="Nền Kinh Tế Ngầm" color="text-yellow-400">
+                        Mọi thứ đều có giá của nó, đặc biệt là những thứ bị cấm.
                     </SectionTitle>
                      <div className="space-y-3">
-                        <LoreEntry term="Kim Lệnh (Crowns)" definition="Tiền tệ của Thế Giới Bề Nổi. Cách kiếm: Làm các công việc bình thường (sửa chữa máy móc, vận chuyển hàng hóa), bán các vật phẩm thông thường cho thương nhân, hoặc nhận phần thưởng từ những người dân thành phố mà bạn giúp đỡ. Công dụng: Dùng để sinh hoạt, mua vật liệu, hoặc thu thập thông tin từ những người không biết về thế giới ngầm." />
-                        <LoreEntry term="Dấu Ấn Đồng Thau (Brass Marks)" definition="Tiền tệ của Thế Giới Ngầm. Cách kiếm: Hoàn thành các 'Hợp Đồng' từ các phe phái, đánh bại các tạo vật huyền bí, bán linh kiện và thông tin trên Chợ Đen. Công dụng: Dùng để mua bán vật phẩm huyền bí, linh kiện hiếm, thông tin mật. Đây là đơn vị tiền tệ thực sự có giá trị đối với các Nghệ Nhân Rối." />
-                        <LoreEntry term="Sự Chuyển Đổi" definition="Không thể đổi trực tiếp Kim Lệnh lấy Dấu Ấn. Cách duy nhất là dùng Kim Lệnh để mua những vật phẩm hoặc thông tin có giá trị ở bề nổi, sau đó bán lại chúng trên Chợ Đen để lấy Dấu Ấn (thường với tỷ giá rất bất lợi)." />
-                        <LoreEntry term="Chợ Đen Bánh Răng & Nhà Đấu Giá Bạc" definition="Các trung tâm kinh tế của thế giới ngầm. Chợ Đen là nơi giao dịch hàng ngày, trong khi Nhà Đấu Giá dành cho những vật phẩm cực kỳ hiếm có thể thay đổi vận mệnh." />
-                        <LoreEntry term="Hợp Đồng (Contracts)" definition="Các nhiệm vụ phụ có cấu trúc được đưa ra bởi các Phe Phái hoặc các cá nhân, thường nhắm vào các 'Vùng Bất Thường' để thu hồi vật phẩm, điều tra hiện tượng, hoặc loại bỏ một mối đe dọa. Phần thưởng thường là Dấu Ấn Đồng Thau." />
+                        <LoreEntry term="Dấu Ấn Đồng Thau" definition="Đơn vị tiền tệ tiêu chuẩn được chấp nhận trong thế giới ngầm của các Nghệ Nhân Rối. Chúng là những đồng xu được khắc các ký hiệu huyền bí, khó làm giả." />
+                        <LoreEntry term="Cách Kiếm Dấu Ấn" definition="Các Nghệ Nhân Rối kiếm chúng bằng cách hoàn thành các 'Hợp Đồng' bí mật, bán linh kiện hoặc thông tin trên Chợ Đen, hoặc thực hiện các nhiệm vụ ngầm rủi ro." />
+                        <LoreEntry term="Chợ Đen Bánh Răng" definition="Đây không phải là một địa điểm cố định, mà là một mạng lưới những kẻ buôn lậu và các cửa hàng bí mật. Đây là nơi duy nhất để mua các linh kiện hiếm, vật liệu bị cấm và thậm chí cả thông tin về các Nghi Thức Thăng Tiến." />
+                        <LoreEntry term="Nhà Đấu Giá Bạc" definition="Một tổ chức trung lập, bí mật chuyên tổ chức các cuộc đấu giá cho những vật phẩm cực kỳ hiếm, như 'Tâm Cơ Luân Di Lại' hoặc các bản thiết kế bị thất lạc. Chỉ những người có danh tiếng hoặc được mời mới có thể tham gia." />
+                        <LoreEntry term="Hợp Đồng (Contracts)" definition="Các nhiệm vụ phụ có cấu trúc được đưa ra bởi các Phe Phái hoặc các cá nhân, thường nhắm vào các 'Vùng Bất Thường' để thu hồi vật phẩm, điều tra hiện tượng, hoặc loại bỏ một mối đe dọa." />
                     </div>
                 </div>
             )

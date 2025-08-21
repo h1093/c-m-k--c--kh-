@@ -18,17 +18,21 @@ export const saveGameState = (state: GameState): boolean => {
     }
 };
 
-export const loadGameState = (): GameState | null => {
+export const loadGameState = (initialState: GameState): GameState | null => {
     try {
         const stateJson = localStorage.getItem(SAVE_KEY);
         if (!stateJson) return null;
         
-        const loadedState = JSON.parse(stateJson);
+        const loadedData = JSON.parse(stateJson);
         
-        // Convert Array back to Set
-        loadedState.shownExplanations = new Set(loadedState.shownExplanations);
+        // Convert Array back to Set and merge with initial state
+        const mergedState: GameState = {
+            ...initialState,
+            ...loadedData,
+            shownExplanations: new Set(loadedData.shownExplanations || []),
+        };
 
-        return loadedState as GameState;
+        return mergedState;
     } catch (e) {
         console.error("Lỗi khi tải game:", e);
         localStorage.removeItem(SAVE_KEY); // Clear corrupted save

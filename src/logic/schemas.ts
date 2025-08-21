@@ -1,3 +1,4 @@
+
 import { Type } from "@google/genai";
 
 export const puppetAbilitySchema = {
@@ -105,6 +106,25 @@ export const loreSummarySchema = {
         }
     },
     required: ["summary"]
+};
+
+export const biographySchema = {
+    type: Type.OBJECT,
+    properties: {
+        origin: {
+            type: Type.STRING,
+            description: "Một câu mô tả nguồn gốc của nhân vật."
+        },
+        incident: {
+            type: Type.STRING,
+            description: "Một câu mô tả biến cố khởi đầu hoặc một chi tiết bất thường."
+        },
+        goal: {
+            type: Type.STRING,
+            description: "Một câu mô tả mục tiêu cá nhân của nhân vật."
+        },
+    },
+    required: ["origin", "incident", "goal"],
 };
 
 export const puppetSchema = {
@@ -248,7 +268,7 @@ export const storySegmentSchema = {
         worldEvent: { type: Type.STRING, description: "Một đoạn văn ngắn mô tả một sự kiện xảy ra trong thế giới khi người chơi không có mặt, để làm cho thế giới cảm thấy sống động. Ví dụ: tin đồn, thay đổi quyền lực của phe phái, v.v. Chỉ bao gồm không thường xuyên." },
         updatedWorldState: {
             type: Type.OBJECT,
-            description: "Một đối tượng chứa các thay đổi đối với trạng thái của thế giới. Key là ID địa điểm hoặc ID ảnh hưởng của phe phái (ví dụ: 'faction-influence-industrial-zone'), value là trạng thái mới. QUAN TRỌNG: Bỏ qua hoàn toàn trường này nếu không có thay đổi nào.",
+            description: "Một đối tượng chứa các thay đổi đối với trạng thái của thế giới. Key là ID địa điểm (kebab-case), value là trạng thái mới. Ví dụ: {'khu-cong-nghiep': 'bao-dong-cao'}. QUAN TRỌNG: Bỏ qua hoàn toàn trường này nếu không có thay đổi nào về trạng thái thế giới.",
             properties: {
                 placeholder: { 
                     type: Type.STRING,
@@ -257,7 +277,7 @@ export const storySegmentSchema = {
             },
             additionalProperties: { type: Type.STRING }
         },
-        newOrUpdatedNPCs: { type: Type.ARRAY, items: npcSchema, description: "Danh sách các NPC mới gặp hoặc có hồ sơ đã thay đổi (mối quan hệ, mục tiêu, kiến thức)." },
+        newOrUpdatedNPCs: { type: Type.ARRAY, items: npcSchema, description: "Danh sách các NPC mới gặp hoặc có mối quan hệ đã thay đổi." },
         newLoreEntries: { type: Type.ARRAY, items: loreEntrySchema, description: "Một danh sách các mục tri thức động mới mà người chơi đã khám phá ra. Chỉ tạo ra khi có một khám phá quan trọng, đáng ghi nhớ." },
         updatedFactionRelations: {
             type: Type.OBJECT,
