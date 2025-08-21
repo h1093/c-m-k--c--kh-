@@ -15,7 +15,8 @@ const App: React.FC = () => {
         gameState, setGameState, startingScenario, saveMessage,
         loadGameState, handleCustomGameStart, handleCharacterCreation,
         handleChoice, handleCombatAction, handleEnterWorkshop, handleUpgrade,
-        handleInstallComponent, handleExitWorkshop, restartGame, handleSaveGame, handleExitToMenu
+        handleInstallComponent, handleExitWorkshop, restartGame, handleSaveGame, handleExitToMenu,
+        handleRetry
     } = useGameState();
 
     const handleLoadGame = () => {
@@ -41,23 +42,24 @@ const App: React.FC = () => {
                 return <CharacterCreation onStart={handleCharacterCreation} />;
             case GameStage.PLAYING:
             case GameStage.GAME_OVER:
-                return <AdventureScreen gameState={gameState} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} />;
+                return <AdventureScreen gameState={gameState} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} onRetry={handleRetry} />;
             case GameStage.COMBAT:
                 if (!gameState.puppet || !gameState.enemy) {
-                    return <AdventureScreen gameState={{...gameState, error: "Lỗi chiến đấu: Dữ liệu không hợp lệ."}} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} />;
+                    return <AdventureScreen gameState={{...gameState, error: "Lỗi chiến đấu: Dữ liệu không hợp lệ."}} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} onRetry={handleRetry} />;
                 }
                 return <CombatUI
                     {...gameState}
                     onAction={handleCombatAction}
                     onSaveGame={handleSaveGame}
                     onExitToMenu={handleExitToMenu}
+                    onRetry={handleRetry}
                     turnCount={turnCount}
                     inventory={gameState.componentInventory}
                     masterName={gameState.puppetMasterName}
                 />;
             case GameStage.WORKSHOP:
                 if (!gameState.puppet) {
-                    return <AdventureScreen gameState={{...gameState, error: "Lỗi xưởng: Không tìm thấy con rối."}} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} />;
+                    return <AdventureScreen gameState={{...gameState, error: "Lỗi xưởng: Không tìm thấy con rối."}} startingScenario={startingScenario} onChoice={handleChoice} onEnterWorkshop={handleEnterWorkshop} onRestart={restartGame} onSaveGame={handleSaveGame} onExitToMenu={handleExitToMenu} turnCount={turnCount} apiCalls={gameState.apiCalls} onRetry={handleRetry} />;
                 }
                 return <WorkshopUI
                     puppet={gameState.puppet}
@@ -68,6 +70,7 @@ const App: React.FC = () => {
                     onUpgrade={handleUpgrade}
                     onInstall={handleInstallComponent}
                     onExit={handleExitWorkshop}
+                    onRetry={handleRetry}
                 />
             default:
                 return <p>Trạng thái không xác định</p>;

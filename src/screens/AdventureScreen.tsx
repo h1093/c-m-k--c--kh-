@@ -17,11 +17,12 @@ interface AdventureScreenProps {
     onRestart: () => void;
     onSaveGame: () => void;
     onExitToMenu: () => void;
+    onRetry: () => void;
     turnCount: number;
     apiCalls: number;
 }
 
-const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, turnCount, apiCalls }) => {
+const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, turnCount, apiCalls }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -86,7 +87,14 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     )}
                     <StoryDisplay segment={gameState.currentSegment} />
                     <ExplanationDisplay explanation={gameState.currentSegment?.explanation} />
-                    {gameState.error && <p className="text-red-400 mt-4 animate-pulse">Lỗi: {gameState.error}</p>}
+                    {gameState.error && (
+                        <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-center animate-fade-in">
+                             <p className="text-red-400 animate-pulse">Lỗi: {gameState.error}</p>
+                             <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
+                                 Thử Lại
+                             </button>
+                         </div>
+                    )}
                 </div>
 
                 <div className="p-4 sm:p-6 pt-0 flex-shrink-0 mt-auto">

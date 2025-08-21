@@ -44,6 +44,7 @@ export const useGameState = () => {
     const [gameState, setGameState] = useState<GameState>(initialState);
     const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
+    const [lastAction, setLastAction] = useState<{ type: string; payload: any } | null>(null);
 
      useEffect(() => {
         if (saveMessage) {
@@ -61,9 +62,11 @@ export const useGameState = () => {
     };
 
     const handleCharacterCreation = async (puppetMasterName: string, biography: string, mainQuest: string, scenario: StartingScenario, difficulty: Difficulty) => {
+        setLastAction({ type: 'characterCreation', payload: [puppetMasterName, biography, mainQuest, scenario, difficulty] });
         setStartingScenario(scenario);
-        setGameState(prev => ({ ...initialState, stage: GameStage.PLAYING, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, customWorldPrompt: prev.customWorldPrompt, difficulty, apiCalls: prev.apiCalls + 1 }));
+        setGameState(prev => ({ ...initialState, stage: GameStage.PLAYING, isLoading: true, puppetMasterName, puppetMasterBiography: biography, mainQuest, customWorldPrompt: prev.customWorldPrompt, difficulty }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const initialSegment = await generateInitialStory(puppetMasterName, biography, mainQuest, scenario, gameState.customWorldPrompt, difficulty);
 
             const newShownExplanations = new Set<ExplanationId>();
@@ -91,6 +94,7 @@ export const useGameState = () => {
                 dauAnDongThau: prev.dauAnDongThau + (initialSegment.dauAnDongThauChange || 0),
                 factionRelations: initialSegment.updatedFactionRelations ? { ...prev.factionRelations, ...initialSegment.updatedFactionRelations } : prev.factionRelations,
             }));
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -99,8 +103,10 @@ export const useGameState = () => {
 
     const handleChoice = useCallback(async (choice: string) => {
         if (!gameState.currentSegment) return;
-        setGameState(prev => ({ ...prev, isLoading: true, error: null, apiCalls: prev.apiCalls + 1 }));
+        setLastAction({ type: 'choice', payload: choice });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const nextSegment = await generateNextStorySegment(
                 gameState.puppetMasterName,
                 gameState.puppet,
@@ -200,6 +206,7 @@ export const useGameState = () => {
                 dauAnDongThau: prev.dauAnDongThau + (nextSegment.dauAnDongThauChange || 0),
                 factionRelations: newFactionRelations,
             }));
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -208,8 +215,10 @@ export const useGameState = () => {
 
     const handleCombatAction = async (action: string) => {
         if (!gameState.puppet || !gameState.enemy) return;
-        setGameState(prev => ({ ...prev, isLoading: true, error: null, apiCalls: prev.apiCalls + 1 }));
+        setLastAction({ type: 'combat', payload: action });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const result = await handleCombatTurn(gameState.puppet, gameState.enemy, gameState.companions, action, gameState.combatLog, Array.from(gameState.shownExplanations));
             const newLog = [...gameState.combatLog, result.combatLogEntry];
             if (result.isCombatOver) {
@@ -240,6 +249,7 @@ export const useGameState = () => {
             } else {
                 setGameState(prev => ({ ...prev, puppet: result.updatedPuppet, enemy: result.updatedEnemy, combatLog: newLog, isLoading: false, companions: result.updatedCompanions || prev.companions }));
             }
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -248,10 +258,13 @@ export const useGameState = () => {
 
     const handleEnterWorkshop = async () => {
         if (!gameState.puppet) return;
-        setGameState(prev => ({ ...prev, stage: GameStage.WORKSHOP, isLoading: true, error: null, apiCalls: prev.apiCalls + 1 }));
+        setLastAction({ type: 'enterWorkshop', payload: null });
+        setGameState(prev => ({ ...prev, stage: GameStage.WORKSHOP, isLoading: true, error: null }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const workshopData = await generateWorkshopOptions(gameState.puppet, Array.from(gameState.shownExplanations));
             setGameState(prev => ({ ...prev, workshopData, isLoading: false }));
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -265,8 +278,10 @@ export const useGameState = () => {
             setGameState(prev => ({ ...prev, error: "Không đủ Tinh Hoa Cơ Khí." }));
             return;
         }
-        setGameState(prev => ({ ...prev, isLoading: true, error: null, apiCalls: prev.apiCalls + 1 }));
+        setLastAction({ type: 'upgrade', payload: option });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             let updatedPuppet = { ...gameState.puppet, stats: { ...gameState.puppet.stats }, abilities: [...gameState.puppet.abilities] };
             updatedPuppet.mechanicalEssence -= upgradeCost;
             updatedPuppet.sequence -= 1;
@@ -279,6 +294,7 @@ export const useGameState = () => {
                 case 'purge': updatedPuppet.stats.aberrantEnergy = Math.max(0, updatedPuppet.stats.aberrantEnergy - 50); break;
             }
             setGameState(prev => ({ ...prev, puppet: updatedPuppet, stage: GameStage.PLAYING, workshopData: null, isLoading: false }));
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -287,12 +303,15 @@ export const useGameState = () => {
 
     const handleInstallComponent = async (component: Component) => {
         if (!gameState.puppet) return;
-        setGameState(prev => ({ ...prev, isLoading: true, error: null, apiCalls: prev.apiCalls + 1 }));
+        setLastAction({ type: 'installComponent', payload: component });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const { scene, updatedPuppet } = await installComponentOnPuppet(gameState.puppet, component);
             const newInventory = gameState.componentInventory.filter(c => c.id !== component.id);
             const installSegment: StorySegment = { scene, choices: ['Tiếp tục'], updatedPuppet };
             setGameState(prev => ({ ...prev, puppet: updatedPuppet, componentInventory: newInventory, stage: GameStage.PLAYING, workshopData: null, isLoading: false, currentSegment: installSegment, storyHistory: [...prev.storyHistory, installSegment] }));
+            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -331,6 +350,34 @@ export const useGameState = () => {
         setGameState(prev => ({ ...initialState, stage: getInitialStage(), customWorldPrompt: prev.customWorldPrompt }));
     };
 
+    const handleRetry = () => {
+        if (!lastAction) return;
+        setGameState(prev => ({ ...prev, error: null }));
+
+        switch (lastAction.type) {
+            case 'characterCreation':
+                handleCharacterCreation(...(lastAction.payload as [string, string, string, StartingScenario, Difficulty]));
+                break;
+            case 'choice':
+                handleChoice(lastAction.payload as string);
+                break;
+            case 'combat':
+                handleCombatAction(lastAction.payload as string);
+                break;
+            case 'enterWorkshop':
+                handleEnterWorkshop();
+                break;
+            case 'upgrade':
+                handleUpgrade(lastAction.payload as UpgradeOption);
+                break;
+            case 'installComponent':
+                handleInstallComponent(lastAction.payload as Component);
+                break;
+            default:
+                console.error('Unknown action type for retry:', lastAction.type);
+        }
+    };
+
     return {
         gameState,
         setGameState,
@@ -348,5 +395,6 @@ export const useGameState = () => {
         restartGame,
         handleSaveGame,
         handleExitToMenu,
+        handleRetry,
     };
 };

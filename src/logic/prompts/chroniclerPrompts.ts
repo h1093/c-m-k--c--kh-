@@ -1,4 +1,5 @@
 
+
 import { INITIAL_PUPPETS, FACTION_PATHWAYS } from '../../data/gameConfig';
 import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../../types';
 
@@ -27,31 +28,42 @@ const PATHWAY_LORE_PROMPT = formatPathwaysForPrompt();
 
 
 export const getInitialStoryPrompt = (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, customWorldPrompt: string | null, difficulty: Difficulty): string => {
-    const puppetExamples = JSON.stringify(INITIAL_PUPPETS.map(p => ({type: p.type, material: p.material})), null, 2);
-    
     let scenarioInstructions = '';
     let explanationContext = '';
+    let puppetCreationInstruction = `
+-   **Tạo Con Rối:** BẠN BẮT BUỘC PHẢI tạo một con rối mới và trả về nó trong trường 'updatedPuppet'.
+    -   Con rối phải phản ánh tiểu sử của người chơi.
+    -   Đặt \`phePhai\` = 'Không Phe Phái', \`loTrinh\` = 'Độc Lập', \`truongPhai\` = 'Trung Lập'.
+    -   Đặt Thứ Tự là 9, resonance là 50, mechanicalEssence là 0.
+    -   Các mảng (memoryFragments, mutations, equippedComponents) phải là mảng rỗng.
+    -   aberrantEnergy phải là 0.`;
+
     switch(startingScenario) {
         case 'human':
             scenarioInstructions = `
 -   **Mô Tả Phân Cảnh:** Bắt đầu bằng cách mô tả cuộc sống bình thường của ${puppetMasterName}. Sau đó, giới thiệu **"sự kiện khởi đầu"** đã được xây dựng từ 'chi tiết bất thường' trong tiểu sử.
--   **Yêu Cầu:** KHÔNG tạo con rối. Trường 'updatedPuppet' phải là null.
+-   **Yêu Cầu:** KHÔNG tạo con rối. Trường 'updatedPuppet' phải là null hoặc không được cung cấp.
 -   **Manh Mối & Lựa Chọn:** Sự kiện khởi đầu phải tạo ra manh mối đầu tiên liên quan đến nhiệm vụ chính. Cung cấp các lựa chọn để người chơi phản ứng với bí ẩn này.
             `;
             explanationContext = `Họ là người mới, hoàn toàn không biết gì về Huyền Học Cơ Khí. Giải thích nên ở dạng một khám phá (đọc nhật ký, một người khác giải thích cho họ).`;
             break;
         case 'ritual':
             scenarioInstructions = `
--   **Mô Tả Phân Cảnh:** Bối cảnh là ngay TRƯỚC KHI hoàn thành "Nghi Thức Chế Tác". Mô tả sự chuẩn bị, không khí căng thẳng.
+${puppetCreationInstruction}
+-   **Mô Tả Phân Cảnh:** Bối cảnh là ngay TRƯỚC KHI hoàn thành "Nghi Thức Chế Tác". Mô tả sự chuẩn bị, không khí căng thẳng. Con rối đã được tạo ra, nhưng chưa được kích hoạt.
 -   **Lựa Chọn Đầu Tiên:** Lựa chọn phải là về cách thực hiện bước cuối cùng để truyền sự sống vào con rối.
 -   **Manh Mối:** Phân cảnh BẮT BUỘC phải chứa manh mối đầu tiên liên quan đến **NHIỆM VỤ CHÍNH**.
             `;
             explanationContext = `Họ đã là một Nghệ Nhân Rối. Giải thích nên ở dạng một đoạn suy nghĩ nội tâm, một lời nhắc nhở về các nguyên tắc cơ bản.`;
             break;
         case 'chaos':
+            puppetCreationInstruction = puppetCreationInstruction.replace(
+                'aberrantEnergy phải là 0.',
+                'aberrantEnergy BẮT BUỘC phải trong khoảng từ 15 đến 25.'
+            );
             scenarioInstructions = `
+${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là GIỮA một "Nghi Thức Chế Tác" đang gặp sự cố. Mô tả sự hỗn loạn, năng lượng Tà Năng tăng vọt.
--   **Yêu Cầu Con Rối:** Con rối được tạo ra BẮT BUỘC phải có 'aberrantEnergy' từ 15 đến 25.
 -   **Lựa Chọn Đầu Tiên:** Lựa chọn phải là về cách xử lý khủng hoảng.
 -   **Manh Mối:** Phân cảnh BẮT BUỘC phải chứa manh mối đầu tiên liên quan đến **NHIỆM VỤ CHÍNH**.
             `;
@@ -60,6 +72,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
         case 'complete':
         default:
             scenarioInstructions = `
+${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là khoảnh khắc cuối cùng của "Nghi Thức Chế Tác". Không khí của phân cảnh nên liên quan trực tiếp đến **NHIỆM VỤ CHÍNH**.
 -   **Manh Mối:** Phân cảnh BẮT BUỘC phải chứa manh mối đầu tiên liên quan đến **NHIỆM VỤ CHÍNH**.
             `;
@@ -134,14 +147,8 @@ ${customWorldPrompt}
 
         1.  **Phân Tích Bối Cảnh:** Đọc kỹ tiểu sử, **NHIỆM VỤ CHÍNH** và **Độ Khó**.
         2.  **XỬ LÝ MÂU THUẪN LOGIC:** Nếu tiểu sử mâu thuẫn với nhiệm vụ, hãy biến nó thành một bí ẩn.
-        3.  **Sáng Tạo Con Rối (Trừ kịch bản 'human'):**
-            - Tạo một con rối mới phản ánh tiểu sử người chơi.
-            - **BẮT BUỘC:** Đặt \`phePhai\` = 'Không Phe Phái', \`loTrinh\` = 'Độc Lập', \`truongPhai\` = 'Trung Lập'.
-            - Đặt Thứ Tự là 9, resonance là 50, mechanicalEssence là 0.
-            - aberrantEnergy là 0 (trừ kịch bản 'chaos').
-            - Các mảng (memoryFragments, etc.) phải là mảng rỗng.
-            - Trả về con rối trong trường 'updatedPuppet'.
-        4.  **Viết Phân Cảnh Theo Kịch Bản:** Tuân thủ hướng dẫn kịch bản: ${scenarioInstructions}
+        3.  **Viết Phân Cảnh Theo Kịch Bản:** Tuân thủ các hướng dẫn sau đây một cách TUYỆT ĐỐI:
+            ${scenarioInstructions}
     `;
 }
 

@@ -12,9 +12,10 @@ interface WorkshopUIProps {
     onUpgrade: (option: UpgradeOption) => void;
     onInstall: (component: Component) => void;
     onExit: () => void;
+    onRetry: () => void;
 }
 
-const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory, isLoading, error, onUpgrade, onInstall, onExit }) => {
+const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory, isLoading, error, onUpgrade, onInstall, onExit, onRetry }) => {
     const upgradeCost = 100 * (10 - puppet.sequence);
 
     if (isLoading && !workshopData) {
@@ -30,6 +31,14 @@ const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory
         return (
            <div className="flex flex-col items-center justify-center h-full">
                <p className="text-gray-400">Lỗi: Không có dữ liệu xưởng.</p>
+               {error && (
+                   <div className="text-center mt-4 bg-red-900/50 p-3 animate-pulse">
+                        <p className="text-red-400">{error}</p>
+                        <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
+                            Thử Lại
+                        </button>
+                    </div>
+                )}
                <div className="mt-8 text-center border-t border-red-500/20 pt-6">
                    <button onClick={onExit} className="ui-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6">
                        Thoát
@@ -47,7 +56,14 @@ const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory
                     <p className="text-gray-400 mt-2">Nơi những cỗ máy được tái sinh. Tinh hoa cần thiết: <span className="font-bold text-white">{upgradeCost}</span>. Hiện có: <span className="font-bold text-white">{puppet.mechanicalEssence}</span></p>
                 </div>
 
-                {error && <p className="text-red-400 text-center mb-4 bg-red-900/50 p-3 animate-pulse">{error}</p>}
+                {error && (
+                    <div className="text-center mb-4 bg-red-900/50 p-3 animate-pulse">
+                        <p className="text-red-400">{error}</p>
+                        <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
+                            Thử Lại
+                        </button>
+                    </div>
+                )}
                 
                 <p className="text-center text-gray-300 italic mb-8">{workshopData.scene}</p>
                 

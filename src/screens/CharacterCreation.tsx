@@ -36,6 +36,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
   const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+  const [canRetryBio, setCanRetryBio] = useState(false);
   
   const handleStart = () => {
     if (!masterName.trim()) {
@@ -69,6 +70,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
   const handleGenerateBio = async () => {
     setIsGeneratingBio(true);
     setError('');
+    setCanRetryBio(false);
     try {
         const result = await generateBiography(origin, incident, goal, startingScenario);
         setOrigin(result.origin);
@@ -76,6 +78,7 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
         setGoal(result.goal);
     } catch (e) {
         setError(e instanceof Error ? e.message : 'Không thể tạo tiểu sử. Vui lòng thử lại.');
+        setCanRetryBio(true);
     } finally {
         setIsGeneratingBio(false);
     }
@@ -88,7 +91,16 @@ const CharacterCreation: React.FC<CharacterCreationProps> = ({ onStart }) => {
       <h2 className="text-4xl font-cinzel text-center text-red-600 mb-2">Tạo Nhân Vật</h2>
       <p className="text-center text-gray-400 mb-8">Hãy dệt nên sợi chỉ định mệnh của chính bạn.</p>
       
-      {error && <p className="text-red-400 text-center mb-6 bg-red-900/50 p-3 animate-pulse">{error}</p>}
+      {error && (
+          <div className="text-center mb-6 bg-red-900/50 p-3 animate-pulse">
+            <p className="text-red-400">{error}</p>
+            {canRetryBio && (
+                <button onClick={handleGenerateBio} className="ui-button text-sm py-1 px-3 mt-2">
+                    Thử Lại
+                </button>
+            )}
+          </div>
+      )}
       
       <div className="space-y-6">
 

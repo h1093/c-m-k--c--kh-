@@ -21,6 +21,8 @@ interface CombatUIProps {
     factionRelations: FactionRelations;
     onSaveGame: () => void;
     onExitToMenu: () => void;
+    onRetry: () => void;
+    error: string | null;
     turnCount: number;
     apiCalls: number;
     kimLenh: number;
@@ -125,7 +127,7 @@ const CombatLog: React.FC<{ log: string[] }> = ({ log }) => {
 };
 
 
-const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, turnCount, apiCalls, kimLenh, dauAnDongThau }) => {
+const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -174,6 +176,14 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
                     <CompanionCombatStatus companions={companions} />
                     <CombatLog log={combatLog} />
                     <ExplanationDisplay explanation={explanation} />
+                    {error && (
+                        <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-center animate-fade-in">
+                             <p className="text-red-400 animate-pulse">Lỗi: {error}</p>
+                             <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
+                                 Thử Lại
+                             </button>
+                         </div>
+                    )}
                 </div>
                 <div className="mt-auto pt-4 flex-shrink-0">
                     {isLoading 
