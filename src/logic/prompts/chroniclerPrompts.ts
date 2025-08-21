@@ -81,7 +81,7 @@ ${puppetCreationInstruction}
     }
     
     const defaultLore = `
-**LORE CỐ ĐỊNH (TUÂN THỦ TUYỆT ĐỐI - ĐÂY LÀ CÁC ĐỊNH LUẬT VẬT LÝ CỦA THẾ GIỚI):**
+**LORE CỐ ĐỊnh (TUÂN THỦ TUYỆT ĐỐI - ĐÂY LÀ CÁC ĐỊNH LUẬT VẬT LÝ CỦA THẾ GIỚI):**
 
 **I. Bối Cảnh Xã Hội: Thế Giới Hai Mặt**
 *   **Thế Giới Bề Nổi:** Vận hành bằng hơi nước và logic. Tiền tệ là **Kim Lệnh**. Những câu chuyện về "con rối có linh hồn" chỉ là lời đồn.
@@ -202,6 +202,7 @@ ${customWorldPrompt}
         3.  **Hiển Thị, Đừng Chỉ Kể:** Khi chỉ số thay đổi, hãy mô tả nó trong câu chuyện.
         4.  **Tạo Ra Thế Giới Sống Động:** Sử dụng và cập nhật trạng thái thế giới (\`updatedWorldState\`, \`worldEvent\`).
         5.  **Tương Tác NPC Sâu Sắc:** Phản ứng của NPC phải dựa trên hồ sơ của họ. Cập nhật hồ sơ của họ trong \`newOrUpdatedNPCs\`.
+            - **QUAN TRỌNG:** Khi cập nhật NPC, hãy tập trung vào các thay đổi hữu hình như \`relationship\`, \`location\`, \`goal\`, và \`knowledge\`. Một AI chuyên biệt sẽ xử lý trạng thái tâm lý nội tâm (\`trangThai\`, \`tuongTacCuoi\`) của họ sau đó, vì vậy bạn không cần cung cấp các trường đó.
         6.  **SỬ DỤNG HỆ THỐNG KINH TẾ & PHE PHÁI (QUAN TRỌNG):**
             *   **Tạo Lựa Chọn có Ý nghĩa:** Các lựa chọn nên có hậu quả rõ ràng. Thay vì "Đi tiếp", hãy tạo ra "Hối lộ lính gác (-10 Kim Lệnh)" hoặc "Đe dọa họ (Ảnh hưởng quan hệ với Viện Giám Sát)".
             *   **Phần Thưởng Hợp Lý:** Thưởng \`kimLenhChange\` cho các hoạt động thông thường. Thưởng \`dauAnDongThauChange\` cho các nhiệm vụ nguy hiểm, bí mật, hoặc phi pháp.

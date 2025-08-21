@@ -87,6 +87,21 @@ export const npcSchema = {
     required: ["id", "name", "description", "relationship", "location"]
 };
 
+export const npcMindSchema = {
+    type: Type.OBJECT,
+    properties: {
+        trangThai: { 
+            type: Type.STRING, 
+            description: "Trạng thái hoặc vai trò hiện tại của NPC trong phân cảnh này. Ví dụ: 'Đang hoài nghi', 'Bị đe dọa', 'Thân thiện một cách thận trọng'." 
+        },
+        updatedTuongTacCuoi: { 
+            type: Type.STRING, 
+            description: "Một bản tóm tắt MỚI cho tương tác cuối cùng NẾU tương tác hiện tại đủ quan trọng để ghi nhớ (thay đổi mối quan hệ, mục tiêu, hoặc tiết lộ bí mật lớn). Nếu không, hãy trả về một chuỗi rỗng." 
+        }
+    },
+    required: ["trangThai", "updatedTuongTacCuoi"]
+};
+
 export const loreEntrySchema = {
     type: Type.OBJECT,
     properties: {
@@ -277,7 +292,7 @@ export const storySegmentSchema = {
             },
             additionalProperties: { type: Type.STRING }
         },
-        newOrUpdatedNPCs: { type: Type.ARRAY, items: npcSchema, description: "Danh sách các NPC mới gặp hoặc có mối quan hệ đã thay đổi." },
+        newOrUpdatedNPCs: { type: Type.ARRAY, items: npcSchema, description: "Danh sách các NPC mới gặp hoặc có mối quan hệ đã thay đổi. QUAN TRỌNG: Chỉ bao gồm các thuộc tính đã thay đổi cộng với id và name." },
         newLoreEntries: { type: Type.ARRAY, items: loreEntrySchema, description: "Một danh sách các mục tri thức động mới mà người chơi đã khám phá ra. Chỉ tạo ra khi có một khám phá quan trọng, đáng ghi nhớ." },
         updatedFactionRelations: {
             type: Type.OBJECT,

@@ -1,6 +1,7 @@
+
 import { useState, useCallback, useEffect } from 'react';
-import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty } from '../types';
-import { generateInitialStory, generateNextStorySegment, generateLoreSummary } from '../logic/storyService';
+import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC } from '../types';
+import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate } from '../logic/storyService';
 import { handleCombatTurn } from '../logic/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../logic/workshopService';
 import * as saveService from '../logic/saveService';
@@ -87,7 +88,7 @@ export const useGameState = () => {
                 shownExplanations: newShownExplanations,
                 sideQuests: initialSegment.newQuests || [],
                 companions: initialSegment.newCompanion ? [initialSegment.newCompanion] : [],
-                npcs: initialSegment.newOrUpdatedNPCs || [],
+                npcs: (initialSegment.newOrUpdatedNPCs as NPC[]) || [],
                 worldState: initialSegment.updatedWorldState || {},
                 loreEntries: initialSegment.newLoreEntries || [],
                 kimLenh: prev.kimLenh + (initialSegment.kimLenhChange || 0),
@@ -154,13 +155,37 @@ export const useGameState = () => {
 
             const newWorldState = { ...gameState.worldState, ...nextSegment.updatedWorldState };
             
-            const newNPCs = [...gameState.npcs];
-            if (nextSegment.newOrUpdatedNPCs) {
-                nextSegment.newOrUpdatedNPCs.forEach(updNPC => {
-                    const idx = newNPCs.findIndex(n => n.id === updNPC.id);
-                    if (idx > -1) newNPCs[idx] = updNPC; else newNPCs.push(updNPC);
+            const currentNPCs = [...gameState.npcs];
+            const updatedNPCsFromStory = nextSegment.newOrUpdatedNPCs || [];
+
+            if (updatedNPCsFromStory.length > 0) {
+                const mindUpdatePromises = updatedNPCsFromStory.map(partialNpc => {
+                    const existingNpc = currentNPCs.find(n => n.id === partialNpc.id);
+                    const mergedForContext = { ...existingNpc, ...partialNpc } as NPC;
+                    
+                    setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+                    return generateNpcMindUpdate(mergedForContext, nextSegment.scene, choice);
+                });
+                
+                const mindUpdates = await Promise.all(mindUpdatePromises);
+                
+                updatedNPCsFromStory.forEach((partialNpc, index) => {
+                    const mindUpdate = mindUpdates[index];
+                    partialNpc.trangThai = mindUpdate.trangThai;
+                    if (mindUpdate.updatedTuongTacCuoi) {
+                        partialNpc.tuongTacCuoi = mindUpdate.updatedTuongTacCuoi;
+                    }
                 });
             }
+
+            updatedNPCsFromStory.forEach(updNPC => {
+                const idx = currentNPCs.findIndex(n => n.id === updNPC.id);
+                if (idx > -1) {
+                    currentNPCs[idx] = { ...currentNPCs[idx], ...updNPC };
+                } else {
+                    currentNPCs.push(updNPC as NPC);
+                }
+            });
             
             const newLoreEntries = [...gameState.loreEntries];
             if (nextSegment.newLoreEntries) {
@@ -199,7 +224,7 @@ export const useGameState = () => {
                 sideQuests: newSideQuests,
                 companions: newCompanions,
                 worldState: newWorldState,
-                npcs: newNPCs,
+                npcs: currentNPCs,
                 loreEntries: newLoreEntries,
                 loreSummaries: newLoreSummaries,
                 kimLenh: prev.kimLenh + (nextSegment.kimLenhChange || 0),

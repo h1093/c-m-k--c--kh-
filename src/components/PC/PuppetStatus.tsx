@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations } from '../../types';
 import CodexDisplay from '../UI/CodexDisplay';
@@ -52,10 +53,10 @@ const Section: React.FC<{ title: string, children: React.ReactNode, titleColor?:
 const AttackIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>;
 const DefenseIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>;
 const EssenceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-200" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0L8 8.25H3.17c-1.56.38-1.56 2.6 0 2.98L8 11.75v5.08c.38 1.56 2.6 1.56 2.98 0L11.5 11.75h4.83c1.56-.38 1.56-2.6 0-2.98L11.5 8.25V3.17z" clipRule="evenodd" /></svg>;
-const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a.75.75 0 001.06 0l1.836-1.836a.75.75 0 011.06 1.06L11 7.127c.231.096.419.188.577.291a.75.75 0 010 1.164c-.158.103-.346.195-.577.291l2.252 2.252a.75.75 0 01-1.06 1.06l-1.836-1.836a.75.75 0 00-1.06 0l-1.836 1.836a.75.75 0 01-1.06-1.06l2.252-2.252c-.231-.096-.419-.188-.577-.291a.75.75 0 010-1.164z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM3 10a7 7 0 1114 0 7 7 0 01-14 0z" clipRule="evenodd" /></svg>;
+const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a.75.75 0 001.06 0l1.836-1.836a.75.75 0 011.06 1.06L11 7.127c.231.096.419.188.577.291a.75.75 0 010 1.164c-.158.103-.346-.195-.577-.291l2.252 2.252a.75.75 0 01-1.06 1.06l-1.836-1.836a.75.75 0 00-1.06 0l-1.836 1.836a.75.75 0 01-1.06-1.06l2.252-2.252c-.231-.096-.419-.188-.577-.291a.75.75 0 010-1.164z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM3 10a7 7 0 1114 0 7 7 0 01-14 0z" clipRule="evenodd" /></svg>;
 const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 10a1 1 0 00-1-1H2a1 1 0 000 2h1a1 1 0 001-1zm1 5a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm9-5a1 1 0 100 2h1a1 1 0 100-2h-1zM6 5a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm8 0a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm9 10a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM9 10a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-type PuppetView = 'stats' | 'skills' | 'components' | 'mutations' | 'memories' | 'design' | 'inventory' | 'quests' | 'companions' | 'world' | 'lore' | 'journal' | 'factions' | 'codex';
+type PuppetView = 'stats' | 'skills' | 'components' | 'mutations' | 'memories' | 'design' | 'inventory' | 'quests' | 'companions' | 'npcs' | 'lore' | 'journal' | 'factions' | 'codex';
 
 interface NavButtonProps { label: string; view: PuppetView; activeView: PuppetView; setActiveView: (view: PuppetView) => void; disabled?: boolean; }
 const NavButton: React.FC<NavButtonProps> = ({ label, view, activeView, setActiveView, disabled = false }) => (
@@ -70,6 +71,15 @@ const NavButton: React.FC<NavButtonProps> = ({ label, view, activeView, setActiv
     </button>
 );
 
+const getRelationshipColor = (relationship: 'ally' | 'friendly' | 'neutral' | 'hostile') => {
+    switch (relationship) {
+        case 'ally': return 'text-green-400 font-bold';
+        case 'friendly': return 'text-cyan-400';
+        case 'hostile': return 'text-red-400 font-bold';
+        case 'neutral':
+        default: return 'text-gray-400';
+    }
+};
 
 interface PuppetStatusProps {
   puppet: Puppet;
@@ -89,7 +99,6 @@ interface PuppetStatusProps {
 
 const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
-  const hasWorldInfo = npcs.length > 0 || Object.keys(worldState).length > 0;
 
   const renderContent = () => {
     switch (activeView) {
@@ -117,7 +126,45 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
         case 'journal': return (<div className="animate-fade-in"><Section title="Nhật Ký Tóm Tắt">{loreSummaries.map(s => <div key={s.id} className="text-sm bg-black/30 p-3 border-l-4 mb-2"><p className="font-semibold">Lượt {s.turnNumber}:</p><p className="italic text-gray-400">{s.summary}</p></div>)}</Section></div>);
         case 'companions': return (<div className="animate-fade-in"><Section title="Đồng Đội">{companions.map(c => <div key={c.id} className="bg-black/30 p-3 mb-2"><p className="font-semibold text-green-300">{c.name}</p><p className="text-xs italic text-gray-400">{c.description}</p></div>)}</Section></div>);
         case 'factions': return (<div className="animate-fade-in"><Section title="Quan Hệ Phe Phái">{Object.entries(factionRelations).map(([name, score]) => <div key={name} className="flex justify-between items-center bg-black/30 p-2 mb-2"><p>{name}</p><p className={`${score > 20 ? 'text-green-400' : score < -20 ? 'text-red-400' : ''}`}>{score}</p></div>)}</Section></div>);
-        case 'world': return (<div className="animate-fade-in"><Section title="Tình Hình Thế Giới">{npcs.map(n => <div key={n.id} className="bg-black/30 p-2 mb-2"><p className="font-semibold">{n.name} <span className="text-xs text-gray-500">({n.relationship})</span></p></div>)}</Section></div>);
+        case 'npcs': 
+            return (
+                <div className="animate-fade-in">
+                    <Section title="Hồ Sơ Nhân Vật">
+                        {npcs.length > 0 ? (
+                            <div className="space-y-3">
+                                {npcs.map(npc => (
+                                    <details key={npc.id} className="bg-black/30 p-3 ui-panel border border-gray-700/50 transition-all duration-300 open:bg-gray-900/50 open:border-red-500/20">
+                                        <summary className="font-semibold text-gray-200 list-none cursor-pointer flex justify-between items-center">
+                                            <span>
+                                                {npc.name} 
+                                                <span className={`text-xs ml-2 capitalize ${getRelationshipColor(npc.relationship)}`}>({npc.relationship})</span>
+                                            </span>
+                                            <span className="text-xs text-gray-500 italic">{npc.location}</span>
+                                        </summary>
+                                        <div className="mt-3 pt-3 border-t border-red-500/10 text-sm text-gray-400 space-y-2">
+                                            <p className="italic">{npc.description}</p>
+                                            {npc.faction && <p><span className="font-semibold text-gray-300">Phe phái:</span> {npc.faction}</p>}
+                                            {npc.goal && <p><span className="font-semibold text-gray-300">Mục tiêu:</span> {npc.goal}</p>}
+                                            {npc.trangThai && <p><span className="font-semibold text-gray-300">Trạng thái:</span> {npc.trangThai}</p>}
+                                            {npc.tuongTacCuoi && <p><span className="font-semibold text-gray-300">Tương tác cuối:</span> {npc.tuongTacCuoi}</p>}
+                                            {npc.knowledge && npc.knowledge.length > 0 && (
+                                                <div>
+                                                    <p className="font-semibold text-gray-300">Những điều đã biết về bạn:</p>
+                                                    <ul className="list-disc list-inside pl-2 mt-1 space-y-1">
+                                                        {npc.knowledge.map((fact, index) => <li key={index}>{fact}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </details>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="italic text-gray-500 text-center">Chưa gặp gỡ ai đáng chú ý.</p>
+                        )}
+                    </Section>
+                </div>
+            );
         case 'lore': return (<div className="animate-fade-in"><Section title="Tri Thức Đã Thu Thập">{loreEntries.map(l => <details key={l.id} className="bg-black/30 p-3 cursor-pointer mb-2"><summary className="font-semibold text-gray-200 list-none">{l.title}</summary><p className="italic mt-2 pt-2 border-t border-red-500/10 text-gray-400">{l.content}</p></details>)}</Section></div>);
         case 'components': return (<div className="animate-fade-in"><Section title="Linh Kiện Đã Lắp">{puppet.equippedComponents.length > 0 ? puppet.equippedComponents.map(c => <div key={c.id} className="bg-red-900/20 p-3 mb-2"><p className="font-semibold text-red-300">{c.name}</p></div>) : <p className="italic text-gray-500 text-center">Trống.</p>}</Section></div>);
         case 'mutations': return (<div className="animate-fade-in"><Section title="Đột Biến Tà Năng">{puppet.mutations.length > 0 ? puppet.mutations.map(m => <div key={m.id} className="bg-purple-900/30 p-3 mb-2"><p className="font-semibold text-purple-300">{m.name}</p></div>) : <p className="italic text-gray-500 text-center">Chưa có.</p>}</Section></div>);
@@ -152,7 +199,7 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
         <NavButton label="Nhật Ký" view="journal" activeView={activeView} setActiveView={setActiveView} disabled={loreSummaries.length === 0} />
         <NavButton label="Đồng Đội" view="companions" activeView={activeView} setActiveView={setActiveView} disabled={companions.length === 0} />
         <NavButton label="Phe Phái" view="factions" activeView={activeView} setActiveView={setActiveView} disabled={Object.keys(factionRelations).length === 0} />
-        <NavButton label="Thế Giới" view="world" activeView={activeView} setActiveView={setActiveView} disabled={!hasWorldInfo} />
+        <NavButton label="Hồ Sơ" view="npcs" activeView={activeView} setActiveView={setActiveView} disabled={npcs.length === 0} />
         <NavButton label="Tri Thức" view="lore" activeView={activeView} setActiveView={setActiveView} disabled={loreEntries.length === 0} />
         <NavButton label="Ký Ức" view="memories" activeView={activeView} setActiveView={setActiveView} disabled={puppet.memoryFragments.length === 0} />
         <NavButton label="Đột Biến" view="mutations" activeView={activeView} setActiveView={setActiveView} disabled={puppet.mutations.length === 0} />

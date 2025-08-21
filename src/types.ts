@@ -60,6 +60,10 @@ export interface NPC {
   faction?: string; // Tên phe phái mà NPC này thuộc về, ví dụ: "Giáo Hội Đồng Hồ"
   goal?: string; // Their current short-term goal or state of mind.
   knowledge?: string[]; // A list of facts the NPC knows or believes about the player.
+
+  // New properties for detailed profiling
+  trangThai?: string; // "Status": What the NPC is currently doing, their role in the current scene.
+  tuongTacCuoi?: string; // "Last Interaction": A summary of the last significant story-altering interaction.
 }
 
 
@@ -153,7 +157,7 @@ export interface StorySegment {
   // Dynamic World Features
   worldEvent?: string;
   updatedWorldState?: { [key: string]: string };
-  newOrUpdatedNPCs?: NPC[];
+  newOrUpdatedNPCs?: Partial<NPC>[];
   newLoreEntries?: LoreEntry[]; // Tri thức động mới được khám phá
   updatedFactionRelations?: { [faction: string]: number }; // Các thay đổi về mối quan hệ của người chơi với phe phái
 }
