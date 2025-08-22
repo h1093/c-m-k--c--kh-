@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from 'react';
 import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item } from '../../types';
 import CodexDisplay from '../UI/CodexDisplay';
@@ -86,6 +83,8 @@ const getRelationshipColor = (relationship: 'ally' | 'friendly' | 'neutral' | 'h
 interface PuppetStatusProps {
   puppet: Puppet;
   masterName: string;
+  psyche: number;
+  maxPsyche: number;
   componentInventory: Component[];
   itemInventory: Item[];
   sideQuests: Quest[];
@@ -101,7 +100,7 @@ interface PuppetStatusProps {
   onUseItem: (itemId: string) => void;
 }
 
-const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem }) => {
+const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
 
   const renderContent = () => {
@@ -116,6 +115,16 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
                             <StatBar value={puppet.stats.aberrantEnergy} maxValue={puppet.stats.maxAberrantEnergy} label="Tà Năng" color="bg-gradient-to-r from-purple-600 to-purple-500" glowColor="#c084fc" tooltip="Năng lượng hỗn loạn. Nếu quá cao, nó có thể gây ra đột biến không mong muốn." />
                             <StatBar value={puppet.stats.resonance} maxValue={100} label="Cộng Hưởng" color="bg-gradient-to-r from-slate-500 to-slate-400" glowColor="#94a3b8" tooltip="Mức độ đồng điệu với 'Nhân Cách'. Cộng hưởng cao giúp tăng hiệu quả chiến đấu." />
                         </div>
+                    </Section>
+                    <Section title="Trạng Thái Nghệ Nhân" titleColor="text-sky-400">
+                        <StatBar 
+                            value={psyche} 
+                            maxValue={maxPsyche} 
+                            label="Lý Trí" 
+                            color="bg-gradient-to-r from-sky-500 to-sky-400" 
+                            glowColor="#38bdf8" 
+                            tooltip="Sự ổn định tinh thần của bạn. Nếu xuống quá thấp, thực tại có thể bắt đầu rạn nứt." 
+                        />
                     </Section>
                      <Section title="Thuộc Tính Chiến Đấu">
                        <div className="grid grid-cols-2 gap-3">

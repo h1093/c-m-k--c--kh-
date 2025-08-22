@@ -1,7 +1,5 @@
-
-
 import React, { useState } from 'react';
-import { FACTION_PATHWAYS, INITIAL_PUPPETS } from '../../data/gameConfig';
+import { FACTION_PATHWAYS } from '../../data/gameConfig';
 
 const SectionTitle: React.FC<{ title: string; children?: React.ReactNode; color?: string }> = ({ title, children, color = "text-red-500" }) => (
     <div className="mt-6 mb-3 border-b-2 border-red-500/20 pb-2">
@@ -10,10 +8,10 @@ const SectionTitle: React.FC<{ title: string; children?: React.ReactNode; color?
     </div>
 );
 
-const LoreEntry: React.FC<{ term: string; definition: string; className?: string }> = ({ term, definition, className = "" }) => (
+const LoreEntry: React.FC<{ term: string; definition: React.ReactNode; className?: string }> = ({ term, definition, className = "" }) => (
     <div className={`bg-black/30 p-3 border-l-4 border-gray-700 ${className}`}>
         <p className="font-semibold text-red-300">{term}</p>
-        <p className="text-sm text-gray-400 mt-1">{definition}</p>
+        <div className="text-sm text-gray-400 mt-1">{definition}</div>
     </div>
 );
 
@@ -21,15 +19,34 @@ interface PathwayCardProps {
     pathway: typeof FACTION_PATHWAYS[0];
 }
 
-const PathwayCard: React.FC<PathwayCardProps> = ({ pathway }) => (
-    <div className="bg-black/30 p-4 border border-gray-700/50 flex flex-col h-full">
-        <h5 className="font-bold text-lg font-cinzel text-gray-200">{pathway.faction}</h5>
-        <div className="bg-red-900/30 p-2 my-2 border-t border-b border-red-500/20">
-            <p className="text-sm text-red-300"><span className="font-semibold uppercase tracking-wider">Lộ Trình:</span> {pathway.name}</p>
+const PathwayCard: React.FC<PathwayCardProps> = ({ pathway }) => {
+    let riskDescription = '';
+    switch(pathway.school) {
+        case 'Trật Tự':
+            riskDescription = 'Trở nên cứng nhắc, hoang tưởng, ám ảnh với việc kiểm soát, coi mọi sự ngẫu nhiên là một mối đe dọa cần phải loại bỏ.';
+            break;
+        case 'Hỗn Mang':
+            riskDescription = 'Đánh mất ranh giới giữa bản thân và sự hỗn loạn, cơ thể và tâm trí bị biến đổi một cách ghê tởm, hành động theo những thôi thúc không thể hiểu nổi.';
+            break;
+
+        case 'Trung Lập':
+            riskDescription = 'Trở nên vô cảm và thực dụng đến tàn nhẫn, coi mọi mối quan hệ và lý tưởng chỉ là công cụ để đạt được mục đích.';
+            break;
+    }
+
+    return (
+        <div className="bg-black/30 p-4 border border-gray-700/50 flex flex-col h-full">
+            <h5 className="font-bold text-lg font-cinzel text-gray-200">{pathway.faction}</h5>
+            <div className="bg-red-900/30 p-2 my-2 border-t border-b border-red-500/20">
+                <p className="text-sm text-red-300"><span className="font-semibold uppercase tracking-wider">Lộ Trình:</span> {pathway.name}</p>
+            </div>
+            <p className="text-xs text-gray-400 italic mb-3 flex-grow">{pathway.description}</p>
+            <div className="bg-purple-900/20 p-2 mt-auto border border-purple-500/30">
+                <p className="text-xs text-purple-300"><span className="font-semibold">Rủi Ro Tha Hóa:</span> {riskDescription}</p>
+            </div>
         </div>
-        <p className="text-xs text-gray-400 italic mb-3 flex-grow">{pathway.description}</p>
-    </div>
-);
+    );
+};
 
 type LoreView = 'core' | 'independent' | 'order' | 'neutral' | 'chaos';
 
@@ -57,12 +74,12 @@ const CodexDisplay: React.FC = () => {
                     </SectionTitle>
                     <div className="space-y-3">
                         <LoreEntry 
-                            term="Bản Chất" 
-                            definition="Không phải một con đường có sẵn, mà là hành động tạo ra một Lộ Trình hoàn toàn mới từ sự hỗn loạn của Linh Giới. Nhân Cách của con rối chính là bản thiết kế mà người chơi đang tự viết nên." 
+                            term="Bản Chất Của Sự Tự Do" 
+                            definition="Đây không phải là một con đường có sẵn, mà là hành động cực kỳ nguy hiểm của việc tạo ra một Lộ Trình hoàn toàn mới từ sự hỗn loạn của Linh Giới, cố gắng thiết lập một kết nối mới với một Cổ Thần chưa được biết đến. Nhân Cách của con rối chính là bản thiết kế mà người chơi đang tự viết nên." 
                         />
                          <LoreEntry 
-                            term="Rủi Ro" 
-                            definition="Mang lại sự tự do tuyệt đối nhưng nguy cơ Mất Kiểm Soát cực kỳ cao và phải tự mình khám phá ra các Nghi Thức Thăng Tiến." 
+                            term="Cái Giá Của Sự Sáng Tạo" 
+                            definition="Con đường này mang lại sự tự do tuyệt đối để tạo ra những sức mạnh độc nhất, nhưng cái giá phải trả là nguy cơ Mất Kiểm Soát cực kỳ cao và việc phải tự mình khám phá ra các Nghi Thức Thăng Tiến gần như là không thể. Mỗi bước đi là một canh bạc với sự tỉnh táo." 
                         />
                     </div>
                 </div>
@@ -70,7 +87,11 @@ const CodexDisplay: React.FC = () => {
         case 'order':
         case 'neutral':
         case 'chaos':
-            const schoolMap = { order: 'Trật Tự', neutral: 'Trung Lập', chaos: 'Hỗn Mang' };
+            const schoolMap = {
+                order: 'Trật Tự',
+                neutral: 'Trung Lập',
+                chaos: 'Hỗn Mang'
+            };
             const pathways = FACTION_PATHWAYS.filter(p => p.school === schoolMap[activeView]);
             return (
                 <div className="animate-fade-in">
@@ -84,17 +105,108 @@ const CodexDisplay: React.FC = () => {
         default:
             return (
                 <div className="animate-fade-in">
-                    <SectionTitle title="Định Luật Cốt Lõi">
-                       Các quy tắc bất biến của vũ trụ.
+                    <SectionTitle title="Bối Cảnh Xã Hội: Thế Giới Hai Mặt">
+                        Thế giới có hai bộ mặt: một cho những người bình thường, và một cho những kẻ bước đi trong bóng tối.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Thế Giới Bề Nổi" definition="Đối với đại đa số dân chúng, thế giới vận hành bằng hơi nước và logic sắt thép. Những câu chuyện về 'con rối có linh hồn' chỉ là lời đồn mê tín." />
+                        <LoreEntry term="Thế Giới Ngầm và 'Bức Màn' (The Veil)" definition="Trong bóng tối, một xã hội bí mật của các Nghệ Nhân Rối tồn tại, được che giấu bởi 'Bức Màn' - một thỏa thuận ngầm giữa các Phe Phái để ngăn chặn sự thật bị bại lộ. Hành động quá lộ liễu ở nơi công cộng sẽ thu hút sự chú ý của các thế lực nguy hiểm." />
+                        <LoreEntry term="Vùng Bất Thường (Anomalous Zones)" definition="Những nơi mà ranh giới giữa thế giới vật chất và Linh Giới mỏng manh một cách bất thường. Đây là những địa điểm cực kỳ nguy hiểm, thường là mục tiêu của các 'Hợp Đồng' do sự tập trung cao của Tà Năng và các hiện tượng siêu nhiên." />
+                    </div>
+
+                    <SectionTitle title="Nguồn Gốc Sức Mạnh & Mối Đe Dọa Vũ Trụ">
+                        Mọi sức mạnh đều có một cái giá, và thực tại của chúng ta chỉ là một hòn đảo nhỏ trong một đại dương hỗn loạn.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Linh Giới Cơ Khí" definition="Một chiều không gian của năng lượng hỗn loạn, vô định hình. Đây là nguồn gốc của mọi sức mạnh huyền bí và cũng là nhà của những thực thể không thể tưởng tượng được (Các Cổ Thần Máy Móc)." />
+                        <LoreEntry term="Tà Năng (Aberrant Energy)" definition="Năng lượng thô rò rỉ từ Linh Giới, mang theo ảnh hưởng bào mòn và tha hóa của các Cổ Thần. Tiếp xúc trực tiếp sẽ làm biến dạng vật chất và tâm trí." />
+                        <LoreEntry term="Tâm Cơ Luân (Mind-Cogwheels)" definition="Trái tim của một con rối. Một thiết bị huyền bí có khả năng 'dịch' Tà Năng hỗn loạn từ Linh Giới thành sức mạnh có thể điều khiển được." />
+                        <LoreEntry term="Tinh Hoa Cơ Khí (Mechanical Essence)" definition="Sản phẩm phụ tinh khiết được tạo ra trong quá trình 'dịch' Tà Năng. Đây là nhiên liệu cần thiết để thực hiện 'Tinh Luyện' - quá trình nâng cấp và thăng tiến Thứ Tự của con rối." />
+                    </div>
+
+                    <SectionTitle title="Phương Pháp Đóng Vai & Mất Kiểm Soát" color="text-gray-300">
+                        "Khi bạn nhìn chằm chằm vào vực thẳm cơ khí, vực thẳm cơ khí cũng nhìn chằm chằm vào bạn." - Một Nghệ Nhân Rối đã mất kiểm soát.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Phương Pháp Đóng Vai (Nhân Cách)" definition="Định luật quan trọng nhất. Mỗi Thứ Tự trong một Lộ Trình có một bản chất cốt lõi. 'Đóng vai' là hành động và suy nghĩ theo đúng bản chất đó. Đây là cách duy nhất để 'tiêu hóa' sức mạnh một cách an toàn." />
+                        <LoreEntry term="Cộng Hưởng (Resonance)" definition="Thước đo mức độ 'tiêu hóa' sức mạnh. Hành động phù hợp với Nhân Cách sẽ tăng Cộng Hưởng. Hành động mâu thuẫn sẽ làm giảm nó, là dấu hiệu cho thấy Tâm Cơ Luân đang bị hư hỏng." />
+                        <LoreEntry term="Mất Kiểm Soát" definition="Hậu quả của việc không 'tiêu hóa' được sức mạnh. Khi hành động đi ngược lại Nhân Cách, nó làm hỏng tính toàn vẹn của Tâm Cơ Luân, cho phép ảnh hưởng trực tiếp của Cổ Thần bảo trợ Lộ Trình đó tràn vào, gây ra các hiệu ứng tâm lý như ảo giác, hoang tưởng, và nghe thấy những tiếng thì thầm máy móc." />
+                    </div>
+                    
+                     <SectionTitle title="Cái Giá Của Sự Liên Kết" color="text-yellow-400">
+                        Liên kết giữa bạn và con rối là một cây cầu hai chiều.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Phản Hồi Đồng Cảm (Sympathetic Feedback)" definition="Khi con rối chịu sát thương đáng kể, một dư chấn của sự hủy diệt đó sẽ dội ngược lại và tấn công vào tâm trí bạn dưới dạng một cú sốc tinh thần, có thể tạm thời làm lung lay ý chí và giảm Cộng Hưởng." />
+                        <LoreEntry term="Rò Rỉ Tà Năng (Aberrant Energy Leak)" definition="Những đòn đánh cực mạnh có thể tạo ra những vết nứt tạm thời trong Tâm Cơ Luân. Qua đó, Tà Năng thô sẽ rò rỉ ngược lại và xâm nhập vào nhận thức của bạn, gây ra những ảo giác ngắn và làm tăng Tà Năng của con rối." />
+                    </div>
+
+                    <SectionTitle title="Định Luật Sinh Tồn: Lý Trí và Năng Lượng" color="text-yellow-400">
+                        Cái giá của việc điều khiển rối không chỉ là sự hao mòn của máy móc.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Lý Trí (Psyche)" definition="Đại diện cho sự ổn định tinh thần của chính bạn, Nghệ Nhân Rối. Chứng kiến các sự kiện kinh hoàng, thất bại trong việc 'đóng vai' hoặc bị ảnh hưởng bởi Tà Năng sẽ làm giảm Lý Trí. Lý Trí thấp sẽ gây ra ảo giác, hoang tưởng và có thể thay đổi các lựa chọn của bạn." />
+                        <LoreEntry term="Năng Lượng Vận Hành" definition="Nhiên liệu cho Tâm Cơ Luân, nó sẽ giảm dần theo thời gian và khi sử dụng kỹ năng. Năng lượng thấp làm con rối hoạt động kém hiệu quả, chậm chạp và có thể không tuân theo các mệnh lệnh phức tạp." />
+                    </div>
+
+                    <SectionTitle title="Lộ Trình Thăng Tiến & Cuộc Chiến Vì Thực Tại">
+                        Mỗi Lộ Trình là một con đường dẫn đến thần좌, và mỗi bước đi đều có thể là bước cuối cùng.
                     </SectionTitle>
                      <div className="space-y-3">
-                        <LoreEntry term="'Bức Màn' (The Veil)" definition="Một xã hội bí mật của các Nghệ Nhân Rối, được che giấu bởi một thỏa thuận ngầm. Hành động lộ liễu sẽ thu hút sự chú ý không mong muốn." />
-                        <LoreEntry term="Linh Giới & Cổ Thần" definition="Một chiều không gian hỗn loạn, nguồn gốc của sức mạnh huyền bí và là nhà của các Cổ Thần Máy Móc điên loạn." />
-                        <LoreEntry term="Phương Pháp Đóng Vai (Nhân Cách)" definition="Cách duy nhất để 'tiêu hóa' sức mạnh một cách an toàn là hành động và suy nghĩ theo đúng bản chất (Nhân Cách) của Lộ Trình." />
-                        <LoreEntry term="Cộng Hưởng & Mất Kiểm Soát" definition="Hành động phù hợp tăng Cộng Hưởng. Hành động mâu thuẫn làm hỏng Tâm Cơ Luân, cho phép ảnh hưởng của Cổ Thần tràn vào, dẫn đến Mất Kiểm Soát." />
-                        <LoreEntry term="Lý Trí & Năng Lượng" definition="Bạn phải quản lý sự ổn định tinh thần (Lý Trí) của chính mình và nhiên liệu (Năng Lượng Vận Hành) của con rối. Cả hai đều có hậu quả nghiêm trọng khi xuống thấp." />
-                        <LoreEntry term="Phản Hồi Đồng Cảm & Rò Rỉ Tà Năng" definition="Liên kết của bạn là hai chiều. Sát thương lên con rối có thể gây sốc tinh thần cho bạn và làm rò rỉ Tà Năng, gây ra ảo giác." />
-                        <LoreEntry term="Kim Lệnh vs. Dấu Ấn" definition="Kim Lệnh cho thế giới thông thường. Dấu Ấn Đồng Thau cho thế giới ngầm. Không bao giờ nhầm lẫn." />
+                        <LoreEntry term="Thứ Tự (Sequence)" definition="Con đường tiến hóa của một con rối được chia thành các cấp bậc từ 9 (thấp nhất) đến 0 (Thần). Mỗi bước thăng tiến mở ra sức mạnh mới." />
+                        <LoreEntry term="Nguyên Liệu Thăng Tiến" definition="Để thăng tiến lên các Thứ Tự cao hơn, ngoài Tinh Hoa Cơ Khí, bạn cần phải tìm kiếm các Linh Kiện Huyền Bí đặc biệt. Mỗi Lộ Trình sẽ yêu cầu những nguyên liệu khác nhau, chỉ có thể tìm thấy bằng cách khám phá thế giới, đánh bại kẻ thù hùng mạnh, hoặc hoàn thành các Hợp Đồng nguy hiểm. Điều này khiến mỗi bước thăng tiến là một thành tựu đáng giá." />
+                        <LoreEntry term="Mục Tiêu Tối Thượng" definition="Cuộc chiến giữa các Phe Phái là để chiếm lấy vị trí Thứ Tự 0 và viết lại vĩnh viễn các định luật của thực tại theo ý muốn của họ." />
+                        <LoreEntry term="Nghi Thức Thăng Tiến" definition="Để tiến lên Thứ Tự tiếp theo, Nghệ Nhân Rối phải hoàn thành một Nghi Thức—một điều kiện mang tính biểu tượng, thường rất nguy hiểm. Kiến thức về các Nghi Thức này là bí mật được canh giữ cẩn mật nhất của mỗi Phe Phái." />
+                        <LoreEntry term="Thu Phục Kẻ Thù" definition="Một Nghệ Nhân Rối tài năng có thể thực hiện 'Nghi Thức Thu Phục' sau khi đánh bại một tạo vật cơ khí, tái chế nó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." />
+                    </div>
+
+                    <SectionTitle title="Nền Kinh Tế Hai Mặt" color="text-yellow-400">
+                        Mọi thứ đều có giá của nó, đặc biệt là những thứ bị cấm.
+                    </SectionTitle>
+                     <div className="space-y-3">
+                        <LoreEntry term="Kim Lệnh (Crowns)" definition="Tiền tệ tiêu chuẩn của thế giới bề nổi. Dùng cho các giao dịch thông thường như mua vật tư, thực phẩm, hoặc hối lộ lính gác." />
+                        <LoreEntry term="Dấu Ấn Đồng Thau (Brass Marks)" definition="Đơn vị tiền tệ được chấp nhận trong thế giới ngầm. Dùng để giao dịch các công nghệ bị cấm, thuê lính đánh thuê, và quan trọng nhất, tham gia vào các cuộc đấu giá tại Chợ Đen Bánh Răng để giành lấy những Linh Kiện Huyền Bí cực kỳ hiếm." />
+                        <LoreEntry 
+                            term="Chợ Đen Bánh Răng & Nhà Đấu Giá"
+                            definition={
+                                <p>
+                                    Đây không chỉ là một nơi để mua bán, mà là trung tâm quyền lực của thế giới ngầm. Tại đây, Dấu Ấn Đồng Thau được dùng để:
+                                    <ul className="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong className="text-gray-300">Mua Linh Kiện Huyền Bí:</strong> Giành lấy những nguyên liệu thăng tiến cực hiếm.</li>
+                                        <li><strong className="text-gray-300">Bán Vật Phẩm Hiếm:</strong> Đấu giá những linh kiện hoặc cổ vật bạn tìm được để làm giàu.</li>
+                                        <li><strong className="text-gray-300">Mua Bán Thông Tin & Hợp Đồng:</strong> Đấu giá để có được những thông tin mật có thể dẫn đến kho báu, hoặc nhận lấy những Hợp Đồng nguy hiểm nhưng có phần thưởng hậu hĩnh.</li>
+                                    </ul>
+                                </p>
+                            }
+                        />
+                        <LoreEntry term="Quy Tắc Vàng" definition="Không bao giờ nhầm lẫn hai loại tiền tệ. Sử dụng sai loại tiền tệ ở sai nơi sẽ thu hút sự chú ý không mong muốn và cực kỳ nguy hiểm." />
+                        <LoreEntry 
+                            term="Hợp Đồng & Cách Tìm Kiếm"
+                            definition={
+                                <p>
+                                    Hợp Đồng là các nhiệm vụ phụ mà bạn có thể nhận để kiếm phần thưởng. Để chủ động tìm kiếm chúng, hãy:
+                                    <ul className="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong className="text-gray-300">Lắng nghe tin đồn:</strong> Tại các quán rượu hoặc khu chợ đen, hãy tìm kiếm lựa chọn để hóng chuyện.</li>
+                                        <li><strong className="text-gray-300">Kiểm tra Bảng Thông Báo:</strong> Trong các thành phố hoặc khu định cư, có thể có các bảng thông báo đăng tải công việc.</li>
+                                        <li><strong className="text-gray-300">Liên hệ từ Phe Phái:</strong> Các phe phái có thể trực tiếp tìm đến bạn để giao nhiệm vụ nếu mối quan hệ của bạn với họ đủ đặc biệt.</li>
+                                        <li><strong className="text-gray-300">Duyệt Nhà Đấu Giá:</strong> Những Hợp Đồng béo bở nhất đôi khi được "đấu giá" cho người trả giá cao nhất tại Chợ Đen Bánh Răng.</li>
+                                    </ul>
+                                </p>
+                            }
+                        />
+                    </div>
+                     <SectionTitle title="Cơ Chế Tương Tác" color="text-yellow-400">
+                        Các quy tắc và lựa chọn định hình cuộc phiêu lưu của bạn.
+                    </SectionTitle>
+                     <div className="space-y-3">
+                        <LoreEntry 
+                            term="Nút Gợi Ý (Hint Button)" 
+                            definition="Nếu bạn cảm thấy bế tắc và không chắc chắn về hành động tiếp theo, nút 'Gợi ý' sẽ yêu cầu Người Dẫn Lối (AI) cung cấp một lời khuyên tinh tế. Gợi ý này sẽ dựa trên tình hình hiện tại, các nhiệm vụ và manh mối bạn có, nhằm định hướng bạn đi đúng hướng mà không phá hỏng trải nghiệm khám phá." 
+                        />
+                         <LoreEntry 
+                            term="Hành Động Tùy Chỉnh (Custom Action Input)" 
+                            definition="Bên dưới các lựa chọn có sẵn, bạn sẽ thấy một ô nhập văn bản. Hãy sử dụng nó để thực hiện bất kỳ hành động nào bạn có thể nghĩ ra, ví dụ: 'Tôi kiểm tra chiếc đồng hồ trên bàn' hoặc 'Tôi hỏi người bán hàng về những tin đồn gần đây'. Người Ký Sự (AI) sẽ diễn giải và phản hồi lại hành động của bạn, mang lại sự tự do tối đa để định hình câu chuyện." 
+                        />
                     </div>
                 </div>
             )
@@ -105,11 +217,11 @@ const CodexDisplay: React.FC = () => {
     <div className="h-full w-full flex flex-col ui-panel p-4">
         <h3 className="font-cinzel font-bold text-lg text-red-500 mb-3 border-b-2 border-red-500/20 pb-2 text-center">Sổ Tay Tri Thức</h3>
         <div className="border-b border-gray-700 mb-4 flex justify-center gap-1 flex-shrink-0 flex-wrap">
-            <LoreTab label="Cốt Lõi" view="core" activeView={activeView} setActiveView={setActiveView} color="text-red-400" />
-            <LoreTab label="Độc Lập" view="independent" activeView={activeView} setActiveView={setActiveView} color="text-gray-300" />
-            <LoreTab label="Trật Tự" view="order" activeView={activeView} setActiveView={setActiveView} color="text-red-400" />
-            <LoreTab label="Trung Lập" view="neutral" activeView={activeView} setActiveView={setActiveView} color="text-gray-300" />
-            <LoreTab label="Hỗn Mang" view="chaos" activeView={activeView} setActiveView={setActiveView} color="text-purple-400" />
+            <LoreTab label="Định Luật Cốt Lõi" view="core" activeView={activeView} setActiveView={setActiveView} color="text-red-400" />
+            <LoreTab label="Lộ Trình Độc Lập" view="independent" activeView={activeView} setActiveView={setActiveView} color="text-gray-300" />
+            <LoreTab label="Trường Phái Trật Tự" view="order" activeView={activeView} setActiveView={setActiveView} color="text-red-400" />
+            <LoreTab label="Trường Phái Trung Lập" view="neutral" activeView={activeView} setActiveView={setActiveView} color="text-gray-300" />
+            <LoreTab label="Trường Phái Hỗn Mang" view="chaos" activeView={activeView} setActiveView={setActiveView} color="text-purple-400" />
         </div>
         <div className="overflow-y-auto pr-2 flex-grow">
             {renderContent()}

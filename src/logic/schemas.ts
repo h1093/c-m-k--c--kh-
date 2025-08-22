@@ -156,6 +156,17 @@ export const biographySchema = {
     required: ["origin", "incident", "goal"],
 };
 
+export const hintSchema = {
+    type: Type.OBJECT,
+    properties: {
+        hint: {
+            type: Type.STRING,
+            description: "Một gợi ý hữu ích, ngắn gọn, súc tích cho người chơi về việc họ nên làm gì tiếp theo."
+        }
+    },
+    required: ["hint"]
+};
+
 export const puppetSchema = {
     type: Type.OBJECT,
     properties: {
@@ -371,6 +382,11 @@ export const combatTurnSchema = {
         outcome: { type: Type.STRING, description: "Kết quả của trận chiến nếu nó đã kết thúc: 'win', 'loss', hoặc 'ongoing'." },
         essenceGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Tinh Hoa Cơ Khí' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
         dauAnDongThauGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Dấu Ấn Đồng Thau' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
+        newItemsOnWin: {
+            type: Type.ARRAY,
+            items: itemSchema,
+            description: "Danh sách các vật phẩm mới (ví dụ: nguyên liệu chế tạo) người chơi nhận được NẾU họ thắng trận này. Chỉ điền khi isCombatOver=true và outcome='win'."
+        },
         explanation: explanationSchema,
         updatedCompanions: { type: Type.ARRAY, items: companionSchema, description: "Trạng thái được cập nhật của các đồng đội sau lượt chiến đấu."},
         mentalShock: { type: Type.STRING, description: "Mô tả cú sốc tinh thần mà người điều khiển phải chịu do Phản Hồi Đồng Cảm. Chỉ bao gồm khi con rối chịu sát thương đáng kể." },

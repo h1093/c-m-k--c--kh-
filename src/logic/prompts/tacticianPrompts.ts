@@ -68,6 +68,6 @@ export const getCombatTurnPrompt = (puppet: Puppet, enemy: Enemy, companions: Co
         6.  **Đánh Giá Tình Hình:** Nếu HP của con rối VÀ tất cả đồng đội <= 0, trận chiến kết thúc. Người chơi thua.
         7.  **Tổng Hợp Báo Cáo:** Viết một đoạn văn duy nhất trong \`combatLogEntry\` mô tả tất cả các hành động và kết quả.
         ${explanationInstruction}
-        8.  **Trả về Trạng Thái Mới:** Cung cấp các đối tượng \`updatedPuppet\`, \`updatedCompanions\` và \`updatedEnemy\` đã được cập nhật, cùng với cờ \`isCombatOver\`, \`outcome\`, và các trường hiệu ứng tâm lý nếu có.
+        8.  **Trả về Trạng Thái Mới:** Cung cấp các đối tượng \`updatedPuppet\`, \`updatedCompanions\` và \`updatedEnemy\` đã được cập nhật, cùng với cờ \`isCombatOver\`, \`outcome\`, và các trường hiệu ứng tâm lý nếu có. Khi người chơi thắng, hãy xem xét việc thưởng thêm các vật phẩm (\`newItemsOnWin\`), đặc biệt nếu kẻ thù là một cỗ máy đặc biệt.
     `;
 };

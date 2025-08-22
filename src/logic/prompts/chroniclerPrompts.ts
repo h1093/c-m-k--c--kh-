@@ -2,7 +2,6 @@
 
 
 
-
 import { INITIAL_PUPPETS, FACTION_PATHWAYS } from '../../data/gameConfig';
 import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../../types';
 
@@ -109,7 +108,7 @@ ${PATHWAY_LORE_PROMPT}
 
 **V. NỀN KINH TẾ HAI MẶT (QUY TẮC SỐNG CÒN - TUÂN THỦ TUYỆT ĐỐI)**
 *   **Kim Lệnh (Crowns):** TIỀN TỆ BỀ NỔI. Chỉ dùng cho các giao dịch thông thường.
-*   **Dấu Ấn Đồng Thau (Brass Marks):** TIỀN TỆ NGẦM. Chỉ dùng cho các giao dịch huyền bí.
+*   **Dấu Ấn Đồng Thau (Brass Marks):** TIỀN TỆ NGẦM. Dùng để mua bán vật phẩm cấm và **tham gia đấu giá các nguyên liệu thăng tiến hiếm tại Chợ Đen Bánh Răng.**
 *   **QUY TẮC VÀNG:** **KHÔNG BAO GIỜ NHẦM LẪN HAI LOẠI TIỀN TỆ NÀY.**
 
 **VI. ĐỊNH LUẬT SINH TỒN: LÝ TRÍ VÀ NĂNG LƯỢNG (QUAN TRỌNG)**
@@ -169,8 +168,6 @@ export const getNextStorySegmentPrompt = (puppetMasterName: string, puppet: Pupp
         currentDauAn += seg.dauAnDongThauChange || 0;
     });
 
-    const isExploring = choice === 'EXPLORE_FREELY';
-
     const puppetContext = puppet 
         ? `- Con Rối: ${puppet.name} (Lộ Trình: ${puppet.loTrinh}, Thứ Tự ${puppet.sequence}) | Nhân Cách: ${puppet.persona} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy}, Tinh Hoa: ${puppet.mechanicalEssence}, Cộng Hưởng: ${puppet.stats.resonance}`
         : `- Con Rối: Người chơi là người thường.`;
@@ -191,9 +188,7 @@ ${customWorldPrompt}
 ---
     ` : defaultLore;
 
-    const playerActionContext = isExploring
-        ? `Hành Động: Người chơi quyết định tự do khám phá xung quanh.`
-        : `Lựa Chọn: "${choice}"`;
+    const playerActionContext = `Lựa Chọn: "${choice}"`;
         
     const npcContext = npcs.length > 0 ? `Các NPC Đã Gặp:\n${npcs.map(n => `- ${n.name} (quan hệ: ${n.relationship}) tại ${n.location}`).join('\n')}` : "";
     const factionContext = Object.keys(factionRelations).length > 0 ? `Quan Hệ Phe Phái:\n${Object.entries(factionRelations).map(([faction, score]) => `- ${faction}: ${score}`).join('\n')}` : "";
@@ -215,8 +210,10 @@ ${customWorldPrompt}
             - **LÀM CHO NPC SỐNG ĐỘNG:** Khi tạo một NPC MỚI, hãy cung cấp một trường \`background\` (lý lịch) ngắn gọn nhưng thú vị để làm cho họ trở nên đáng nhớ và có chiều sâu.
         4.  **SỬ DỤNG HỆ THỐNG KINH TẾ & PHE PHÁI (QUAN TRỌNG):**
             *   **Tạo Lựa Chọn có Ý nghĩa:** Các lựa chọn nên có hậu quả rõ ràng. Thay vì "Đi tiếp", hãy tạo ra "Hối lộ lính gác (-10 Kim Lệnh)" hoặc "Đe dọa họ (Ảnh hưởng quan hệ với Viện Giám Sát)".
-            *   **Phần Thưởng Hợp Lý:** Thưởng \`kimLenhChange\` cho các hoạt động thông thường. Thưởng \`dauAnDongThauChange\` cho các nhiệm vụ nguy hiểm, bí mật, hoặc phi pháp.
+            *   **Phần Thưởng Hợp Lý:** Thưởng \`kimLenhChange\` cho các hoạt động thông thường. Thưởng \`dauAnDongThauChange\` cho các nhiệm vụ nguy hiểm, bí mật, hoặc phi pháp. Thưởng các vật phẩm hiếm (\`newItems\`), đặc biệt là nguyên liệu chế tạo, khi người chơi vượt qua thử thách lớn hoặc khám phá bí mật.
             *   **Tác Động Phe Phái:** Nếu hành động của người chơi giúp đỡ hoặc cản trở một phe phái, BẮT BUỘC phải cập nhật \`updatedFactionRelations\`.
+        5.  **TÍCH HỢP ĐẤU GIÁ (QUAN TRỌNG):** Khi người chơi ở một khu vực an toàn (như một thành phố lớn) và có đủ Dấu Ấn Đồng Thau, hãy cân nhắc đưa ra lựa chọn "Ghé thăm Chợ Đen Bánh Răng". Nếu họ chọn điều này, hãy tạo ra một phân cảnh đấu giá. Mô tả một nguyên liệu hiếm đang được bán, không khí căng thẳng, và cung cấp các lựa chọn để trả giá bằng 'Dấu Ấn Đồng Thau'. Nếu họ thắng, hãy sử dụng 'newItems' và 'dauAnDongThauChange' để phản ánh kết quả.
+
 
         **CƠ CHẾ GIẢI THÍCH:**
         - Nếu một cơ chế MỚI xuất hiện lần đầu (đặc biệt là 'psyche_and_energy'), BẮT BUỘC phải tạo giải thích.
@@ -236,5 +233,44 @@ ${customWorldPrompt}
         ${playerActionContext}
 
         **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh tiếp theo. Phản ánh những thay đổi về tiền tệ (\`kimLenhChange\`, \`dauAnDongThauChange\`), Lý Trí (\`psycheChange\`) và quan hệ phe phái (\`updatedFactionRelations\`) một cách hợp lý.
+    `;
+};
+
+export const getHintPrompt = (puppet: Puppet | null, history: StorySegment[], knownClues: Clue[], mainQuest: string, sideQuests: Quest[]): string => {
+    const lastSegment = history[history.length - 1];
+    const sceneContext = lastSegment.scene;
+    const choicesContext = lastSegment.choices.join(' | ');
+
+    const puppetContext = puppet 
+        ? `- Con Rối: ${puppet.name} (Thứ Tự ${puppet.sequence}) | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}`
+        : `- Con Rối: Người chơi là người thường.`;
+    
+    const questContext = `
+- Nhiệm vụ chính: ${mainQuest}
+- Nhiệm vụ phụ: ${sideQuests.filter(q => q.status === 'active').map(q => q.title).join(', ') || "Không có"}
+    `;
+
+    const cluesContext = `Manh mối đã biết: ${knownClues.map(c => c.title).join(', ') || "Chưa có"}`;
+
+    return `
+        Bạn là **Người Dẫn Lối**, một AI thông thái trong game "Cấm Kỵ Cơ Khí". Vai trò của bạn là đưa ra những gợi ý tinh tế, không quá lộ liễu cho người chơi khi họ gặp khó khăn.
+
+        **Bối Cảnh Hiện Tại:**
+        - **Cảnh cuối:** "${sceneContext}"
+        - **Lựa chọn có sẵn:** ${choicesContext}
+        - ${puppetContext}
+        - ${questContext}
+        - ${cluesContext}
+
+        **Nhiệm Vụ Của Bạn:**
+        Dựa vào bối cảnh trên, hãy cung cấp một gợi ý ngắn gọn, súc tích (1-2 câu) cho người chơi.
+
+        **QUY TẮC GỢI Ý:**
+        1.  **Không tiết lộ trực tiếp:** Thay vì nói "Hãy chọn lựa chọn A", hãy gợi ý về *tại sao* một hướng đi nào đó lại hợp lý. Ví dụ: "Có lẽ nên kiểm tra vật thể lạ kia, nó có vẻ liên quan đến những tin đồn bạn đã nghe."
+        2.  **Khuyến khích hành động tùy chỉnh:** Nếu bối cảnh có nhiều chi tiết thú vị, hãy gợi ý người chơi sử dụng ô nhập hành động tùy chỉnh. Ví dụ: "Căn phòng này có nhiều chi tiết đáng ngờ. Thử kiểm tra một thứ gì đó cụ thể xem?"
+        3.  **Liên kết với nhiệm vụ:** Nếu có thể, hãy liên kết gợi ý với nhiệm vụ chính hoặc nhiệm vụ phụ hiện tại.
+        4.  **Giọng văn bí ẩn:** Giữ giọng văn phù hợp với thế giới game: hơi bí ẩn, nhưng hữu ích.
+
+        Hãy trả về gợi ý của bạn trong schema JSON được yêu cầu.
     `;
 };

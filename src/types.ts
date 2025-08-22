@@ -187,6 +187,7 @@ export interface CombatTurnResult {
     outcome: 'win' | 'loss' | 'ongoing';
     essenceGainedOnWin?: number;
     dauAnDongThauGainedOnWin?: number; // Thêm tiền tệ thế giới ngầm khi thắng
+    newItemsOnWin?: Item[]; // Thêm vật phẩm khi thắng
     explanation?: Explanation;
     updatedCompanions?: Companion[];
     mentalShock?: string; // Sốc tinh thần người chơi phải chịu

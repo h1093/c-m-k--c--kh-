@@ -123,8 +123,8 @@ export const FACTION_PATHWAYS = [
         description: "Triết lý 'phòng thủ tuyệt đối'. Họ là quân đội của Trường Phái Trật Tự, bảo vệ các thành trì khỏi sự hỗn loạn bằng kỷ luật thép và những cỗ máy phòng thủ gần như không thể xuyên thủng. Cấu trúc của họ mang tính quân phiệt, với các pháo đài ẩn giấu ở những vị trí chiến lược.",
         sequences: [
             { seq: 9, name: "Lính Gác" },
-            { seq: 8, name: "Thợ Rèn Khiên" },
-            { seq: 7, name: "Người Giữ Cổng" },
+            { seq: 8, name: "Thợ Rèn Khiên", requiredMaterial: { id: "stable-conduction-core", name: "Lõi Dẫn Truyền Ổn Định", quantity: 1, materialHint: "Nghe đồn có thể tìm thấy từ những Vệ Binh cổ đại ở Thành Cổ Bị Lãng Quên." } },
+            { seq: 7, name: "Người Giữ Cổng", requiredMaterial: { id: "aegis-fragment", name: "Mảnh Vỡ Của Aegis", quantity: 1, materialHint: "Chỉ những Kẻ Bất Diệt, những cỗ máy phòng thủ tối thượng, mới mang trong mình mảnh vỡ này." } },
         ]
     },
     {
@@ -135,8 +135,8 @@ export const FACTION_PATHWAYS = [
         description: "Những nhà thần học máy móc tin rằng vũ trụ là một cỗ máy đồng hồ vĩ đại. Phương pháp của họ là tiên tri và thao túng vi mô, nhằm 'hiệu chỉnh' thực tại để nó khớp với 'Thiết Kế Vĩ Đại'. Họ hoạt động trong các thánh đường ẩn giấu, đầy những thiết bị thiên văn phức tạp.",
         sequences: [
             { seq: 9, name: "Người Theo Dõi Bánh Răng" },
-            { seq: 8, name: "Nhà Chiêm Tinh Dây Cót" },
-            { seq: 7, name: "Nhà Toán Học Định Mệnh" },
+            { seq: 8, name: "Nhà Chiêm Tinh Dây Cót", requiredMaterial: { id: "time-crystal-lens", name: "Thấu Kính Tinh Thể Thời Gian", quantity: 1, materialHint: "Được chế tác từ những tinh thể chỉ hình thành ở những nơi thực tại bị rạn nứt hoặc trong các Hợp Đồng đặc biệt." } },
+            { seq: 7, name: "Nhà Toán Học Định Mệnh", requiredMaterial: { id: "fateful-cog", name: "Bánh Răng Định Mệnh", quantity: 1, materialHint: "Một linh kiện huyền thoại, được cho là rơi ra từ những cỗ máy tiên tri đã Mất Kiểm Soát." } },
         ]
     },
     {
@@ -184,8 +184,8 @@ export const FACTION_PATHWAYS = [
         description: "Với triết lý 'tri thức là trên hết', họ là những nhà thám hiểm và gián điệp của thế giới ngầm. Phương pháp của họ là xâm nhập, thu thập và bán thông tin cho bất kỳ ai trả giá cao nhất, nhằm phục vụ mục tiêu cuối cùng của riêng họ: tìm ra 'Axis Mundi', điểm kiểm soát lý thuyết của Linh Giới.",
         sequences: [
             { seq: 9, name: "Người Dẫn Lối" },
-            { seq: 8, name: "Nhà Trinh Sát" },
-            { seq: 7, name: "Kẻ Bước Trong Gió" },
+            { seq: 8, name: "Nhà Trinh Sát", requiredMaterial: { id: "aetheric-compass", name: "La Bàn Linh Giới", quantity: 1, materialHint: "Một vật phẩm thường được trao thưởng cho việc hoàn thành các Hợp Đồng khám phá các Vùng Bất Thường." } },
+            { seq: 7, name: "Kẻ Bước Trong Gió", requiredMaterial: { id: "whirlwind-feather", name: "Lông Vũ Gió Xoáy", quantity: 1, materialHint: "Lấy từ những sinh vật cơ khí có khả năng điều khiển gió ở những đỉnh núi cao nhất." } },
         ]
     },
     {
@@ -257,8 +257,8 @@ export const FACTION_PATHWAYS = [
         description: "Những kẻ cuồng tín tôn thờ sự hỗn loạn, tin rằng xác thịt là yếu đuối và sự cứu rỗi nằm ở việc hợp nhất với máy móc và Tà Năng. Phương pháp của họ là các nghi lễ hiến tế đẫm máu và những thí nghiệm ghê tởm, biến tín đồ và nạn nhân thành những quái vật nửa người nửa máy.",
         sequences: [
             { seq: 9, name: "Tín Đồ" },
-            { seq: 8, name: "Kẻ Điên Loạn" },
-            { seq: 7, name: "Cỗ Máy Hủy Diệt" },
+            { seq: 8, name: "Kẻ Điên Loạn", requiredMaterial: { id: "cursed-clockwork-blood", name: "Máu Dây Cót Bị Nguyền", quantity: 1, materialHint: "Có thể được chưng cất từ những thành viên cấp cao của Cơ Giới Thần Giáo." } },
+            { seq: 7, name: "Cỗ Máy Hủy Diệt", requiredMaterial: { id: "frenzied-machine-heart", name: "Trái Tim Máy Móc Điên Loạn", quantity: 1, materialHint: "Đánh bại một Cỗ Máy Hủy Diệt lang thang trong các khu công nghiệp đổ nát." } },
         ]
     },
     {

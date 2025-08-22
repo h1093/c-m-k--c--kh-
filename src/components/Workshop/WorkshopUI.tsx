@@ -1,12 +1,14 @@
 import React from 'react';
-import type { Puppet, WorkshopData, UpgradeOption, Explanation, Component } from '../../types';
+import type { Puppet, WorkshopData, UpgradeOption, Explanation, Component, Item } from '../../types';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ExplanationDisplay from '../UI/ExplanationDisplay';
+import { FACTION_PATHWAYS } from '../../data/gameConfig';
 
 interface WorkshopUIProps {
     puppet: Puppet;
     workshopData: WorkshopData | null;
     inventory: Component[];
+    itemInventory: Item[];
     isLoading: boolean;
     error: string | null;
     onUpgrade: (option: UpgradeOption) => void;
@@ -15,8 +17,29 @@ interface WorkshopUIProps {
     onRetry: () => void;
 }
 
-const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory, isLoading, error, onUpgrade, onInstall, onExit, onRetry }) => {
+const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory, itemInventory, isLoading, error, onUpgrade, onInstall, onExit, onRetry }) => {
     const upgradeCost = 100 * (10 - puppet.sequence);
+
+    // Find the required material for the next sequence
+    const pathway = FACTION_PATHWAYS.find(p => p.name === puppet.loTrinh);
+    const nextSequenceDef = pathway?.sequences.find(s => s.seq === puppet.sequence - 1);
+    const requiredMaterial = (nextSequenceDef as any)?.requiredMaterial as { id: string; name: string; quantity: number; materialHint?: string; } | undefined;
+
+    let playerHasMaterial = true;
+    let requiredMaterialText = '';
+    let materialHintText = '';
+
+    if (requiredMaterial) {
+        const playerMaterial = itemInventory.find(item => item.id === requiredMaterial.id);
+        if (!playerMaterial || playerMaterial.quantity < requiredMaterial.quantity) {
+            playerHasMaterial = false;
+        }
+        const playerQuantity = playerMaterial ? playerMaterial.quantity : 0;
+        requiredMaterialText = `, ${requiredMaterial.quantity}x ${requiredMaterial.name} (${playerQuantity}/${requiredMaterial.quantity})`;
+        if (requiredMaterial.materialHint) {
+            materialHintText = requiredMaterial.materialHint;
+        }
+    }
 
     if (isLoading && !workshopData) {
         return (
@@ -53,7 +76,18 @@ const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory
             <div className="w-full max-w-4xl mx-auto ui-panel p-8">
                 <div className="text-center mb-6">
                     <h2 className="text-4xl font-cinzel text-red-600">Xưởng Chế Tác</h2>
-                    <p className="text-gray-400 mt-2">Nơi những cỗ máy được tái sinh. Tinh hoa cần thiết: <span className="font-bold text-white">{upgradeCost}</span>. Hiện có: <span className="font-bold text-white">{puppet.mechanicalEssence}</span></p>
+                    <div className="text-gray-400 mt-2">
+                        <p>Nơi những cỗ máy được tái sinh.</p>
+                        <p>
+                            <span className="font-semibold">Cần thiết:</span> <span className="font-bold text-white">{upgradeCost} Tinh Hoa{requiredMaterialText}</span>. 
+                            <span className="font-semibold"> Hiện có:</span> <span className="font-bold text-white">{puppet.mechanicalEssence}</span>
+                        </p>
+                         {materialHintText && (
+                            <p className="text-sm text-yellow-300 italic mt-1">
+                                Gợi ý: {materialHintText}
+                            </p>
+                        )}
+                    </div>
                 </div>
 
                 {error && (
@@ -83,7 +117,7 @@ const WorkshopUI: React.FC<WorkshopUIProps> = ({ puppet, workshopData, inventory
                                 <button
                                     key={index}
                                     onClick={() => onUpgrade(option)}
-                                    disabled={puppet.mechanicalEssence < upgradeCost || isLoading}
+                                    disabled={puppet.mechanicalEssence < upgradeCost || !playerHasMaterial || isLoading}
                                     className="w-full text-left ui-button bg-gray-800 border-gray-700 hover:bg-gray-700/80 disabled:opacity-50 disabled:cursor-not-allowed p-4"
                                 >
                                     <p className="font-bold text-red-300">{option.name}</p>

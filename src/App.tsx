@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { GameStage } from './types';
 import { useGameState } from './hooks/useGameState';
@@ -13,7 +14,7 @@ import ApiKeySetup from './screens/ApiKeySetup';
 
 const App: React.FC = () => {
     const {
-        gameState, setGameState, startingScenario, saveMessage,
+        gameState, setGameState, startingScenario, saveMessage, hint,
         loadGameState, handleCustomGameStart, handleCharacterCreation,
         handleChoice, handleCombatAction, handleEnterWorkshop, handleUpgrade,
         handleInstallComponent, handleExitWorkshop, restartGame, handleSaveGame, handleExitToMenu,
@@ -68,6 +69,7 @@ const App: React.FC = () => {
                     puppet={gameState.puppet}
                     workshopData={gameState.workshopData}
                     inventory={gameState.componentInventory}
+                    itemInventory={gameState.inventory}
                     isLoading={gameState.isLoading}
                     error={gameState.error}
                     onUpgrade={handleUpgrade}
@@ -93,6 +95,7 @@ const App: React.FC = () => {
                 )}
             </div>
             {saveMessage && <div className="save-toast font-cinzel">{saveMessage}</div>}
+            {hint && <div className="hint-toast font-cinzel">{hint}</div>}
         </main>
     );
 };

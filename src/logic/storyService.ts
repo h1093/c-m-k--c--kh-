@@ -1,9 +1,10 @@
 
+
 import { generateContentWithSchema } from './aiService';
-import { getInitialStoryPrompt, getNextStorySegmentPrompt } from './prompts/chroniclerPrompts';
+import { getInitialStoryPrompt, getNextStorySegmentPrompt, getHintPrompt } from './prompts/chroniclerPrompts';
 import { getLoreSummaryPrompt } from './prompts/archivistPrompts';
 import { getBiographyGenerationPrompt } from './prompts/creatorPrompts';
-import { storySegmentSchema, loreSummarySchema, biographySchema, npcMindSchema } from './schemas';
+import { storySegmentSchema, loreSummarySchema, biographySchema, npcMindSchema, hintSchema } from './schemas';
 import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../types';
 
 
@@ -33,6 +34,12 @@ export const generateBiography = async (
 ): Promise<{ origin: string; incident: string; goal: string }> => {
     const prompt = getBiographyGenerationPrompt(origin, incident, goal, startingScenario);
     return await generateContentWithSchema<{ origin: string; incident: string; goal: string }>(prompt, biographySchema);
+};
+
+export const generateHint = async (puppet: Puppet | null, history: StorySegment[], knownClues: Clue[], mainQuest: string, sideQuests: Quest[]): Promise<string> => {
+    const prompt = getHintPrompt(puppet, history, knownClues, mainQuest, sideQuests);
+    const result = await generateContentWithSchema<{ hint: string }>(prompt, hintSchema);
+    return result.hint;
 };
 
 const getNpcMindPrompt = (npcToUpdate: NPC, scene: string, playerChoice: string): string => {

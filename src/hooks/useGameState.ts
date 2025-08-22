@@ -1,13 +1,15 @@
 
 
 
+
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item } from '../types';
-import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate } from '../logic/storyService';
+import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint } from '../logic/storyService';
 import { handleCombatTurn } from '../logic/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../logic/workshopService';
 import * as saveService from '../logic/saveService';
 import { apiKeyManager } from '../logic/aiClient';
+import { FACTION_PATHWAYS } from '../data/gameConfig';
 
 const getInitialStage = (): GameStage => {
     return apiKeyManager.getApiKey() ? GameStage.START_SCREEN : GameStage.API_SETUP;
@@ -52,6 +54,7 @@ export const useGameState = () => {
     const [gameState, setGameState] = useState<GameState>(initialState);
     const [startingScenario, setStartingScenario] = useState<StartingScenario>('complete');
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
+    const [hint, setHint] = useState<string | null>(null);
     const [lastAction, setLastAction] = useState<{ type: string; payload: any } | null>(null);
 
      useEffect(() => {
@@ -60,6 +63,13 @@ export const useGameState = () => {
             return () => clearTimeout(timer);
         }
     }, [saveMessage]);
+
+    useEffect(() => {
+        if (hint) {
+            const timer = setTimeout(() => setHint(null), 8000); // 8 seconds to match animation
+            return () => clearTimeout(timer);
+        }
+    }, [hint]);
 
     const handleCustomGameStart = (prompt: string) => {
         setGameState(prev => ({
@@ -112,9 +122,39 @@ export const useGameState = () => {
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
         }
     };
+    
+    const handleGetHint = async () => {
+        if (!gameState.currentSegment) return;
+        setLastAction({ type: 'getHint', payload: null });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+        try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+            const hintText = await generateHint(
+                gameState.puppet,
+                gameState.storyHistory,
+                gameState.clues,
+                gameState.mainQuest,
+                gameState.sideQuests,
+            );
+            setHint(hintText);
+            setLastAction(null);
+        } catch (error) {
+            console.error(error);
+            setGameState(prev => ({ ...prev, error: error instanceof Error ? error.message : String(error) }));
+        } finally {
+            setGameState(prev => ({ ...prev, isLoading: false }));
+        }
+    };
+
 
     const handleChoice = useCallback(async (choice: string) => {
         if (!gameState.currentSegment) return;
+        
+        if (choice === 'GET_HINT') {
+            await handleGetHint();
+            return;
+        }
+
         setLastAction({ type: 'choice', payload: choice });
         setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
@@ -297,11 +337,25 @@ export const useGameState = () => {
                 if (result.outcome === 'win') {
                     const finalPuppetState = result.updatedPuppet;
                     finalPuppetState.mechanicalEssence += result.essenceGainedOnWin || 0;
+                    
+                    const newInventory = [...gameState.inventory];
+                    if (result.newItemsOnWin) {
+                        result.newItemsOnWin.forEach(newItem => {
+                            const existingItem = newInventory.find(i => i.id === newItem.id);
+                            if (existingItem) {
+                                existingItem.quantity += newItem.quantity;
+                            } else {
+                                newInventory.push(newItem);
+                            }
+                        });
+                    }
+
                     const victorySegment: StorySegment = {
                         scene: `Sau một trận chiến ác liệt, ${gameState.enemy.name} cuối cùng đã bị đánh bại.`,
                         choices: ['Tiếp tục'],
                         updatedPuppet: finalPuppetState,
                         essenceGained: result.essenceGainedOnWin || 0,
+                        newItems: result.newItemsOnWin || [],
                     };
                     setGameState(prev => ({
                         ...prev,
@@ -313,7 +367,8 @@ export const useGameState = () => {
                         stage: GameStage.PLAYING,
                         isLoading: false,
                         companions: result.updatedCompanions || prev.companions,
-                        dauAnDongThau: prev.dauAnDongThau + (result.dauAnDongThauGainedOnWin || 0)
+                        dauAnDongThau: prev.dauAnDongThau + (result.dauAnDongThauGainedOnWin || 0),
+                        inventory: newInventory.filter(i => i.quantity > 0),
                     }));
                 } else {
                     setGameState(prev => ({ ...prev, isLoading: false, stage: GameStage.GAME_OVER, error: `Bạn đã bị ${gameState.enemy?.name} đánh bại.` }));
@@ -343,7 +398,7 @@ export const useGameState = () => {
         setGameState(prev => ({ ...prev, stage: GameStage.WORKSHOP, isLoading: true, error: null }));
         try {
             setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
-            const workshopData = await generateWorkshopOptions(gameState.puppet, Array.from(gameState.shownExplanations));
+            const workshopData = await generateWorkshopOptions(gameState.puppet, Array.from(gameState.shownExplanations), gameState.inventory);
             setGameState(prev => ({ ...prev, workshopData, isLoading: false }));
             setLastAction(null);
         } catch (error) {
@@ -384,19 +439,35 @@ export const useGameState = () => {
 
     const handleUpgrade = async (option: UpgradeOption) => {
         if (!gameState.puppet) return;
+
         const upgradeCost = 100 * (10 - gameState.puppet.sequence);
         if (gameState.puppet.mechanicalEssence < upgradeCost) {
             setGameState(prev => ({ ...prev, error: "Không đủ Tinh Hoa Cơ Khí." }));
             return;
         }
+
+        const pathway = FACTION_PATHWAYS.find(p => p.name === gameState.puppet.loTrinh);
+        const nextSequenceDef = pathway?.sequences.find(s => s.seq === gameState.puppet!.sequence - 1);
+        const requiredMaterial = (nextSequenceDef as any)?.requiredMaterial as { id: string; name: string; quantity: number; } | undefined;
+
+        if (requiredMaterial) {
+            const playerMaterial = gameState.inventory.find(item => item.id === requiredMaterial.id);
+            if (!playerMaterial || playerMaterial.quantity < requiredMaterial.quantity) {
+                setGameState(prev => ({ ...prev, error: `Không đủ nguyên liệu. Cần ${requiredMaterial.quantity} x ${requiredMaterial.name}.` }));
+                return;
+            }
+        }
+
         setLastAction({ type: 'upgrade', payload: option });
         setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+
         try {
             setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             let updatedPuppet = { ...gameState.puppet, stats: { ...gameState.puppet.stats }, abilities: [...gameState.puppet.abilities] };
             updatedPuppet.mechanicalEssence -= upgradeCost;
             updatedPuppet.sequence -= 1;
             updatedPuppet.sequenceName = await generateNewSequenceName(updatedPuppet, updatedPuppet.sequence);
+            
             switch (option.type) {
                 case 'skill': if (option.payload) { updatedPuppet.abilities.push(option.payload); updatedPuppet.abilityPool = updatedPuppet.abilityPool.slice(1); } break;
                 case 'stat_attack': updatedPuppet.stats.attack += 2; break;
@@ -404,7 +475,18 @@ export const useGameState = () => {
                 case 'stat_hp': updatedPuppet.stats.maxHp += 5; updatedPuppet.stats.hp += 5; break;
                 case 'purge': updatedPuppet.stats.aberrantEnergy = Math.max(0, updatedPuppet.stats.aberrantEnergy - 50); break;
             }
-            setGameState(prev => ({ ...prev, puppet: updatedPuppet, stage: GameStage.PLAYING, workshopData: null, isLoading: false }));
+            
+            let newInventory = [...gameState.inventory];
+            if (requiredMaterial) {
+                newInventory = newInventory.map(item => {
+                    if (item.id === requiredMaterial.id) {
+                        return { ...item, quantity: item.quantity - requiredMaterial.quantity };
+                    }
+                    return item;
+                }).filter(item => item.quantity > 0);
+            }
+
+            setGameState(prev => ({ ...prev, puppet: updatedPuppet, inventory: newInventory, stage: GameStage.PLAYING, workshopData: null, isLoading: false }));
             setLastAction(null);
         } catch (error) {
             console.error(error);
@@ -478,6 +560,9 @@ export const useGameState = () => {
             case 'enterWorkshop':
                 handleEnterWorkshop();
                 break;
+            case 'getHint':
+                handleGetHint();
+                break;
             case 'upgrade':
                 handleUpgrade(lastAction.payload as UpgradeOption);
                 break;
@@ -494,6 +579,7 @@ export const useGameState = () => {
         setGameState,
         startingScenario,
         saveMessage,
+        hint,
         loadGameState,
         handleCustomGameStart,
         handleCharacterCreation,

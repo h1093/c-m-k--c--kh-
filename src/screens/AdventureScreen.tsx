@@ -32,6 +32,8 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                 ? <PuppetStatus
                     puppet={gameState.puppet}
                     masterName={gameState.puppetMasterName}
+                    psyche={gameState.psyche}
+                    maxPsyche={gameState.maxPsyche}
                     componentInventory={gameState.componentInventory}
                     itemInventory={gameState.inventory}
                     sideQuests={gameState.sideQuests}
@@ -115,9 +117,12 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                          <span className="text-sm text-gray-500 font-mono order-last sm:order-first">Lượt: {turnCount}</span>
                          <div className="flex flex-col sm:flex-row items-center gap-4">
                             {gameState.puppet && gameState.puppet.sequence > 1 && (
-                                <button onClick={onEnterWorkshop} disabled={gameState.puppet.mechanicalEssence < (100 * (10 - gameState.puppet.sequence))} className="w-full sm:w-auto ui-button py-2 px-4">
-                                    Vào Xưởng (Cần {100 * (10 - gameState.puppet.sequence)} Tinh Hoa)
-                                </button>
+                                <div className="relative group w-full sm:w-auto">
+                                    <button onClick={onEnterWorkshop} disabled={gameState.puppet.mechanicalEssence < (100 * (10 - gameState.puppet.sequence))} className="w-full sm:w-auto ui-button py-2 px-4">
+                                        Vào Xưởng (Cần {100 * (10 - gameState.puppet.sequence)} Tinh Hoa)
+                                    </button>
+                                    <span className="tooltip">Nơi bạn có thể dùng Tinh Hoa Cơ Khí để nâng cấp Thứ Tự và kỹ năng cho con rối.</span>
+                                </div>
                             )}
                              {gameState.stage !== GameStage.GAME_OVER && (
                                  <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">

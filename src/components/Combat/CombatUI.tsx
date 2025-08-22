@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import type { Puppet, Enemy, Explanation, Component, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item, Quest } from '../../types';
 import PuppetStatus from '../PC/PuppetStatus';
@@ -31,6 +30,8 @@ interface CombatUIProps {
     apiCalls: number;
     kimLenh: number;
     dauAnDongThau: number;
+    psyche: number;
+    maxPsyche: number;
     mentalShock: string | null;
     aberrantEnergyLeak: string | null;
 }
@@ -133,13 +134,15 @@ const CombatLog: React.FC<{ log: string[] }> = ({ log }) => {
 };
 
 
-const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, itemInventory, sideQuests, onUseItem, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau, mentalShock, aberrantEnergyLeak }) => {
+const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, itemInventory, sideQuests, onUseItem, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau, psyche, maxPsyche, mentalShock, aberrantEnergyLeak }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
          <PuppetStatus 
             puppet={puppet} 
             masterName={masterName} 
+            psyche={psyche}
+            maxPsyche={maxPsyche}
             componentInventory={inventory} 
             itemInventory={itemInventory}
             sideQuests={sideQuests} 

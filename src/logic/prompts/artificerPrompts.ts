@@ -1,12 +1,25 @@
-import type { Puppet, ExplanationId, Component } from '../../types';
+import type { Puppet, ExplanationId, Component, Item } from '../../types';
 import { FACTION_PATHWAYS } from '../../data/gameConfig';
 
-export const getWorkshopPrompt = (puppet: Puppet, shownExplanations: ExplanationId[]): string => {
+export const getWorkshopPrompt = (puppet: Puppet, shownExplanations: ExplanationId[], inventory: Item[]): string => {
     const upgradeCost = 100 * (10 - puppet.sequence);
     const availableSkill = puppet.abilityPool.length > 0 ? puppet.abilityPool[0] : null;
 
+    const nextSequence = puppet.sequence - 1;
+    const pathway = FACTION_PATHWAYS.find(p => p.name === puppet.loTrinh);
+    const nextSequenceDef = pathway?.sequences.find(s => s.seq === nextSequence);
+    const requiredMaterial = (nextSequenceDef as any)?.requiredMaterial as { id: string; name: string; quantity: number; } | undefined;
+
+    let materialAnalysis = "Không yêu cầu nguyên liệu đặc biệt.";
+    if (requiredMaterial) {
+        const playerMaterial = inventory.find(item => item.id === requiredMaterial.id);
+        const hasMaterial = playerMaterial && playerMaterial.quantity >= requiredMaterial.quantity;
+        materialAnalysis = `Yêu cầu: ${requiredMaterial.quantity}x ${requiredMaterial.name}. | Trạng thái kho: ${hasMaterial ? 'Đã có đủ' : 'Thiếu nguyên liệu'}.`;
+    }
+
+
      const explanationInstruction = !shownExplanations.includes('sequences')
-        ? `3.  **Giải Thích Cơ Chế:** Vì đây là lần đầu người chơi nâng cấp, BẮT BUỘC phải thêm một đoạn giải thích trong trường 'explanation'. id: 'sequences', title: 'Về Thứ Tự và Tinh Luyện', text: 'Mỗi con rối đều có 9 Thứ Tự, từ 9 là thấp nhất đến 1 là cao nhất. Mỗi lần Tinh Luyện Tâm Cơ Luân bằng Tinh Hoa Cơ Khí, con rối sẽ tiến lên một Thứ Tự mới, trở nên mạnh mẽ hơn và có thể học được những kỹ năng phi thường. Đây là con đường để đạt đến sự hoàn hảo cơ khí.'`
+        ? `3.  **Giải Thích Cơ Chế:** Vì đây là lần đầu người chơi nâng cấp, BẮT BUỘC phải thêm một đoạn giải thích trong trường 'explanation'. id: 'sequences', title: 'Về Thứ Tự và Tinh Luyện', text: 'Mỗi con rối đều có 9 Thứ Tự, từ 9 là thấp nhất đến 1 là cao nhất. Mỗi lần Tinh Luyện Tâm Cơ Luân, con rối sẽ tiến lên một Thứ Tự mới, trở nên mạnh mẽ hơn và có thể học được những kỹ năng phi thường. Để thăng tiến lên các Thứ Tự cao hơn, ngoài Tinh Hoa Cơ Khí, bạn cần phải tìm kiếm các Linh Kiện Huyền Bí đặc biệt.'`
         : '';
 
     return `
@@ -16,15 +29,16 @@ export const getWorkshopPrompt = (puppet: Puppet, shownExplanations: Explanation
         Người chơi đang ở trong Xưởng Chế Tác, chuẩn bị thực hiện quy trình **"Tinh Luyện Tâm Cơ Luân"**.
         - Mẫu Vật: ${puppet.name} (Thứ Tự hiện tại: ${puppet.sequence})
         - Nguồn Năng Lượng (Tinh Hoa Cơ Khí): ${puppet.mechanicalEssence}
-        - Độ Nhiễu Loạn (Tà Năng): ${puppet.stats.aberrantEnergy} / ${puppet.stats.maxAberrantEnergy}
         - Chi Phí Quy Trình: ${upgradeCost} Tinh Hoa
+        - Phân Tích Nguyên Liệu cho Thứ Tự ${nextSequence}: ${materialAnalysis}
+        - Độ Nhiễu Loạn (Tà Năng): ${puppet.stats.aberrantEnergy} / ${puppet.stats.maxAberrantEnergy}
         - Sơ Đồ Thiết Kế (Lộ Trình): ${puppet.loTrinh}
         - Triết Lý Cốt Lõi (Trường Phái): ${puppet.truongPhai}
         - Bản Nâng Cấp Kỹ Năng Tiềm Năng: ${availableSkill ? `"${availableSkill.name}: ${availableSkill.description}"` : "Không có trong kho lưu trữ."}
 
         **Nhiệm Vụ Của Bạn:**
-        1.  **Viết Đoạn Mô Tả (scene):** Tạo một đoạn văn ngắn (2-3 câu) mô tả quá trình Nghệ Nhân Rối chuẩn bị Tinh Luyện. Sử dụng thuật ngữ kỹ thuật. Mô tả âm thanh của các bánh răng, ánh sáng từ lõi năng lượng, và cảm giác của năng lượng đang được hiệu chỉnh. Nếu Tà Năng cao (>30), hãy mô tả các dấu hiệu bất ổn, ví dụ như 'những tiếng rít bất thường từ các khớp nối' hoặc 'sự dao động bất thường trong dòng chảy năng lượng'.
-        2.  **Đề Xuất Các Hướng Tinh Luyện (options):** Cung cấp một danh sách gồm 3 lựa chọn nâng cấp cân bằng và hợp lý về mặt kỹ thuật.
+        1.  **Viết Đoạn Mô Tả (scene):** Tạo một đoạn văn ngắn (2-3 câu) mô tả quá trình Nghệ Nhân Rối chuẩn bị Tinh Luyện. Sử dụng thuật ngữ kỹ thuật. Mô tả âm thanh của các bánh răng, ánh sáng từ lõi năng lượng, và cảm giác của năng lượng đang được hiệu chỉnh. Nếu Tà Năng cao (>30), hãy mô tả các dấu hiệu bất ổn.
+        2.  **Đề Xuất Các Hướng Tinh Luyện (options):** Cung cấp một danh sách gồm 3 lựa chọn nâng cấp cân bằng và hợp lý về mặt kỹ thuật. Trong phần mô tả của mỗi lựa chọn, hãy đề cập đến việc tiêu thụ Tinh Hoa và nguyên liệu (nếu có).
             *   **QUAN TRỌNG (Giao Thức An Toàn): Nếu độ nhiễu loạn (Tà Năng) từ 30 trở lên, một trong ba lựa chọn BẮT BUỘC phải là lựa chọn 'purge' (Thanh Tẩy).**
             *   **Lựa chọn 1 (Tích Hợp Kỹ Năng hoặc Tối Ưu Hóa):** Nếu có kỹ năng trong \`abilityPool\` (\`availableSkill\`), ưu tiên tạo một lựa chọn để tích hợp mô-đun kỹ năng đó. Nếu không, thay thế bằng một lựa chọn tối ưu hóa chỉ số (ví dụ: Tấn Công).
             *   **Lựa chọn 2 & 3 (Nâng Cấp Phần Cứng):** Tạo hai lựa chọn khác nhau để nâng cấp các thành phần vật lý, giúp tăng vĩnh viễn các chỉ số. Chọn từ Tấn Công, Phòng Thủ, và HP Tối Đa.

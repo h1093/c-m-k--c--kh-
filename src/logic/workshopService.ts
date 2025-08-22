@@ -5,11 +5,11 @@ import {
     sequenceNameSchema,
     componentInstallSchema
 } from './schemas';
-import type { WorkshopData, Puppet, ExplanationId, Component } from '../types';
+import type { WorkshopData, Puppet, ExplanationId, Component, Item } from '../types';
 
 
-export const generateWorkshopOptions = async (puppet: Puppet, shownExplanations: ExplanationId[]): Promise<WorkshopData> => {
-    const prompt = getWorkshopPrompt(puppet, shownExplanations);
+export const generateWorkshopOptions = async (puppet: Puppet, shownExplanations: ExplanationId[], inventory: Item[]): Promise<WorkshopData> => {
+    const prompt = getWorkshopPrompt(puppet, shownExplanations, inventory);
     return await generateContentWithSchema<WorkshopData>(prompt, workshopSchema);
 };
 

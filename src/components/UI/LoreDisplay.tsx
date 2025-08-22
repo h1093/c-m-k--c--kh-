@@ -10,10 +10,10 @@ const SectionTitle: React.FC<{ title: string; children?: React.ReactNode; color?
     </div>
 );
 
-const LoreEntry: React.FC<{ term: string; definition: string; className?: string }> = ({ term, definition, className = "" }) => (
+const LoreEntry: React.FC<{ term: string; definition: React.ReactNode; className?: string }> = ({ term, definition, className = "" }) => (
     <div className={`bg-black/30 p-3 border-l-4 border-gray-700 ${className}`}>
         <p className="font-semibold text-red-300">{term}</p>
-        <p className="text-sm text-gray-400 mt-1">{definition}</p>
+        <div className="text-sm text-gray-400 mt-1">{definition}</div>
     </div>
 );
 
@@ -182,6 +182,7 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                     </SectionTitle>
                      <div className="space-y-3">
                         <LoreEntry term="Thứ Tự (Sequence)" definition="Con đường tiến hóa của một con rối được chia thành các cấp bậc từ 9 (thấp nhất) đến 0 (Thần). Mỗi bước thăng tiến mở ra sức mạnh mới." />
+                        <LoreEntry term="Nguyên Liệu Thăng Tiến" definition="Để thăng tiến lên các Thứ Tự cao hơn, ngoài Tinh Hoa Cơ Khí, bạn cần phải tìm kiếm các Linh Kiện Huyền Bí đặc biệt. Mỗi Lộ Trình sẽ yêu cầu những nguyên liệu khác nhau, chỉ có thể tìm thấy bằng cách khám phá thế giới, đánh bại kẻ thù hùng mạnh, hoặc hoàn thành các Hợp Đồng nguy hiểm. Điều này khiến mỗi bước thăng tiến là một thành tựu đáng giá." />
                         <LoreEntry term="Mục Tiêu Tối Thượng" definition="Cuộc chiến giữa các Phe Phái là để chiếm lấy vị trí Thứ Tự 0 và viết lại vĩnh viễn các định luật của thực tại theo ý muốn của họ." />
                         <LoreEntry term="Nghi Thức Thăng Tiến" definition="Để tiến lên Thứ Tự tiếp theo, Nghệ Nhân Rối phải hoàn thành một Nghi Thức—một điều kiện mang tính biểu tượng, thường rất nguy hiểm. Kiến thức về các Nghi Thức này là bí mật được canh giữ cẩn mật nhất của mỗi Phe Phái." />
                         <LoreEntry term="Thu Phục Kẻ Thù" definition="Một Nghệ Nhân Rối tài năng có thể thực hiện 'Nghi Thức Thu Phục' sau khi đánh bại một tạo vật cơ khí, tái chế nó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." />
@@ -192,9 +193,35 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                     </SectionTitle>
                      <div className="space-y-3">
                         <LoreEntry term="Kim Lệnh (Crowns)" definition="Tiền tệ tiêu chuẩn của thế giới bề nổi. Dùng cho các giao dịch thông thường như mua vật tư, thực phẩm, hoặc hối lộ lính gác." />
-                        <LoreEntry term="Dấu Ấn Đồng Thau (Brass Marks)" definition="Đơn vị tiền tệ được chấp nhận trong thế giới ngầm của các Nghệ Nhân Rối. Kiếm được bằng cách hoàn thành các 'Hợp Đồng' bí mật hoặc bán các vật phẩm huyền bí." />
+                        <LoreEntry term="Dấu Ấn Đồng Thau (Brass Marks)" definition="Đơn vị tiền tệ được chấp nhận trong thế giới ngầm. Dùng để giao dịch các công nghệ bị cấm, thuê lính đánh thuê, và quan trọng nhất, tham gia vào các cuộc đấu giá tại Chợ Đen Bánh Răng để giành lấy những Linh Kiện Huyền Bí cực kỳ hiếm." />
+                        <LoreEntry 
+                            term="Chợ Đen Bánh Răng & Nhà Đấu Giá"
+                            definition={
+                                <p>
+                                    Đây không chỉ là một nơi để mua bán, mà là trung tâm quyền lực của thế giới ngầm. Tại đây, Dấu Ấn Đồng Thau được dùng để:
+                                    <ul className="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong className="text-gray-300">Mua Linh Kiện Huyền Bí:</strong> Giành lấy những nguyên liệu thăng tiến cực hiếm.</li>
+                                        <li><strong className="text-gray-300">Bán Vật Phẩm Hiếm:</strong> Đấu giá những linh kiện hoặc cổ vật bạn tìm được để làm giàu.</li>
+                                        <li><strong className="text-gray-300">Mua Bán Thông Tin & Hợp Đồng:</strong> Đấu giá để có được những thông tin mật có thể dẫn đến kho báu, hoặc nhận lấy những Hợp Đồng nguy hiểm nhưng có phần thưởng hậu hĩnh.</li>
+                                    </ul>
+                                </p>
+                            }
+                        />
                         <LoreEntry term="Quy Tắc Vàng" definition="Không bao giờ nhầm lẫn hai loại tiền tệ. Sử dụng sai loại tiền tệ ở sai nơi sẽ thu hút sự chú ý không mong muốn và cực kỳ nguy hiểm." />
-                        <LoreEntry term="Hợp Đồng (Contracts)" definition="Các nhiệm vụ phụ có cấu trúc được đưa ra bởi các Phe Phái hoặc các cá nhân, thường nhắm vào các 'Vùng Bất Thường' để thu hồi vật phẩm, điều tra hiện tượng, hoặc loại bỏ một mối đe dọa." />
+                        <LoreEntry 
+                            term="Hợp Đồng & Cách Tìm Kiếm"
+                            definition={
+                                <p>
+                                    Hợp Đồng là các nhiệm vụ phụ mà bạn có thể nhận để kiếm phần thưởng. Để chủ động tìm kiếm chúng, hãy:
+                                    <ul className="list-disc list-inside mt-2 space-y-1">
+                                        <li><strong className="text-gray-300">Lắng nghe tin đồn:</strong> Tại các quán rượu hoặc khu chợ đen, hãy tìm kiếm lựa chọn để hóng chuyện.</li>
+                                        <li><strong className="text-gray-300">Kiểm tra Bảng Thông Báo:</strong> Trong các thành phố hoặc khu định cư, có thể có các bảng thông báo đăng tải công việc.</li>
+                                        <li><strong className="text-gray-300">Liên hệ từ Phe Phái:</strong> Các phe phái có thể trực tiếp tìm đến bạn để giao nhiệm vụ nếu mối quan hệ của bạn với họ đủ đặc biệt.</li>
+                                        <li><strong className="text-gray-300">Duyệt Nhà Đấu Giá:</strong> Những Hợp Đồng béo bở nhất đôi khi được "đấu giá" cho người trả giá cao nhất tại Chợ Đen Bánh Răng.</li>
+                                    </ul>
+                                </p>
+                            }
+                        />
                     </div>
                 </div>
             )
