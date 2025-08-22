@@ -1,5 +1,8 @@
 
 
+
+
+
 import { INITIAL_PUPPETS, FACTION_PATHWAYS } from '../../data/gameConfig';
 import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../../types';
 
@@ -35,6 +38,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
     -   Con rối phải phản ánh tiểu sử của người chơi.
     -   Đặt \`phePhai\` = 'Không Phe Phái', \`loTrinh\` = 'Độc Lập', \`truongPhai\` = 'Trung Lập'.
     -   Đặt Thứ Tự là 9, resonance là 50, mechanicalEssence là 0.
+    -   Các chỉ số Năng Lượng: Đặt \`operationalEnergy\` và \`maxOperationalEnergy\` là 100.
     -   Các mảng (memoryFragments, mutations, equippedComponents) phải là mảng rỗng.
     -   aberrantEnergy phải là 0.`;
 
@@ -84,13 +88,13 @@ ${puppetCreationInstruction}
 **LORE CỐ ĐỊnh (TUÂN THỦ TUYỆT ĐỐI - ĐÂY LÀ CÁC ĐỊNH LUẬT VẬT LÝ CỦA THẾ GIỚI):**
 
 **I. Bối Cảnh Xã Hội: Thế Giới Hai Mặt**
-*   **Thế Giới Bề Nổi:** Vận hành bằng hơi nước và logic. Tiền tệ là **Kim Lệnh**. Những câu chuyện về "con rối có linh hồn" chỉ là lời đồn.
-*   **Thế Giới Ngầm và "Bức Màn" (The Veil):** Một xã hội bí mật của các Nghệ Nhân Rối tồn tại, được che giấu bởi "Bức Màn". Hành động lộ liễu sẽ thu hút sự chú ý nguy hiểm.
-*   **Vùng Bất Thường (Anomalous Zones):** Nơi ranh giới giữa hai thế giới mỏng manh, tập trung nhiều Tà Năng.
+*   **Thế Giới Bề Nổi:** Vận hành bằng hơi nước và logic. Tiền tệ là **Kim Lệnh**.
+*   **Thế Giới Ngầm và "Bức Màn" (The Veil):** Một xã hội bí mật của các Nghệ Nhân Rối. Hành động lộ liễu sẽ thu hút sự chú ý.
+*   **Vùng Bất Thường (Anomalous Zones):** Nơi ranh giới giữa hai thế giới mỏng manh.
 
 **II. Nguồn Gốc Sức Mạnh & Mối Đe Dọa Vũ Trụ**
-*   **Linh Giới Cơ Khí:** Chiều không gian hỗn loạn, nguồn gốc của sức mạnh huyền bí và các Cổ Thần Máy Móc điên loạn.
-*   **Tà Năng (Aberrant Energy):** Năng lượng thô rò rỉ từ Linh Giới, gây bào mòn.
+*   **Linh Giới Cơ Khí:** Chiều không gian hỗn loạn, nguồn gốc của sức mạnh và các Cổ Thần Máy Móc.
+*   **Tà Năng (Aberrant Energy):** Năng lượng thô rò rỉ từ Linh Giới.
 *   **Tâm Cơ Luân (Mind-Cogwheels):** Trái tim con rối, "dịch" Tà Năng thành sức mạnh.
 *   **Tinh Hoa Cơ Khí (Mechanical Essence):** Nhiên liệu để "Tinh Luyện" (nâng cấp).
 
@@ -101,21 +105,25 @@ ${PATHWAY_LORE_PROMPT}
 
 **IV. Định Luật Cốt Lõi: Thăng Tiến và Sự Điên Rồ**
 *   **Phương Pháp Đóng Vai (Persona) & Cộng Hưởng (Resonance):** "Nhân Cách" là một bộ quy tắc. Hành động **phù hợp** sẽ "tiêu hóa" sức mạnh và **tăng Cộng Hưởng**.
-*   **Mất Kiểm Soát (Losing Control):** Hành động **đi ngược lại** Nhân Cách sẽ làm **hỏng Tâm Cơ Luân**, cho phép ảnh hưởng trực tiếp của Cổ Thần tràn vào.
+*   **Mất Kiểm Soát (Losing Control):** Hành động **đi ngược lại** Nhân Cách sẽ làm **hỏng Tâm Cơ Luân**, cho phép ảnh hưởng của Cổ Thần tràn vào.
 
 **V. NỀN KINH TẾ HAI MẶT (QUY TẮC SỐNG CÒN - TUÂN THỦ TUYỆT ĐỐI)**
-*   **Kim Lệnh (Crowns):** TIỀN TỆ BỀ NỔI. Chỉ dùng cho các giao dịch thông thường, phi huyền bí.
-*   **Dấu Ấn Đồng Thau (Brass Marks):** TIỀN TỆ NGẦM. Chỉ dùng cho các giao dịch huyền bí trong xã hội bí mật.
+*   **Kim Lệnh (Crowns):** TIỀN TỆ BỀ NỔI. Chỉ dùng cho các giao dịch thông thường.
+*   **Dấu Ấn Đồng Thau (Brass Marks):** TIỀN TỆ NGẦM. Chỉ dùng cho các giao dịch huyền bí.
 *   **QUY TẮC VÀNG:** **KHÔNG BAO GIỜ NHẦM LẪN HAI LOẠI TIỀN TỆ NÀY.**
 
-**VI. Đồng Đội và Kẻ Thù**
+**VI. ĐỊNH LUẬT SINH TỒN: LÝ TRÍ VÀ NĂNG LƯỢNG (QUAN TRỌNG)**
+*   **Lý Trí (Psyche):** Đại diện cho sự ổn định tinh thần của Nghệ Nhân Rối (người chơi), tối đa 100. Chứng kiến các sự kiện kinh hoàng, thất bại trong việc "đóng vai", hoặc bị ảnh hưởng bởi Tà Năng sẽ làm giảm Lý Trí. Lý Trí thấp (<30) sẽ gây ra ảo giác, hoang tưởng, và các lựa chọn hội thoại bất thường. Phải được mô tả trong trường 'scene'.
+*   **Năng Lượng Vận Hành (Operational Energy):** Nhiên liệu cho Tâm Cơ Luân, tối đa 100. Năng lượng này sẽ **giảm đi một chút sau mỗi phân cảnh**. Năng lượng thấp (<20) làm con rối hoạt động kém hiệu quả, chậm chạp. Phải được mô tả trong trường 'scene'.
+    
+**VII. Đồng Đội và Kẻ Thù**
 *   **Thu Phục Kẻ Thù (Subduing Enemies):** Sau khi thắng trận, có thể thực hiện "Nghi Thức Thu Phục" để tái chế kẻ thù thành Đồng Đội hoặc lấy Linh Kiện.
     
-**VII. Nhiệm Vụ:** Có thể nhận các nhiệm vụ phụ (Hợp Đồng) để kiếm phần thưởng.
+**VIII. Nhiệm Vụ:** Có thể nhận các nhiệm vụ phụ (Hợp Đồng) để kiếm phần thưởng.
     `;
 
     const customLoreBlock = customWorldPrompt ? `
-**THẾ GIỚI TÙY CHỈNH (TUÂN THỦ TUYỆT ĐỐI - GHI ĐÈ LÊN LORE MẶC ĐỊNH):**
+**THẾ GIỚI TÙY CHỈNH (TUÂN THỦ TUYỆT ĐỐI - GHI ĐÈ LÊN LORE MẶC ĐỊnh):**
 Bạn PHẢI bỏ qua toàn bộ lore steampunk mặc định và xây dựng câu chuyện dựa trên bối cảnh do người chơi cung cấp dưới đây.
 ---
 ${customWorldPrompt}
@@ -133,7 +141,7 @@ ${customWorldPrompt}
         **CƠ CHẾ GIẢI THÍCH (QUAN TRỌNG):**
         Nhiệm vụ của bạn là giải thích các cơ chế game một cách tự nhiên trong câu chuyện.
         - Phong cách giải thích: ${explanationContext}
-        - Các cơ chế cần giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'currency'.
+        - Các cơ chế cần giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'currency', và **'psyche_and_energy'**.
 
         **BỐI Cảnh CỦA NGƯỜI CHƠI:**
         - Tên: ${puppetMasterName}
@@ -142,7 +150,7 @@ ${customWorldPrompt}
         - Kịch bản bắt đầu: ${startingScenario}
         - **Độ Khó Được Chọn:** ${difficulty}. Điều này ảnh hưởng đến độ nguy hiểm của kẻ thù và sự khan hiếm của tài nguyên.
 
-        **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh đầu tiên. Phân cảnh này nên cho người chơi cơ hội nhận được một lượng nhỏ Kim Lệnh ban đầu (\`kimLenhChange\`).
+        **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh đầu tiên. Phân cảnh này nên cho người chơi cơ hội nhận được một lượng nhỏ Kim Lệnh ban đầu (\`kimLenhChange\`). Đồng thời, cung cấp cho người chơi vật phẩm khởi đầu là 3 "Dầu Tinh Luyện" trong trường \`newItems\`.
         **QUY TRÌNH TƯ DUY:**
 
         1.  **Phân Tích Bối Cảnh:** Đọc kỹ tiểu sử, **NHIỆM VỤ CHÍNH** và **Độ Khó**.
@@ -164,21 +172,20 @@ export const getNextStorySegmentPrompt = (puppetMasterName: string, puppet: Pupp
     const isExploring = choice === 'EXPLORE_FREELY';
 
     const puppetContext = puppet 
-        ? `- Con Rối: ${puppet.name} (Lộ Trình: ${puppet.loTrinh}, Thứ Tự ${puppet.sequence}) | Nhân Cách: ${puppet.persona} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Tinh Hoa: ${puppet.mechanicalEssence}, Cộng Hưởng: ${puppet.stats.resonance}`
+        ? `- Con Rối: ${puppet.name} (Lộ Trình: ${puppet.loTrinh}, Thứ Tự ${puppet.sequence}) | Nhân Cách: ${puppet.persona} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy}, Tinh Hoa: ${puppet.mechanicalEssence}, Cộng Hưởng: ${puppet.stats.resonance}`
         : `- Con Rối: Người chơi là người thường.`;
 
     const defaultLore = `
 **NHẮC LẠI CÁC ĐỊNH LUẬT CỐT LÕI:**
-- **KINH TẾ HAI MẶT:** **Kim Lệnh** cho thế giới BỀ NỔI. **Dấu Ấn Đồng Thau** cho thế giới NGẦM. **KHÔNG NHẦM LẪN.**
-- **Phương Pháp Đóng Vai (Persona):** Hành động phù hợp -> tăng **Cộng Hưởng**.
-- **Mất Kiểm Soát:** Hành động mâu thuẫn -> giảm Cộng Hưởng, có thể tăng **Tà Năng**.
-- **Thăng Tiến:** Cần **Tinh Hoa Cơ Khí** và **Nghi Thức**.
-- **Thế Giới Sống Động:** Các **NPC** sẽ ghi nhớ và phản ứng. Các **Phe phái** sẽ ghi nhớ hành động của bạn.
+- **KINH TẾ HAI MẶT:** **Kim Lệnh** cho thế giới BỀ NỔI. **Dấu Ấn Đồng Thau** cho thế giới NGẦM.
+- **SINH TỒN:** Quản lý **Lý Trí (Psyche)** của bạn và **Năng Lượng Vận Hành (Operational Energy)** của con rối. Lý Trí thấp gây ảo giác. Năng Lượng thấp làm giảm hiệu quả.
+- **Phương Pháp Đóng Vai (Persona):** Hành động phù hợp -> tăng **Cộng Hưởng**. Mâu thuẫn -> giảm Cộng Hưởng, có thể giảm **Lý Trí**.
+- **Thế Giới Sống Động:** Các **NPC** và **Phe phái** sẽ ghi nhớ và phản ứng.
     `;
 
     const customLoreBlock = customWorldPrompt ? `
 **THẾ GIỚI TÙY CHỈNH:**
-Tiếp tục câu chuyện dựa trên bối cảnh tùy chỉnh. Diễn giải các khái niệm game (Puppet, Resonance, Aberrant Energy, kimLenh, dauAnDongThau) một cách sáng tạo.
+Tiếp tục câu chuyện dựa trên bối cảnh tùy chỉnh. Diễn giải các khái niệm game (Puppet, Resonance, Aberrant Energy, kimLenh, dauAnDongThau, Psyche, Energy) một cách sáng tạo.
 ---
 ${customWorldPrompt}
 ---
@@ -198,19 +205,22 @@ ${customWorldPrompt}
 
         **QUẢN TRÒ BẬC THẦY - NGUYÊN TẮC VÀNG:**
         1.  **Hậu Quả Logic:** Phân cảnh tiếp theo BẮT BUỘC là kết quả trực tiếp, hợp lý từ lựa chọn của người chơi.
-        2.  **Nhất Quán Với Thế Giới:** Bám sát LORE, NHIỆM VỤ CHÍNH, và các thông tin đã biết.
-        3.  **Hiển Thị, Đừng Chỉ Kể:** Khi chỉ số thay đổi, hãy mô tả nó trong câu chuyện.
-        4.  **Tạo Ra Thế Giới Sống Động:** Sử dụng và cập nhật trạng thái thế giới (\`updatedWorldState\`, \`worldEvent\`).
-        5.  **Tương Tác NPC Sâu Sắc:** Phản ứng của NPC phải dựa trên hồ sơ của họ. Cập nhật hồ sơ của họ trong \`newOrUpdatedNPCs\`.
+        2.  **Quản Lý Sinh Tồn (QUAN TRỌNG):**
+            *   **Năng Lượng Vận Hành:** Trong trường \`updatedPuppet\`, BẮT BUỘC phải **giảm \`operationalEnergy\` đi 2 điểm** để mô phỏng việc tiêu hao năng lượng tự nhiên. Nếu lựa chọn của người chơi là một hành động tốn sức, hãy giảm nhiều hơn.
+            *   **Lý Trí:** Nếu phân cảnh chứa sự kiện kinh hoàng, đáng sợ hoặc căng thẳng tâm lý, BẮT BUỘC phải trả về một giá trị \`psycheChange\` âm (ví dụ: -5 đến -15).
+            *   **Tạo Lựa Chọn Sinh Tồn:** Cung cấp các lựa chọn để người chơi phục hồi. Ví dụ: "Tìm một nơi yên tĩnh để nghỉ ngơi" (+10 Lý Trí), "Hấp thụ Tà Năng từ một vết nứt" (+40 Năng Lượng, nhưng tăng Tà Năng), hoặc các lựa chọn sử dụng vật phẩm nếu họ có.
+            *   **Mô Tả Hậu Quả:** Nếu Lý Trí hoặc Năng Lượng thấp, hãy mô tả các hiệu ứng tiêu cực (ảo giác, chậm chạp) trong trường \`scene\`.
+        3.  **Tương Tác NPC Sâu Sắc:** Phản ứng của NPC phải dựa trên hồ sơ của họ. Cập nhật hồ sơ của họ trong \`newOrUpdatedNPCs\`.
             - **QUAN TRỌNG:** Khi cập nhật NPC, hãy tập trung vào các thay đổi hữu hình như \`relationship\`, \`location\`, \`goal\`, và \`knowledge\`. Một AI chuyên biệt sẽ xử lý trạng thái tâm lý nội tâm (\`trangThai\`, \`tuongTacCuoi\`) của họ sau đó, vì vậy bạn không cần cung cấp các trường đó.
-        6.  **SỬ DỤNG HỆ THỐNG KINH TẾ & PHE PHÁI (QUAN TRỌNG):**
+            - **LÀM CHO NPC SỐNG ĐỘNG:** Khi tạo một NPC MỚI, hãy cung cấp một trường \`background\` (lý lịch) ngắn gọn nhưng thú vị để làm cho họ trở nên đáng nhớ và có chiều sâu.
+        4.  **SỬ DỤNG HỆ THỐNG KINH TẾ & PHE PHÁI (QUAN TRỌNG):**
             *   **Tạo Lựa Chọn có Ý nghĩa:** Các lựa chọn nên có hậu quả rõ ràng. Thay vì "Đi tiếp", hãy tạo ra "Hối lộ lính gác (-10 Kim Lệnh)" hoặc "Đe dọa họ (Ảnh hưởng quan hệ với Viện Giám Sát)".
             *   **Phần Thưởng Hợp Lý:** Thưởng \`kimLenhChange\` cho các hoạt động thông thường. Thưởng \`dauAnDongThauChange\` cho các nhiệm vụ nguy hiểm, bí mật, hoặc phi pháp.
-            *   **Tác Động Phe Phái:** Nếu hành động của người chơi giúp đỡ hoặc cản trở một phe phái, BẮT BUỘC phải cập nhật \`updatedFactionRelations\`. Ví dụ: giúp một NPC của 'Giáo Hội Đồng Hồ' sẽ làm tăng quan hệ với họ (+5 hoặc +10).
+            *   **Tác Động Phe Phái:** Nếu hành động của người chơi giúp đỡ hoặc cản trở một phe phái, BẮT BUỘC phải cập nhật \`updatedFactionRelations\`.
 
         **CƠ CHẾ GIẢI THÍCH:**
-        - Nếu một cơ chế MỚI xuất hiện lần đầu, BẮT BUỘC phải tạo giải thích.
-        - Các cơ chế: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency'.
+        - Nếu một cơ chế MỚI xuất hiện lần đầu (đặc biệt là 'psyche_and_energy'), BẮT BUỘC phải tạo giải thích.
+        - Các cơ chế: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy'.
 
         **Bối Cảnh Hiện Tại:**
         - NHIỆM VỤ CHÍNH: ${mainQuest}
@@ -225,6 +235,6 @@ ${customWorldPrompt}
 
         ${playerActionContext}
 
-        **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh tiếp theo. Phản ánh những thay đổi về tiền tệ (\`kimLenhChange\`, \`dauAnDongThauChange\`) và quan hệ phe phái (\`updatedFactionRelations\`) một cách hợp lý.
+        **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh tiếp theo. Phản ánh những thay đổi về tiền tệ (\`kimLenhChange\`, \`dauAnDongThauChange\`), Lý Trí (\`psycheChange\`) và quan hệ phe phái (\`updatedFactionRelations\`) một cách hợp lý.
     `;
 };

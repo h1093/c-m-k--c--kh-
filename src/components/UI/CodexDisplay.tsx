@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { FACTION_PATHWAYS, INITIAL_PUPPETS } from '../../data/gameConfig';
 
@@ -91,6 +92,8 @@ const CodexDisplay: React.FC = () => {
                         <LoreEntry term="Linh Giới & Cổ Thần" definition="Một chiều không gian hỗn loạn, nguồn gốc của sức mạnh huyền bí và là nhà của các Cổ Thần Máy Móc điên loạn." />
                         <LoreEntry term="Phương Pháp Đóng Vai (Nhân Cách)" definition="Cách duy nhất để 'tiêu hóa' sức mạnh một cách an toàn là hành động và suy nghĩ theo đúng bản chất (Nhân Cách) của Lộ Trình." />
                         <LoreEntry term="Cộng Hưởng & Mất Kiểm Soát" definition="Hành động phù hợp tăng Cộng Hưởng. Hành động mâu thuẫn làm hỏng Tâm Cơ Luân, cho phép ảnh hưởng của Cổ Thần tràn vào, dẫn đến Mất Kiểm Soát." />
+                        <LoreEntry term="Lý Trí & Năng Lượng" definition="Bạn phải quản lý sự ổn định tinh thần (Lý Trí) của chính mình và nhiên liệu (Năng Lượng Vận Hành) của con rối. Cả hai đều có hậu quả nghiêm trọng khi xuống thấp." />
+                        <LoreEntry term="Phản Hồi Đồng Cảm & Rò Rỉ Tà Năng" definition="Liên kết của bạn là hai chiều. Sát thương lên con rối có thể gây sốc tinh thần cho bạn và làm rò rỉ Tà Năng, gây ra ảo giác." />
                         <LoreEntry term="Kim Lệnh vs. Dấu Ấn" definition="Kim Lệnh cho thế giới thông thường. Dấu Ấn Đồng Thau cho thế giới ngầm. Không bao giờ nhầm lẫn." />
                     </div>
                 </div>

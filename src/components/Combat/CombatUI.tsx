@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import type { Puppet, Enemy, Explanation, Component, Companion, NPC, LoreEntry, LoreSummary, FactionRelations } from '../../types';
+import type { Puppet, Enemy, Explanation, Component, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item, Quest } from '../../types';
 import PuppetStatus from '../PC/PuppetStatus';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ExplanationDisplay from '../UI/ExplanationDisplay';
@@ -14,6 +15,9 @@ interface CombatUIProps {
     masterName: string;
     explanation?: Explanation;
     inventory: Component[];
+    itemInventory: Item[];
+    sideQuests: Quest[];
+    onUseItem: (itemId: string) => void;
     npcs: NPC[];
     worldState: { [locationId: string]: string };
     loreEntries: LoreEntry[];
@@ -27,6 +31,8 @@ interface CombatUIProps {
     apiCalls: number;
     kimLenh: number;
     dauAnDongThau: number;
+    mentalShock: string | null;
+    aberrantEnergyLeak: string | null;
 }
 
 const StatBar: React.FC<{ value: number; maxValue: number; color: string; glowColor: string; }> = ({ value, maxValue, color, glowColor }) => {
@@ -127,7 +133,7 @@ const CombatLog: React.FC<{ log: string[] }> = ({ log }) => {
 };
 
 
-const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau }) => {
+const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, itemInventory, sideQuests, onUseItem, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau, mentalShock, aberrantEnergyLeak }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -135,7 +141,8 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
             puppet={puppet} 
             masterName={masterName} 
             componentInventory={inventory} 
-            sideQuests={[]} 
+            itemInventory={itemInventory}
+            sideQuests={sideQuests} 
             companions={companions} 
             npcs={npcs}
             worldState={worldState}
@@ -145,11 +152,19 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
             apiCalls={apiCalls}
             kimLenh={kimLenh}
             dauAnDongThau={dauAnDongThau}
+            onUseItem={onUseItem}
         />
     );
 
     return (
         <div className="flex flex-col lg:flex-row gap-6 p-2 sm:p-4 md:p-6 h-full animate-fade-in">
+            {aberrantEnergyLeak && (
+                <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-8 animate-fade-in-out-long backdrop-blur-sm">
+                    <div className="text-center">
+                        <p className="text-2xl font-cinzel text-purple-400 animate-glitch">{aberrantEnergyLeak}</p>
+                    </div>
+                </div>
+            )}
             {/* Desktop Status Panel */}
             <div className="hidden lg:block lg:w-[30rem] lg:flex-shrink-0 lg:h-full overflow-y-auto">
                 <StatusPanel />
@@ -172,6 +187,11 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
                 </div>
 
                 <div className="flex-grow overflow-y-auto pr-2 space-y-6">
+                    {mentalShock && (
+                        <div className="p-3 text-center bg-gray-800/50 border-l-4 border-gray-600 animate-fade-in">
+                            <p className="text-gray-300 italic">{mentalShock}</p>
+                        </div>
+                    )}
                     <EnemyStatus enemy={enemy} />
                     <CompanionCombatStatus companions={companions} />
                     <CombatLog log={combatLog} />

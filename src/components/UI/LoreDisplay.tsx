@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { FACTION_PATHWAYS, INITIAL_PUPPETS } from '../../data/gameConfig';
 
@@ -137,7 +138,7 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                     </SectionTitle>
                     <div className="space-y-3">
                         <LoreEntry term="Thế Giới Bề Nổi" definition="Đối với đại đa số dân chúng, thế giới vận hành bằng hơi nước và logic sắt thép. Những câu chuyện về 'con rối có linh hồn' chỉ là lời đồn mê tín." />
-                        <LoreEntry term="Thế Giới Ngầm và 'Bức Màn' (The Veil)" definition="Trong bóng tối, một xã hội bí mật của các Nghệ Nhân Rối tồn tại, được che giấu bởi 'Bức Màn' - một thỏa thuận ngầm giữa các Phe Phái để ngăn chặn sự thật bị bại lộ. Hành động quá lộ liễu ở nơi công cộng sẽ thu hút sự chú ý của các thế lực nguy hiểm và có thể làm suy yếu 'Bức Màn'." />
+                        <LoreEntry term="Thế Giới Ngầm và 'Bức Màn' (The Veil)" definition="Trong bóng tối, một xã hội bí mật của các Nghệ Nhân Rối tồn tại, được che giấu bởi 'Bức Màn' - một thỏa thuận ngầm giữa các Phe Phái để ngăn chặn sự thật bị bại lộ. Hành động quá lộ liễu ở nơi công cộng sẽ thu hút sự chú ý của các thế lực nguy hiểm." />
                         <LoreEntry term="Vùng Bất Thường (Anomalous Zones)" definition="Những nơi mà ranh giới giữa thế giới vật chất và Linh Giới mỏng manh một cách bất thường. Đây là những địa điểm cực kỳ nguy hiểm, thường là mục tiêu của các 'Hợp Đồng' do sự tập trung cao của Tà Năng và các hiện tượng siêu nhiên." />
                     </div>
 
@@ -145,9 +146,10 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                         Mọi sức mạnh đều có một cái giá, và thực tại của chúng ta chỉ là một hòn đảo nhỏ trong một đại dương hỗn loạn.
                     </SectionTitle>
                     <div className="space-y-3">
-                        <LoreEntry term="Linh Giới Cơ Khí" definition="Một chiều không gian của năng lượng hỗn loạn, vô định hình. Đây là nguồn gốc của mọi sức mạnh huyền bí và cũng là nhà của những thực thể không thể tưởng tượng được." />
-                        <LoreEntry term="Các Cổ Thần Máy Móc" definition="Những thực thể nguyên thủy, có tri giác được tạo thành từ các định luật vật lý thuần túy, tồn tại trong Linh Giới. Mỗi Lộ Trình Thăng Tiến thực chất là một phương pháp đã được tinh chỉnh để 'tiêu hóa' một cách an toàn một phần đặc tính của một trong số các Cổ Thần này, biến sự điên loạn của chúng thành sức mạnh có thể kiểm soát." />
-                        <LoreEntry term="Tà Năng" definition="Năng lượng thô rò rỉ từ Linh Giới, mang theo ảnh hưởng bào mòn và tha hóa của các Cổ Thần. Tiếp xúc trực tiếp sẽ làm biến dạng vật chất và tâm trí." />
+                        <LoreEntry term="Linh Giới Cơ Khí" definition="Một chiều không gian của năng lượng hỗn loạn, vô định hình. Đây là nguồn gốc của mọi sức mạnh huyền bí và cũng là nhà của những thực thể không thể tưởng tượng được (Các Cổ Thần Máy Móc)." />
+                        <LoreEntry term="Tà Năng (Aberrant Energy)" definition="Năng lượng thô rò rỉ từ Linh Giới, mang theo ảnh hưởng bào mòn và tha hóa của các Cổ Thần. Tiếp xúc trực tiếp sẽ làm biến dạng vật chất và tâm trí." />
+                        <LoreEntry term="Tâm Cơ Luân (Mind-Cogwheels)" definition="Trái tim của một con rối. Một thiết bị huyền bí có khả năng 'dịch' Tà Năng hỗn loạn từ Linh Giới thành sức mạnh có thể điều khiển được." />
+                        <LoreEntry term="Tinh Hoa Cơ Khí (Mechanical Essence)" definition="Sản phẩm phụ tinh khiết được tạo ra trong quá trình 'dịch' Tà Năng. Đây là nhiên liệu cần thiết để thực hiện 'Tinh Luyện' - quá trình nâng cấp và thăng tiến Thứ Tự của con rối." />
                     </div>
 
                     <SectionTitle title="Phương Pháp Đóng Vai & Mất Kiểm Soát" color="text-gray-300">
@@ -155,28 +157,43 @@ const LoreDisplay: React.FC<LoreDisplayProps> = ({ onClose }) => {
                     </SectionTitle>
                     <div className="space-y-3">
                         <LoreEntry term="Phương Pháp Đóng Vai (Nhân Cách)" definition="Định luật quan trọng nhất. Mỗi Thứ Tự trong một Lộ Trình có một bản chất cốt lõi. 'Đóng vai' là hành động và suy nghĩ theo đúng bản chất đó. Đây là cách duy nhất để 'tiêu hóa' sức mạnh một cách an toàn." />
-                        <LoreEntry term="Cộng Hưởng" definition="Thước đo mức độ 'tiêu hóa' sức mạnh. Hành động phù hợp với Nhân Cách sẽ tăng Cộng Hưởng. Hành động mâu thuẫn sẽ làm giảm nó, là dấu hiệu cho thấy Tâm Cơ Luân đang bị hư hỏng." />
-                        <LoreEntry term="Mất Kiểm Soát" definition="Hậu quả của việc không 'tiêu hóa' được sức mạnh. Khi hành động đi ngược lại Nhân Cách, nó làm hỏng tính toàn vẹn của Tâm Cơ Luân, cho phép ảnh hưởng trực tiếp của Cổ Thần bảo trợ Lộ Trình đó tràn vào. Sự tha hóa này luôn mang tính logic với Lộ Trình (ví dụ: người theo Lộ Trình 'Pháo Đài' sẽ trở nên hoang tưởng cực độ), và gây ra các hiệu ứng tâm lý như ảo giác, hoang tưởng, và nghe thấy những tiếng thì thầm máy móc." />
+                        <LoreEntry term="Cộng Hưởng (Resonance)" definition="Thước đo mức độ 'tiêu hóa' sức mạnh. Hành động phù hợp với Nhân Cách sẽ tăng Cộng Hưởng. Hành động mâu thuẫn sẽ làm giảm nó, là dấu hiệu cho thấy Tâm Cơ Luân đang bị hư hỏng." />
+                        <LoreEntry term="Mất Kiểm Soát" definition="Hậu quả của việc không 'tiêu hóa' được sức mạnh. Khi hành động đi ngược lại Nhân Cách, nó làm hỏng tính toàn vẹn của Tâm Cơ Luân, cho phép ảnh hưởng trực tiếp của Cổ Thần bảo trợ Lộ Trình đó tràn vào, gây ra các hiệu ứng tâm lý như ảo giác, hoang tưởng, và nghe thấy những tiếng thì thầm máy móc." />
+                    </div>
+                    
+                     <SectionTitle title="Cái Giá Của Sự Liên Kết" color="text-yellow-400">
+                        Liên kết giữa bạn và con rối là một cây cầu hai chiều.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Phản Hồi Đồng Cảm (Sympathetic Feedback)" definition="Khi con rối chịu sát thương đáng kể, một dư chấn của sự hủy diệt đó sẽ dội ngược lại và tấn công vào tâm trí bạn dưới dạng một cú sốc tinh thần, có thể tạm thời làm lung lay ý chí và giảm Cộng Hưởng." />
+                        <LoreEntry term="Rò Rỉ Tà Năng (Aberrant Energy Leak)" definition="Những đòn đánh cực mạnh có thể tạo ra những vết nứt tạm thời trong Tâm Cơ Luân. Qua đó, Tà Năng thô sẽ rò rỉ ngược lại và xâm nhập vào nhận thức của bạn, gây ra những ảo giác ngắn và làm tăng Tà Năng của con rối." />
+                    </div>
+
+                    <SectionTitle title="Định Luật Sinh Tồn: Lý Trí và Năng Lượng" color="text-yellow-400">
+                        Cái giá của việc điều khiển rối không chỉ là sự hao mòn của máy móc.
+                    </SectionTitle>
+                    <div className="space-y-3">
+                        <LoreEntry term="Lý Trí (Psyche)" definition="Đại diện cho sự ổn định tinh thần của chính bạn, Nghệ Nhân Rối. Chứng kiến các sự kiện kinh hoàng, thất bại trong việc 'đóng vai' hoặc bị ảnh hưởng bởi Tà Năng sẽ làm giảm Lý Trí. Lý Trí thấp sẽ gây ra ảo giác, hoang tưởng và có thể thay đổi các lựa chọn của bạn." />
+                        <LoreEntry term="Năng Lượng Vận Hành" definition="Nhiên liệu cho Tâm Cơ Luân, nó sẽ giảm dần theo thời gian và khi sử dụng kỹ năng. Năng lượng thấp làm con rối hoạt động kém hiệu quả, chậm chạp và có thể không tuân theo các mệnh lệnh phức tạp." />
                     </div>
 
                     <SectionTitle title="Lộ Trình Thăng Tiến & Cuộc Chiến Vì Thực Tại">
                         Mỗi Lộ Trình là một con đường dẫn đến thần좌, và mỗi bước đi đều có thể là bước cuối cùng.
                     </SectionTitle>
                      <div className="space-y-3">
-                        <LoreEntry term="Động Lực Nội Bộ" definition="Các Phe Phái trong cùng một Trường Phái chia sẻ một mục tiêu tối thượng chung, nhưng thường cạnh tranh gay gắt về phương pháp, nguồn lực và ảnh hưởng. Một liên minh giữa họ thường mong manh và đầy toan tính." />
-                        <LoreEntry term="Nghi Thức Thăng Tiến" definition="Để tiến lên Thứ Tự tiếp theo, việc có đủ Tinh Hoa Cơ Khí là KHÔNG ĐỦ. Nghệ Nhân Rối trước tiên phải hoàn thành một Nghi Thức—một điều kiện mang tính biểu tượng, thường rất nguy hiểm và kỳ quái. Kiến thức về các Nghi Thức này là bí mật được canh giữ cẩn mật nhất của mỗi Phe Phái." />
-                        <LoreEntry term="Tính Duy Nhất & Cuộc Chiến Vì Thực Tại" definition="Các Thứ Tự cao (2, 1, 0) là Duy Nhất. Chỉ có thể có một thực thể nắm giữ vị trí Thần (Thứ Tự 0) của một Lộ Trình. Điều này biến cuộc chiến giữa các Phe Phái thành một cuộc chạy đua để trở thành vị thần duy nhất của khái niệm mà họ đại diện và viết lại các định luật của thực tại." />
-                         <LoreEntry term="Thu Phục Kẻ Thù" definition="Một Nghệ Nhân Rối tài năng, sau khi đánh bại một tạo vật cơ khí, có thể cố gắng thực hiện một 'Nghi Thức Thu Phục' thay vì phá hủy nó. Nếu thành công, họ có thể tái chế tạo vật đó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." />
+                        <LoreEntry term="Thứ Tự (Sequence)" definition="Con đường tiến hóa của một con rối được chia thành các cấp bậc từ 9 (thấp nhất) đến 0 (Thần). Mỗi bước thăng tiến mở ra sức mạnh mới." />
+                        <LoreEntry term="Mục Tiêu Tối Thượng" definition="Cuộc chiến giữa các Phe Phái là để chiếm lấy vị trí Thứ Tự 0 và viết lại vĩnh viễn các định luật của thực tại theo ý muốn của họ." />
+                        <LoreEntry term="Nghi Thức Thăng Tiến" definition="Để tiến lên Thứ Tự tiếp theo, Nghệ Nhân Rối phải hoàn thành một Nghi Thức—một điều kiện mang tính biểu tượng, thường rất nguy hiểm. Kiến thức về các Nghi Thức này là bí mật được canh giữ cẩn mật nhất của mỗi Phe Phái." />
+                        <LoreEntry term="Thu Phục Kẻ Thù" definition="Một Nghệ Nhân Rối tài năng có thể thực hiện 'Nghi Thức Thu Phục' sau khi đánh bại một tạo vật cơ khí, tái chế nó thành một Đồng Đội mới hoặc tháo dỡ nó để lấy những Linh Kiện hiếm." />
                     </div>
 
-                    <SectionTitle title="Nền Kinh Tế Ngầm" color="text-yellow-400">
+                    <SectionTitle title="Nền Kinh Tế Hai Mặt" color="text-yellow-400">
                         Mọi thứ đều có giá của nó, đặc biệt là những thứ bị cấm.
                     </SectionTitle>
                      <div className="space-y-3">
-                        <LoreEntry term="Dấu Ấn Đồng Thau" definition="Đơn vị tiền tệ tiêu chuẩn được chấp nhận trong thế giới ngầm của các Nghệ Nhân Rối. Chúng là những đồng xu được khắc các ký hiệu huyền bí, khó làm giả." />
-                        <LoreEntry term="Cách Kiếm Dấu Ấn" definition="Các Nghệ Nhân Rối kiếm chúng bằng cách hoàn thành các 'Hợp Đồng' bí mật, bán linh kiện hoặc thông tin trên Chợ Đen, hoặc thực hiện các nhiệm vụ ngầm rủi ro." />
-                        <LoreEntry term="Chợ Đen Bánh Răng" definition="Đây không phải là một địa điểm cố định, mà là một mạng lưới những kẻ buôn lậu và các cửa hàng bí mật. Đây là nơi duy nhất để mua các linh kiện hiếm, vật liệu bị cấm và thậm chí cả thông tin về các Nghi Thức Thăng Tiến." />
-                        <LoreEntry term="Nhà Đấu Giá Bạc" definition="Một tổ chức trung lập, bí mật chuyên tổ chức các cuộc đấu giá cho những vật phẩm cực kỳ hiếm, như 'Tâm Cơ Luân Di Lại' hoặc các bản thiết kế bị thất lạc. Chỉ những người có danh tiếng hoặc được mời mới có thể tham gia." />
+                        <LoreEntry term="Kim Lệnh (Crowns)" definition="Tiền tệ tiêu chuẩn của thế giới bề nổi. Dùng cho các giao dịch thông thường như mua vật tư, thực phẩm, hoặc hối lộ lính gác." />
+                        <LoreEntry term="Dấu Ấn Đồng Thau (Brass Marks)" definition="Đơn vị tiền tệ được chấp nhận trong thế giới ngầm của các Nghệ Nhân Rối. Kiếm được bằng cách hoàn thành các 'Hợp Đồng' bí mật hoặc bán các vật phẩm huyền bí." />
+                        <LoreEntry term="Quy Tắc Vàng" definition="Không bao giờ nhầm lẫn hai loại tiền tệ. Sử dụng sai loại tiền tệ ở sai nơi sẽ thu hút sự chú ý không mong muốn và cực kỳ nguy hiểm." />
                         <LoreEntry term="Hợp Đồng (Contracts)" definition="Các nhiệm vụ phụ có cấu trúc được đưa ra bởi các Phe Phái hoặc các cá nhân, thường nhắm vào các 'Vùng Bất Thường' để thu hồi vật phẩm, điều tra hiện tượng, hoặc loại bỏ một mối đe dọa." />
                     </div>
                 </div>

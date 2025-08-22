@@ -10,7 +10,7 @@ export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
     persona: "Một người bảo vệ kiên định, xem nhiệm vụ là trên hết, đứng vững như một tấm khiên cho chủ nhân.",
     sequence: 9,
     sequenceName: "Học Việc Sắt",
-    stats: { hp: 30, maxHp: 30, attack: 5, defense: 8, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50 },
+    stats: { hp: 30, maxHp: 30, attack: 5, defense: 8, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50, operationalEnergy: 100, maxOperationalEnergy: 100 },
     abilities: [{ name: "Sợi Chỉ Aegis", description: "Kéo căng các sợi chỉ gia cố để khóa chặt các tấm khiên đồng, tăng mạnh phòng thủ trong một lượt."}],
     abilityPool: [
         { name: "Khiên Phản Kích", description: "Sau khi phòng thủ, gây một lượng nhỏ sát thương lên kẻ tấn công." },
@@ -32,7 +32,7 @@ export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
     persona: "Một nhà phân tích máy móc, tìm kiếm các quy luật và logic ẩn sau sự hỗn loạn của thế giới để dự đoán các kết quả có khả năng xảy ra nhất.",
     sequence: 9,
     sequenceName: "Tín Đồ Bánh Răng",
-    stats: { hp: 22, maxHp: 22, attack: 7, defense: 6, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50 },
+    stats: { hp: 22, maxHp: 22, attack: 7, defense: 6, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50, operationalEnergy: 100, maxOperationalEnergy: 100 },
     abilities: [{ name: "Bánh Răng Định Mệnh", description: "Tạm thời tính toán trước chuyển động của kẻ thù, tăng mạnh khả năng né tránh và độ chính xác trong lượt tiếp theo."}],
     abilityPool: [
         { name: "Phân Tích Xác Suất", description: "Gây sát thương và có tỷ lệ cao làm giảm Tấn Công của kẻ thù." },
@@ -54,7 +54,7 @@ export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
     persona: "Một nhà thám hiểm nhanh nhẹn và tò mò, luôn bị thôi thúc khám phá những điều chưa biết và tìm ra những con đường ẩn giấu.",
     sequence: 9,
     sequenceName: "Tân Binh Dò Đường",
-    stats: { hp: 25, maxHp: 25, attack: 8, defense: 4, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50 },
+    stats: { hp: 25, maxHp: 25, attack: 8, defense: 4, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50, operationalEnergy: 100, maxOperationalEnergy: 100 },
     abilities: [{ name: "Bánh Răng Tăng Tốc", description: "Vận hành với tốc độ chóng mặt, tấn công hai lần trong một lượt."}],
     abilityPool: [
         { name: "Mắt Kính Tinh Xảo", description: "Phân tích điểm yếu của đối thủ, tăng tỷ lệ chí mạng cho đòn tấn công tiếp theo." },
@@ -76,7 +76,7 @@ export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
     persona: "Một sinh vật của bóng tối và sự lừa dối, tin rằng chiến thắng đến từ mưu mẹo chứ không phải vũ lực.",
     sequence: 9,
     sequenceName: "Tập Sự Bóng Tối",
-    stats: { hp: 20, maxHp: 20, attack: 10, defense: 2, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50 },
+    stats: { hp: 20, maxHp: 20, attack: 10, defense: 2, aberrantEnergy: 0, maxAberrantEnergy: 100, resonance: 50, operationalEnergy: 100, maxOperationalEnergy: 100 },
     abilities: [{ name: "Lọ Bom Khói", description: "Giải phóng một làn sương mù dày đặc gây mất phương hướng, tạm thời trở nên khó bị tấn công hơn."}],
     abilityPool: [
         { name: "Mũi Tiêm Axit", description: "Gây sát thương theo thời gian và làm giảm phòng thủ của mục tiêu." },
@@ -98,7 +98,7 @@ export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
     persona: "Một cỗ máy được tạo ra từ những thí nghiệm táo bạo, kết hợp các bộ phận cơ khí và vật liệu không ổn định, tin rằng sức mạnh thực sự đòi hỏi phải chấp nhận rủi ro.",
     sequence: 9,
     sequenceName: "Kẻ Hy Sinh",
-    stats: { hp: 28, maxHp: 28, attack: 11, defense: 1, aberrantEnergy: 10, maxAberrantEnergy: 100, resonance: 50 },
+    stats: { hp: 28, maxHp: 28, attack: 11, defense: 1, aberrantEnergy: 10, maxAberrantEnergy: 100, resonance: 50, operationalEnergy: 100, maxOperationalEnergy: 100 },
     abilities: [{ name: "Tự Nạp Tà Năng", description: "Hấp thụ năng lượng hỗn loạn, tăng mạnh Tấn công trong một lượt nhưng phải chịu một lượng nhỏ sát thương và tăng Tà Năng."}],
     abilityPool: [
         { name: "Cánh Tay Pít-tông", description: "Một đòn tấn công mạnh mẽ có thể làm choáng kẻ thù nhưng cũng có tỷ lệ nhỏ tự gây sát thương." },

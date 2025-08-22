@@ -1,4 +1,5 @@
 
+
 export interface PuppetAbility {
   name: string;
   description: string;
@@ -23,6 +24,13 @@ export interface Component {
   name: string;
   description: string; // Should describe stat changes and effects
   type: ComponentType;
+}
+
+export interface Item {
+  id: string; // ví dụ: "refined-oil"
+  name: string;
+  description: string;
+  quantity: number;
 }
 
 
@@ -55,6 +63,7 @@ export interface NPC {
   id: string; 
   name: string;
   description: string;
+  background?: string; // Lý lịch, câu chuyện quá khứ hoặc bí mật của NPC.
   relationship: 'ally' | 'friendly' | 'neutral' | 'hostile';
   location: string;
   faction?: string; // Tên phe phái mà NPC này thuộc về, ví dụ: "Giáo Hội Đồng Hồ"
@@ -96,6 +105,8 @@ export interface Puppet {
     aberrantEnergy: number; // Tà Năng
     maxAberrantEnergy: number;
     resonance: number; // Cộng Hưởng - Mức độ đồng điệu với Nhân Cách
+    operationalEnergy: number; // Năng Lượng Vận Hành - Nhiên liệu cho con rối
+    maxOperationalEnergy: number;
   };
   abilities: PuppetAbility[];
   abilityPool: PuppetAbility[]; // Các kỹ năng tiềm năng có thể học
@@ -112,7 +123,7 @@ export interface Puppet {
   equippedComponents: Component[];
 }
 
-export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences' | 'currency';
+export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences' | 'currency' | 'psyche_and_energy';
 
 export interface Explanation {
   id: ExplanationId;
@@ -145,6 +156,12 @@ export interface StorySegment {
   // Economy
   kimLenhChange?: number; // Tiền tệ thế giới bề nổi
   dauAnDongThauChange?: number; // Tiền tệ thế giới ngầm
+  
+  // New Survival Mechanics
+  psycheChange?: number; // Sự thay đổi về Lý Trí của người chơi
+  newItems?: Item[];
+  updatedItems?: { id: string; quantityChange: number }[];
+
 
   // New Features
   newMemoryFragment?: MemoryFragment;
@@ -172,6 +189,8 @@ export interface CombatTurnResult {
     dauAnDongThauGainedOnWin?: number; // Thêm tiền tệ thế giới ngầm khi thắng
     explanation?: Explanation;
     updatedCompanions?: Companion[];
+    mentalShock?: string; // Sốc tinh thần người chơi phải chịu
+    aberrantEnergyLeak?: string; // Mô tả ảo giác do Tà Năng rò rỉ
 }
 
 export interface UpgradeOption {
@@ -224,10 +243,18 @@ export interface GameState {
   customWorldPrompt: string | null;
   sideQuests: Quest[];
   companions: Companion[];
+  mentalShock: string | null;
+  aberrantEnergyLeak: string | null;
   
   // Economy
   kimLenh: number; // Tiền tệ thế giới bề nổi
   dauAnDongThau: number; // Tiền tệ thế giới ngầm
+  
+  // New Survival Mechanics
+  psyche: number; // Lý trí của người chơi
+  maxPsyche: number;
+  inventory: Item[];
+
 
   // Dynamic World Features
   npcs: NPC[];

@@ -1,6 +1,8 @@
 
+
+
 import React, { useState } from 'react';
-import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations } from '../../types';
+import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item } from '../../types';
 import CodexDisplay from '../UI/CodexDisplay';
 
 const InfoTooltip: React.FC<{ text: string }> = ({ text }) => (
@@ -85,6 +87,7 @@ interface PuppetStatusProps {
   puppet: Puppet;
   masterName: string;
   componentInventory: Component[];
+  itemInventory: Item[];
   sideQuests: Quest[];
   companions: Companion[];
   npcs: NPC[];
@@ -95,9 +98,10 @@ interface PuppetStatusProps {
   kimLenh: number;
   dauAnDongThau: number;
   apiCalls: number;
+  onUseItem: (itemId: string) => void;
 }
 
-const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau }) => {
+const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
 
   const renderContent = () => {
@@ -108,6 +112,7 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
                     <Section title="Trạng Thái Cốt Lõi">
                         <div className="space-y-3">
                             <StatBar value={puppet.stats.hp} maxValue={puppet.stats.maxHp} label="Độ Bền" color="bg-gradient-to-r from-red-600 to-red-500" glowColor="#f87171" />
+                            <StatBar value={puppet.stats.operationalEnergy} maxValue={puppet.stats.maxOperationalEnergy} label="Năng Lượng Vận Hành" color="bg-gradient-to-r from-yellow-600 to-yellow-500" glowColor="#f59e0b" tooltip="Nhiên liệu cho Tâm Cơ Luân. Năng lượng thấp sẽ làm giảm hiệu quả chiến đấu." />
                             <StatBar value={puppet.stats.aberrantEnergy} maxValue={puppet.stats.maxAberrantEnergy} label="Tà Năng" color="bg-gradient-to-r from-purple-600 to-purple-500" glowColor="#c084fc" tooltip="Năng lượng hỗn loạn. Nếu quá cao, nó có thể gây ra đột biến không mong muốn." />
                             <StatBar value={puppet.stats.resonance} maxValue={100} label="Cộng Hưởng" color="bg-gradient-to-r from-slate-500 to-slate-400" glowColor="#94a3b8" tooltip="Mức độ đồng điệu với 'Nhân Cách'. Cộng hưởng cao giúp tăng hiệu quả chiến đấu." />
                         </div>
@@ -143,6 +148,7 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
                                         </summary>
                                         <div className="mt-3 pt-3 border-t border-red-500/10 text-sm text-gray-400 space-y-2">
                                             <p className="italic">{npc.description}</p>
+                                            {npc.background && <p><span className="font-semibold text-gray-300">Lý lịch:</span> {npc.background}</p>}
                                             {npc.faction && <p><span className="font-semibold text-gray-300">Phe phái:</span> {npc.faction}</p>}
                                             {npc.goal && <p><span className="font-semibold text-gray-300">Mục tiêu:</span> {npc.goal}</p>}
                                             {npc.trangThai && <p><span className="font-semibold text-gray-300">Trạng thái:</span> {npc.trangThai}</p>}
@@ -169,7 +175,40 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, componentInventory,
         case 'components': return (<div className="animate-fade-in"><Section title="Linh Kiện Đã Lắp">{puppet.equippedComponents.length > 0 ? puppet.equippedComponents.map(c => <div key={c.id} className="bg-red-900/20 p-3 mb-2"><p className="font-semibold text-red-300">{c.name}</p></div>) : <p className="italic text-gray-500 text-center">Trống.</p>}</Section></div>);
         case 'mutations': return (<div className="animate-fade-in"><Section title="Đột Biến Tà Năng">{puppet.mutations.length > 0 ? puppet.mutations.map(m => <div key={m.id} className="bg-purple-900/30 p-3 mb-2"><p className="font-semibold text-purple-300">{m.name}</p></div>) : <p className="italic text-gray-500 text-center">Chưa có.</p>}</Section></div>);
         case 'memories': return (<div className="animate-fade-in"><Section title="Ký Ức Cốt Lõi">{puppet.memoryFragments.length > 0 ? puppet.memoryFragments.map(f => <details key={f.id} className="bg-black/30 p-3 cursor-pointer mb-2"><summary className="font-semibold text-red-300 list-none">{f.title}</summary><p className="italic mt-2 pt-2 border-t border-red-500/10">{f.text}</p></details>) : <p className="italic text-gray-500 text-center">Chưa ghi lại.</p>}</Section></div>);
-        case 'inventory': return (<div className="animate-fade-in"><Section title="Kho Linh Kiện">{componentInventory.length > 0 ? componentInventory.map(c => <div key={c.id} className="bg-gray-900/30 p-3 mb-2"><p className="font-semibold text-gray-300">{c.name}</p></div>) : <p className="italic text-gray-500 text-center">Trống rỗng.</p>}</Section></div>);
+        case 'inventory': return (
+            <div className="animate-fade-in">
+                <Section title="Túi Đồ">
+                    {itemInventory.length > 0 ? (
+                        itemInventory.map(item => (
+                            <div key={item.id} className="bg-black/30 p-3 mb-2">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="font-semibold text-gray-300">{item.name} <span className="text-sm text-gray-400">x{item.quantity}</span></p>
+                                        <p className="text-xs italic text-gray-500 mt-1">{item.description}</p>
+                                    </div>
+                                    {item.id === 'refined-oil' && (
+                                        <button onClick={() => onUseItem(item.id)} className="ui-button text-xs py-1 px-3 bg-gray-700 hover:bg-gray-600 border-gray-600">Sử dụng</button>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="italic text-gray-500 text-center">Trống.</p>
+                    )}
+                </Section>
+                 <Section title="Kho Linh Kiện">
+                    {componentInventory.length > 0 ? (
+                        componentInventory.map(c => 
+                            <div key={c.id} className="bg-gray-900/30 p-3 mb-2">
+                                <p className="font-semibold text-gray-300">{c.name}</p>
+                            </div>
+                        )
+                    ) : (
+                        <p className="italic text-gray-500 text-center">Trống rỗng.</p>
+                    )}
+                </Section>
+            </div>
+        );
         case 'design': return (<div className="animate-fade-in"><Section title="Bản Thiết Kế"><div className="text-sm bg-black/30 p-3 space-y-1"><p>Phe Phái: {puppet.phePhai}</p><p>Lộ Trình: {puppet.loTrinh}</p><p>Trường Phái: {puppet.truongPhai}</p><p>Vật Liệu: {puppet.material}</p><p className="pt-1 border-t border-red-500/10">Nhân Cách: <span className="italic text-red-300">{puppet.persona}</span></p></div></Section></div>);
         case 'codex': return (<div className="animate-fade-in h-full"><CodexDisplay /></div>);
         default: return null;

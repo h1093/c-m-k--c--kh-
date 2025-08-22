@@ -1,4 +1,6 @@
 
+
+
 import { Type } from "@google/genai";
 
 export const puppetAbilitySchema = {
@@ -7,6 +9,17 @@ export const puppetAbilitySchema = {
         name: { type: Type.STRING },
         description: { type: Type.STRING }
     }
+};
+
+export const itemSchema = {
+    type: Type.OBJECT,
+    properties: {
+        id: { type: Type.STRING, description: "ID định danh duy nhất, ví dụ: 'refined-oil'."},
+        name: { type: Type.STRING },
+        description: { type: Type.STRING },
+        quantity: { type: Type.INTEGER }
+    },
+    required: ["id", "name", "description", "quantity"]
 };
 
 export const memoryFragmentSchema = {
@@ -74,6 +87,7 @@ export const npcSchema = {
         id: { type: Type.STRING, description: "ID duy nhất, kebab-case, ví dụ: 'tho-ren-grim'."},
         name: { type: Type.STRING },
         description: { type: Type.STRING },
+        background: { type: Type.STRING, description: "Lý lịch, câu chuyện quá khứ hoặc bí mật của NPC. Giữ nó ngắn gọn và hấp dẫn." },
         relationship: { type: Type.STRING, description: "Mối quan hệ với người chơi: 'ally', 'friendly', 'neutral', 'hostile'."},
         location: { type: Type.STRING, description: "Địa điểm hiện tại hoặc nơi gặp gỡ cuối cùng."},
         faction: { type: Type.STRING, description: "Tên phe phái mà NPC này thuộc về, ví dụ: 'Giáo Hội Đồng Hồ'"},
@@ -163,7 +177,9 @@ export const puppetSchema = {
                 defense: { type: Type.INTEGER },
                 aberrantEnergy: { type: Type.INTEGER },
                 maxAberrantEnergy: { type: Type.INTEGER },
-                resonance: { type: Type.INTEGER, description: "Điểm Cộng Hưởng, từ 0-100, đo lường mức độ đồng điệu của con rối với Nhân Cách của nó." }
+                resonance: { type: Type.INTEGER, description: "Điểm Cộng Hưởng, từ 0-100, đo lường mức độ đồng điệu của con rối với Nhân Cách của nó." },
+                operationalEnergy: { type: Type.INTEGER },
+                maxOperationalEnergy: { type: Type.INTEGER }
             }
         },
         abilities: { 
@@ -196,7 +212,7 @@ export const explanationSchema = {
     type: Type.OBJECT,
     description: "Một đoạn giải thích về một cơ chế game mới, được lồng ghép vào câu chuyện. Chỉ bao gồm khi một cơ chế được giới thiệu lần đầu.",
     properties: {
-        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency'." },
+        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy'." },
         title: { type: Type.STRING, description: "Tiêu đề của phần giải thích, ví dụ: 'Về Cộng Hưởng và Nhân Cách'." },
         text: { type: Type.STRING, description: "Nội dung giải thích chi tiết, được viết theo phong cách phù hợp với bối cảnh." }
     }
@@ -262,6 +278,26 @@ export const storySegmentSchema = {
         dauAnDongThauChange: {
             type: Type.INTEGER,
             description: "Sự thay đổi về 'Dấu Ấn Đồng Thau' (tiền tệ thế giới ngầm). Dương là nhận, âm là mất."
+        },
+        psycheChange: {
+            type: Type.INTEGER,
+            description: "Sự thay đổi về Lý Trí (Psyche) của người chơi. Âm khi gặp sự kiện kinh hoàng, dương khi nghỉ ngơi hoặc thực hiện hành động 'tiếp đất'."
+        },
+        newItems: {
+            type: Type.ARRAY,
+            items: itemSchema,
+            description: "Danh sách các vật phẩm mới người chơi nhận được."
+        },
+        updatedItems: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    id: { type: Type.STRING },
+                    quantityChange: { type: Type.INTEGER, description: "Số lượng thay đổi (âm là mất, dương là thêm)." }
+                }
+            },
+            description: "Danh sách các vật phẩm trong túi đồ đã thay đổi số lượng."
         },
         explanation: explanationSchema,
         newMemoryFragment: { ...memoryFragmentSchema, description: "Một mảnh ký ức mới được mở khóa nếu Cộng Hưởng đạt ngưỡng cao." },
@@ -336,7 +372,9 @@ export const combatTurnSchema = {
         essenceGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Tinh Hoa Cơ Khí' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
         dauAnDongThauGainedOnWin: { type: Type.INTEGER, description: "Lượng 'Dấu Ấn Đồng Thau' người chơi nhận được NẾU họ thắng trận này. Chỉ điền số khi isCombatOver=true và outcome='win'."},
         explanation: explanationSchema,
-        updatedCompanions: { type: Type.ARRAY, items: companionSchema, description: "Trạng thái được cập nhật của các đồng đội sau lượt chiến đấu."}
+        updatedCompanions: { type: Type.ARRAY, items: companionSchema, description: "Trạng thái được cập nhật của các đồng đội sau lượt chiến đấu."},
+        mentalShock: { type: Type.STRING, description: "Mô tả cú sốc tinh thần mà người điều khiển phải chịu do Phản Hồi Đồng Cảm. Chỉ bao gồm khi con rối chịu sát thương đáng kể." },
+        aberrantEnergyLeak: { type: Type.STRING, description: "Mô tả một ảo giác ngắn do Tà Năng rò rỉ. Chỉ bao gồm khi con rối chịu sát thương CỰC KỲ nghiêm trọng hoặc một đòn chí mạng." }
     },
     required: ["combatLogEntry", "updatedPuppet", "updatedEnemy", "isCombatOver", "outcome"]
 };

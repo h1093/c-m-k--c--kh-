@@ -1,6 +1,8 @@
 
+
+
 import { useState, useCallback, useEffect } from 'react';
-import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC } from '../types';
+import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item } from '../types';
 import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate } from '../logic/storyService';
 import { handleCombatTurn } from '../logic/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../logic/workshopService';
@@ -39,6 +41,11 @@ const initialState: GameState = {
     factionRelations: {},
     difficulty: 'normal',
     apiCalls: 0,
+    mentalShock: null,
+    aberrantEnergyLeak: null,
+    psyche: 100,
+    maxPsyche: 100,
+    inventory: [],
 };
 
 export const useGameState = () => {
@@ -74,6 +81,8 @@ export const useGameState = () => {
             if (initialSegment.explanation) {
                 newShownExplanations.add(initialSegment.explanation.id);
             }
+            
+            const initialInventory: Item[] = initialSegment.newItems || [];
 
             if (!initialSegment.updatedPuppet && scenario !== 'human') {
                 throw new Error("Phân cảnh câu chuyện khởi đầu không cung cấp một con rối. Các bánh răng trong xưởng đã bị kẹt.");
@@ -94,6 +103,8 @@ export const useGameState = () => {
                 kimLenh: prev.kimLenh + (initialSegment.kimLenhChange || 0),
                 dauAnDongThau: prev.dauAnDongThau + (initialSegment.dauAnDongThauChange || 0),
                 factionRelations: initialSegment.updatedFactionRelations ? { ...prev.factionRelations, ...initialSegment.updatedFactionRelations } : prev.factionRelations,
+                inventory: initialInventory,
+                psyche: prev.maxPsyche + (initialSegment.psycheChange || 0),
             }));
             setLastAction(null);
         } catch (error) {
@@ -135,19 +146,42 @@ export const useGameState = () => {
             const newShownExplanations = new Set(gameState.shownExplanations);
             if (nextSegment.explanation) { newShownExplanations.add(nextSegment.explanation.id); }
 
-            const newInventory = [...gameState.componentInventory];
+            // Handle component inventory
+            const newComponentInventory = [...gameState.componentInventory];
             if (nextSegment.newComponent) {
                 const componentId = nextSegment.newComponent.id;
-                const alreadyInInventory = newInventory.some(c => c.id === componentId);
+                const alreadyInInventory = newComponentInventory.some(c => c.id === componentId);
                 const alreadyEquipped = gameState.puppet?.equippedComponents.some(c => c.id === componentId);
 
                 if (!alreadyInInventory && !alreadyEquipped) {
-                    newInventory.push(nextSegment.newComponent);
+                    newComponentInventory.push(nextSegment.newComponent);
                 }
             }
             
+            // Handle item inventory
+            const newItemInventory = [...gameState.inventory];
+            if (nextSegment.newItems) {
+                nextSegment.newItems.forEach(newItem => {
+                    const existingItem = newItemInventory.find(i => i.id === newItem.id);
+                    if (existingItem) {
+                        existingItem.quantity += newItem.quantity;
+                    } else {
+                        newItemInventory.push(newItem);
+                    }
+                });
+            }
+            if (nextSegment.updatedItems) {
+                nextSegment.updatedItems.forEach(updatedItem => {
+                    const item = newItemInventory.find(i => i.id === updatedItem.id);
+                    if (item) {
+                        item.quantity += updatedItem.quantityChange;
+                    }
+                });
+            }
+
+
             const newSideQuests = [...gameState.sideQuests];
-            if (nextSegment.newQuests) { nextSegment.newQuests.forEach(q => { if (!newSideQuests.find(sq => sq.id === q.id)) newSideQuests.push(q); }); }
+            if (nextSegment.newQuests) { newSideQuests.forEach(q => { if (!newSideQuests.find(sq => sq.id === q.id)) newSideQuests.push(q); }); }
             if (nextSegment.updatedQuests) {
                 nextSegment.updatedQuests.forEach(uq => { const idx = newSideQuests.findIndex(q => q.id === uq.id); if (idx > -1) newSideQuests[idx].status = uq.status; });
             }
@@ -218,6 +252,8 @@ export const useGameState = () => {
                     newFactionRelations[faction] = (newFactionRelations[faction] || 0) + nextSegment.updatedFactionRelations[faction];
                 }
             }
+            
+            const newPsyche = Math.max(0, Math.min(gameState.maxPsyche, gameState.psyche + (nextSegment.psycheChange || 0)));
 
             setGameState(prev => ({
                 ...prev,
@@ -229,7 +265,7 @@ export const useGameState = () => {
                 isLoading: false,
                 clues: newClues,
                 shownExplanations: newShownExplanations,
-                componentInventory: newInventory,
+                componentInventory: newComponentInventory,
                 sideQuests: newSideQuests,
                 companions: newCompanions,
                 worldState: newWorldState,
@@ -239,6 +275,8 @@ export const useGameState = () => {
                 kimLenh: prev.kimLenh + (nextSegment.kimLenhChange || 0),
                 dauAnDongThau: prev.dauAnDongThau + (nextSegment.dauAnDongThauChange || 0),
                 factionRelations: newFactionRelations,
+                inventory: newItemInventory.filter(i => i.quantity > 0),
+                psyche: newPsyche,
             }));
             setLastAction(null);
         } catch (error) {
@@ -250,7 +288,7 @@ export const useGameState = () => {
     const handleCombatAction = async (action: string) => {
         if (!gameState.puppet || !gameState.enemy) return;
         setLastAction({ type: 'combat', payload: action });
-        setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+        setGameState(prev => ({ ...prev, isLoading: true, error: null, mentalShock: null, aberrantEnergyLeak: null }));
         try {
             setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
             const result = await handleCombatTurn(gameState.puppet, gameState.enemy, gameState.companions, action, gameState.combatLog, Array.from(gameState.shownExplanations));
@@ -281,7 +319,16 @@ export const useGameState = () => {
                     setGameState(prev => ({ ...prev, isLoading: false, stage: GameStage.GAME_OVER, error: `Bạn đã bị ${gameState.enemy?.name} đánh bại.` }));
                 }
             } else {
-                setGameState(prev => ({ ...prev, puppet: result.updatedPuppet, enemy: result.updatedEnemy, combatLog: newLog, isLoading: false, companions: result.updatedCompanions || prev.companions }));
+                setGameState(prev => ({ 
+                    ...prev, 
+                    puppet: result.updatedPuppet, 
+                    enemy: result.updatedEnemy, 
+                    combatLog: newLog, 
+                    isLoading: false, 
+                    companions: result.updatedCompanions || prev.companions,
+                    mentalShock: result.mentalShock || null,
+                    aberrantEnergyLeak: result.aberrantEnergyLeak || null,
+                }));
             }
             setLastAction(null);
         } catch (error) {
@@ -304,6 +351,36 @@ export const useGameState = () => {
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
         }
     };
+    
+    const handleUseItem = (itemId: string) => {
+        const item = gameState.inventory.find(i => i.id === itemId);
+        if (!item || item.quantity <= 0) return;
+
+        let puppetUpdated = false;
+        const updatedPuppet = gameState.puppet ? { ...gameState.puppet, stats: { ...gameState.puppet.stats } } : null;
+
+        // Apply item effect
+        if (itemId === 'refined-oil' && updatedPuppet) {
+            const energyRestored = 50;
+            updatedPuppet.stats.operationalEnergy = Math.min(
+                updatedPuppet.stats.maxOperationalEnergy,
+                updatedPuppet.stats.operationalEnergy + energyRestored
+            );
+            puppetUpdated = true;
+        }
+
+        // Update inventory
+        const newInventory = gameState.inventory.map(i => 
+            i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i
+        ).filter(i => i.quantity > 0);
+
+        setGameState(prev => ({
+            ...prev,
+            inventory: newInventory,
+            puppet: puppetUpdated ? updatedPuppet : prev.puppet,
+        }));
+    };
+
 
     const handleUpgrade = async (option: UpgradeOption) => {
         if (!gameState.puppet) return;
@@ -430,5 +507,6 @@ export const useGameState = () => {
         handleSaveGame,
         handleExitToMenu,
         handleRetry,
+        handleUseItem,
     };
 };

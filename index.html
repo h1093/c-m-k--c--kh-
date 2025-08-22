@@ -101,6 +101,33 @@
         100% { opacity: 0; transform: translate(-50%, 20px); }
       }
 
+      @keyframes glitch {
+        0% { transform: translate(0); text-shadow: 0 0 5px #c084fc, 0 0 10px #c084fc; }
+        10% { transform: translate(-2px, 2px); }
+        20% { transform: translate(2px, -2px); }
+        30% { transform: translate(-2px, -2px); }
+        40% { transform: translate(2px, 2px); }
+        50% { transform: translate(0); }
+        60% { transform: translate(-2px, 2px); opacity: 0.8; }
+        70% { transform: translate(2px, -2px); }
+        80% { transform: translate(-2px, -2px); }
+        90% { transform: translate(2px, 2px); }
+        100% { transform: translate(0); text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7; }
+      }
+      .animate-glitch {
+        animation: glitch 0.5s cubic-bezier(.25, .46, .45, .94) both infinite;
+      }
+
+      @keyframes fade-in-out-long {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+      .animate-fade-in-out-long {
+        animation: fade-in-out-long 5s ease-in-out forwards;
+      }
+
 
       /* General UI element styling */
       .ui-panel {

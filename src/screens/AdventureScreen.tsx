@@ -18,11 +18,12 @@ interface AdventureScreenProps {
     onSaveGame: () => void;
     onExitToMenu: () => void;
     onRetry: () => void;
+    onUseItem: (itemId: string) => void;
     turnCount: number;
     apiCalls: number;
 }
 
-const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, turnCount, apiCalls }) => {
+const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, onUseItem, turnCount, apiCalls }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -32,6 +33,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     puppet={gameState.puppet}
                     masterName={gameState.puppetMasterName}
                     componentInventory={gameState.componentInventory}
+                    itemInventory={gameState.inventory}
                     sideQuests={gameState.sideQuests}
                     companions={gameState.companions}
                     npcs={gameState.npcs}
@@ -42,11 +44,14 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     apiCalls={apiCalls}
                     kimLenh={gameState.kimLenh}
                     dauAnDongThau={gameState.dauAnDongThau}
+                    onUseItem={onUseItem}
                 />
                 : <PlayerStatus
                     name={gameState.puppetMasterName}
                     biography={gameState.puppetMasterBiography}
                     scenario={startingScenario}
+                    psyche={gameState.psyche}
+                    maxPsyche={gameState.maxPsyche}
                     sideQuests={gameState.sideQuests}
                     companions={gameState.companions}
                     npcs={gameState.npcs}
@@ -57,6 +62,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     apiCalls={apiCalls}
                     kimLenh={gameState.kimLenh}
                     dauAnDongThau={gameState.dauAnDongThau}
+                    inventory={gameState.inventory}
                 />
             }
             {gameState.clues.length > 0 && <ClueJournal clues={gameState.clues} />}

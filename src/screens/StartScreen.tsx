@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import LoreDisplay from '../components/UI/LoreDisplay';
 import { hasSaveGame } from '../logic/saveService';
+import ChangelogDisplay from '../components/UI/ChangelogDisplay';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -11,6 +12,7 @@ interface StartScreenProps {
 
 const StartScreen: React.FC<StartScreenProps> = ({ onStart, onWorldCreation, onLoadGame }) => {
   const [isLoreVisible, setIsLoreVisible] = useState(false);
+  const [isChangelogVisible, setIsChangelogVisible] = useState(false);
   const [saveExists, setSaveExists] = useState(false);
 
   useEffect(() => {
@@ -55,9 +57,16 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart, onWorldCreation, onL
             >
               Khám Phá Lore
             </button>
+            <button
+              onClick={() => setIsChangelogVisible(true)}
+              className="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 font-bold py-4 px-12 text-xl font-cinzel transition-all duration-300 shadow-lg hover:shadow-gray-500/50 transform hover:scale-105 w-full sm:w-auto"
+            >
+              Nhật ký cập nhật
+            </button>
         </div>
       </div>
       {isLoreVisible && <LoreDisplay onClose={() => setIsLoreVisible(false)} />}
+      {isChangelogVisible && <ChangelogDisplay onClose={() => setIsChangelogVisible(false)} />}
     </div>
   );
 };
