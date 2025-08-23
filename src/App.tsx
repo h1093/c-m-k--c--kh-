@@ -83,7 +83,7 @@ const App: React.FC = () => {
     };
 
     return (
-        <main className="h-screen w-screen bg-black overflow-y-auto">
+        <main className="h-screen w-screen bg-black">
             <div className="h-full w-full">
                 {gameState.isLoading && (gameState.stage === GameStage.PLAYING || gameState.stage === GameStage.CREATION) ? (
                     <div className="flex flex-col items-center justify-center h-full">
