@@ -10,11 +10,18 @@ export const changelog: ChangelogEntry[] = [
   {
     version: "0.10.0",
     date: "Hiện tại",
-    title: "Định Luật Sinh Tồn",
+    title: "Nền Tảng Tự Do & Thế Giới Sống",
     changes: [
-      "**Thêm chỉ số Lý Trí (Psyche):** Bây giờ bạn phải quản lý sự ổn định tinh thần của chính mình. Chứng kiến các sự kiện kinh hoàng sẽ làm giảm Lý Trí, dẫn đến ảo giác và các lựa chọn bất thường.",
-      "**Thêm Năng Lượng Vận Hành:** Con rối của bạn giờ đây tiêu thụ năng lượng để hoạt động. Sử dụng kỹ năng và duy trì hoạt động sẽ làm cạn kiệt năng lượng, ảnh hưởng đến hiệu quả chiến đấu.",
-      "**Thêm vật phẩm:** 'Dầu Tinh Luyện' đã được thêm vào như một cách để phục hồi Năng Lượng Vận Hành.",
+      "**Hệ Thống Sáng Tạo Thế Giới:** Thêm tính năng **Tạo Thế Giới Mới** ngay từ màn hình chính, cho phép người chơi tự định nghĩa bối cảnh, cốt truyện và ý tưởng nhân vật.",
+      "**Tùy Chỉnh Sâu Sắc:** Giới thiệu nhiều **kịch bản khởi đầu**, **độ khó** đa dạng, và khả năng **tự viết nhiệm vụ chính** để cá nhân hóa hoàn toàn cuộc phiêu lưu của bạn.",
+      "**AI Hỗ Trợ Sáng Tạo:** Thêm nút **Tạo Tiểu Sử Ngẫu Nhiên** để AI giúp bạn xây dựng một câu chuyện nhân vật độc đáo.",
+      "**Hệ Thống Gợi Ý Thông Minh:** Thêm nút **'Gợi ý'** trong màn hình phiêu lưu. Khi bế tắc, hãy để AI đưa ra một lời khuyên tinh tế dựa trên tình hình hiện tại.",
+      "**NPC Có Chiều Sâu:** Mỗi NPC giờ đây có **lý lịch riêng** và **trí nhớ**, họ sẽ phản ứng một cách logic hơn với các hành động của bạn.",
+      "**Quan Hệ Phe Phái:** Giờ đây hành động của bạn sẽ ảnh hưởng đến **mối quan hệ với các phe phái** trong thế giới ngầm, mở ra những cơ hội và nguy hiểm mới.",
+      "**Thêm Sổ Tay Tri Thức (Codex):** Một cuốn sổ tay trong game cho phép bạn xem lại các định luật, lore về các phe phái và cơ chế của thế giới bất cứ lúc nào.",
+      "**Nền Kinh Tế Kép:** Giới thiệu hai loại tiền tệ: **Kim Lệnh** (bề nổi) và **Dấu Ấn Đồng Thau** (thế giới ngầm), mỗi loại có công dụng riêng.",
+      "**Hệ Thống Sinh Tồn Mở Rộng:** Thêm chỉ số **Lý Trí (Psyche)** của người chơi và **Năng Lượng Vận Hành** của con rối. Quản lý chúng là chìa khóa để sống sót.",
+      "**Vật Phẩm & Quản Lý Túi Đồ:** Triển khai hệ thống túi đồ và thêm các vật phẩm tiêu thụ như 'Dầu Tinh Luyện'.",
     ],
   },
   {

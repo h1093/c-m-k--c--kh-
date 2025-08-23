@@ -173,7 +173,7 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
                 <StatusPanel />
             </div>
 
-            <div className="flex-grow flex flex-col overflow-hidden h-full">
+            <div className="flex-grow flex flex-col overflow-hidden">
                  {/* Mobile Header & Status Toggle */}
                 <div className="lg:hidden flex justify-between items-center p-4 border-b border-red-500/20 flex-shrink-0 bg-black/30 mb-4">
                     <div className="truncate pr-2">
@@ -181,9 +181,9 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
                         <span className="text-xs text-gray-400 font-mono">Lượt: {turnCount}</span>
                     </div>
                      <div className="flex items-center gap-2">
-                        <button onClick={onSaveGame} className="ui-button px-3 py-1 text-xs bg-gray-800/80 border-gray-600 hover:bg-gray-700 hover:border-gray-500">Lưu</button>
-                        <button onClick={onExitToMenu} className="ui-button px-3 py-1 text-xs bg-gray-800/80 border-gray-600 hover:bg-gray-700 hover:border-gray-500">Thoát</button>
-                        <button onClick={() => setIsStatusPanelVisible(true)} className="ui-button px-4 py-1 text-sm flex-shrink-0">
+                        <button onClick={onSaveGame} className="ui-button px-3 py-1.5 text-xs bg-gray-800/80 border-gray-600 hover:bg-gray-700 hover:border-gray-500">Lưu</button>
+                        <button onClick={onExitToMenu} className="ui-button px-3 py-1.5 text-xs bg-gray-800/80 border-gray-600 hover:bg-gray-700 hover:border-gray-500">Thoát</button>
+                        <button onClick={() => setIsStatusPanelVisible(true)} className="ui-button px-3 py-1 text-xs flex-shrink-0">
                             Trạng Thái
                         </button>
                     </div>

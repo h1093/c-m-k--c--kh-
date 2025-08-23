@@ -78,7 +78,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                 <StatusPanel />
             </div>
 
-            <div className="flex-grow ui-panel flex flex-col overflow-hidden h-full">
+            <div className="flex-grow ui-panel flex flex-col overflow-hidden">
                 {/* Mobile Header & Status Toggle */}
                 <div className="lg:hidden flex justify-between items-center p-4 border-b border-red-500/20 flex-shrink-0">
                     <h2 className="font-cinzel text-lg text-red-400 truncate pr-2">{gameState.puppet ? gameState.puppet.name : gameState.puppetMasterName}</h2>
@@ -126,8 +126,8 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                             )}
                              {gameState.stage !== GameStage.GAME_OVER && (
                                  <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                                    <button onClick={onSaveGame} className="w-full sm:w-auto ui-button py-2 px-4 bg-gray-800/80 border-gray-600 hover:bg-gray-700">Lưu</button>
-                                    <button onClick={onExitToMenu} className="w-full sm:w-auto ui-button py-2 px-4 bg-gray-800/80 border-gray-600 hover:bg-gray-700">Thoát</button>
+                                    <button onClick={onSaveGame} className="w-full sm:w-auto ui-button py-2 px-3 text-sm bg-gray-800/80 border-gray-600 hover:bg-gray-700">Lưu</button>
+                                    <button onClick={onExitToMenu} className="w-full sm:w-auto ui-button py-2 px-3 text-sm bg-gray-800/80 border-gray-600 hover:bg-gray-700">Thoát</button>
                                 </div>
                              )}
                         </div>
