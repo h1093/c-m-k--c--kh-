@@ -105,7 +105,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 pt-0 flex-shrink-0 mt-auto">
+                <div className="p-4 sm:p-6 pt-0 flex-shrink-0">
                     <div className="mt-6">
                         {gameState.isLoading && gameState.stage !== GameStage.GAME_OVER ? (
                             <div className="flex flex-col items-center justify-center"><LoadingSpinner /><p className="mt-2 text-sm text-red-400">Đang hiệu chỉnh...</p></div>
