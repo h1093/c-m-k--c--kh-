@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { GameState, StartingScenario } from '../types';
 import PuppetStatus from '../components/PC/PuppetStatus';
 import PlayerStatus from '../components/PC/PlayerStatus';
@@ -25,6 +25,11 @@ interface AdventureScreenProps {
 
 const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, onUseItem, turnCount, apiCalls }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
+    const choicesRef = useRef<HTMLDivElement>(null);
+
+    const handleScrollToChoices = () => {
+        choicesRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     const StatusPanel = () => (
         <>
@@ -78,16 +83,16 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                 <StatusPanel />
             </div>
 
-            <div className="flex-grow ui-panel flex flex-col overflow-hidden">
+            <div className="flex-grow ui-panel flex flex-col overflow-y-auto relative">
                 {/* Mobile Header & Status Toggle */}
-                <div className="lg:hidden flex justify-between items-center p-4 border-b border-red-500/20 flex-shrink-0">
+                <div className="lg:hidden flex justify-between items-center p-4 border-b border-red-500/20 flex-shrink-0 sticky top-0 bg-[--color-bg-dark] z-10">
                     <h2 className="font-cinzel text-lg text-red-400 truncate pr-2">{gameState.puppet ? gameState.puppet.name : gameState.puppetMasterName}</h2>
                     <button onClick={() => setIsStatusPanelVisible(true)} className="ui-button px-4 py-1 text-sm flex-shrink-0">
                         Trạng Thái
                     </button>
                 </div>
 
-                <div className="p-4 sm:p-6 flex-grow overflow-y-auto">
+                <div className="p-4 sm:p-6 flex-grow">
                     {gameState.currentSegment?.worldEvent && (
                         <div className="mb-6 p-3 bg-gray-800/50 border-l-4 border-gray-500 text-gray-300 italic animate-fade-in">
                             <p><span className="font-bold not-italic text-gray-400">Trong khi đó...</span> {gameState.currentSegment.worldEvent}</p>
@@ -105,7 +110,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     )}
                 </div>
 
-                <div className="p-4 sm:p-6 pt-0 flex-shrink-0">
+                <div ref={choicesRef} className="p-4 sm:p-6 pt-0 flex-shrink-0">
                     <div className="mt-6">
                         {gameState.isLoading && gameState.stage !== GameStage.GAME_OVER ? (
                             <div className="flex flex-col items-center justify-center"><LoadingSpinner /><p className="mt-2 text-sm text-red-400">Đang hiệu chỉnh...</p></div>
@@ -139,6 +144,20 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                         </div>
                     )}
                 </div>
+
+                {/* Scroll Down Button */}
+                {gameState.currentSegment && gameState.currentSegment.choices.length > 0 && !gameState.isLoading && (
+                    <button
+                        onClick={handleScrollToChoices}
+                        className="lg:hidden absolute bottom-4 right-4 ui-button bg-black/60 hover:bg-black/80 backdrop-blur-sm border-red-500/50 w-12 h-12 rounded-full flex items-center justify-center shadow-lg animate-pulse z-20"
+                        aria-label="Cuộn xuống lựa chọn"
+                        title="Cuộn xuống lựa chọn"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                )}
             </div>
 
             {isStatusPanelVisible && (
