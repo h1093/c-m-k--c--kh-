@@ -169,14 +169,19 @@ const CodexDisplay: React.FC = () => {
                         <LoreEntry 
                             term="Chợ Đen Bánh Răng & Nhà Đấu Giá"
                             definition={
-                                <p>
-                                    Đây không chỉ là một nơi để mua bán, mà là trung tâm quyền lực của thế giới ngầm. Tại đây, Dấu Ấn Đồng Thau được dùng để:
-                                    <ul className="list-disc list-inside mt-2 space-y-1">
-                                        <li><strong className="text-gray-300">Mua Linh Kiện Huyền Bí:</strong> Giành lấy những nguyên liệu thăng tiến cực hiếm.</li>
-                                        <li><strong className="text-gray-300">Bán Vật Phẩm Hiếm:</strong> Đấu giá những linh kiện hoặc cổ vật bạn tìm được để làm giàu.</li>
-                                        <li><strong className="text-gray-300">Mua Bán Thông Tin & Hợp Đồng:</strong> Đấu giá để có được những thông tin mật có thể dẫn đến kho báu, hoặc nhận lấy những Hợp Đồng nguy hiểm nhưng có phần thưởng hậu hĩnh.</li>
-                                    </ul>
-                                </p>
+                                <>
+                                    <p>
+                                        Đây không phải là một địa điểm cố định, mà là một <strong>mạng lưới di động</strong> và là trung tâm quyền lực của thế giới ngầm. Các phiên đấu giá và giao dịch bí mật sẽ được tổ chức vào những thời điểm khác nhau. Cơ hội để tham gia sẽ <strong>xuất hiện định kỳ</strong> khi bạn đang ở một khu vực an toàn và có đủ Dấu Ấn Đồng Thau để chứng tỏ vị thế của mình.
+                                    </p>
+                                    <p className="mt-2">
+                                        Tại đây, Dấu Ấn Đồng Thau được dùng để:
+                                        <ul className="list-disc list-inside mt-2 space-y-1">
+                                            <li><strong className="text-gray-300">Mua Linh Kiện Huyền Bí:</strong> Giành lấy những nguyên liệu thăng tiến cực hiếm.</li>
+                                            <li><strong className="text-gray-300">Bán Vật Phẩm Hiếm:</strong> Đấu giá những linh kiện hoặc cổ vật bạn tìm được để làm giàu.</li>
+                                            <li><strong className="text-gray-300">Mua Bán Thông Tin & Hợp Đồng:</strong> Đấu giá để có được những thông tin mật có thể dẫn đến kho báu, hoặc nhận lấy những Hợp Đồng nguy hiểm nhưng có phần thưởng hậu hĩnh.</li>
+                                        </ul>
+                                    </p>
+                                </>
                             }
                         />
                         <LoreEntry term="Quy Tắc Vàng" definition="Không bao giờ nhầm lẫn hai loại tiền tệ. Sử dụng sai loại tiền tệ ở sai nơi sẽ thu hút sự chú ý không mong muốn và cực kỳ nguy hiểm." />
