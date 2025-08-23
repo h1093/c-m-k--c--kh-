@@ -1,14 +1,12 @@
 
 
-
-
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item } from '../types';
-import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint } from '../logic/storyService';
-import { handleCombatTurn } from '../logic/combatService';
-import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../logic/workshopService';
-import * as saveService from '../logic/saveService';
-import { apiKeyManager } from '../logic/aiClient';
+import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint } from '../services/storyService';
+import { handleCombatTurn } from '../services/combatService';
+import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../services/workshopService';
+import * as saveService from '../services/saveService';
+import { apiKeyManager } from '../services/ai/aiClient';
 import { FACTION_PATHWAYS } from '../data/gameConfig';
 
 const getInitialStage = (): GameStage => {

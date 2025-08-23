@@ -1,7 +1,8 @@
 
+
 import React, { useState, useEffect } from 'react';
 import LoreDisplay from '../components/UI/LoreDisplay';
-import { hasSaveGame } from '../logic/saveService';
+import { hasSaveGame } from '../services/saveService';
 import ChangelogDisplay from '../components/UI/ChangelogDisplay';
 
 interface StartScreenProps {

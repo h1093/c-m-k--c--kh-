@@ -1,5 +1,7 @@
+
+
 import React, { useState } from 'react';
-import { apiKeyManager } from '../logic/aiClient';
+import { apiKeyManager } from '../services/ai/aiClient';
 
 interface ApiKeySetupProps {
     onKeyProvided: () => void;

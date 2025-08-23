@@ -1,8 +1,9 @@
 
+
 import React, { useState } from 'react';
 import { DEFAULT_QUESTS } from '../data/quests';
 import type { StartingScenario, Difficulty } from '../types';
-import { generateBiography } from '../logic/storyService';
+import { generateBiography } from '../services/storyService';
 
 interface CharacterCreationProps {
   onStart: (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, difficulty: Difficulty) => void;

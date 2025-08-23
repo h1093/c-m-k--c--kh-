@@ -1,5 +1,4 @@
 
-
 export interface PuppetAbility {
   name: string;
   description: string;

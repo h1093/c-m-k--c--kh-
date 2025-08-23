@@ -1,3 +1,4 @@
+
 import type { Puppet } from '../types';
 
 export const INITIAL_PUPPETS: Omit<Puppet, 'name'>[] = [
