@@ -1,3 +1,5 @@
+
+
 import type { Puppet, Enemy, ExplanationId, Companion } from '../../../types';
 
 export const getCombatTurnPrompt = (puppet: Puppet, enemy: Enemy, companions: Companion[], playerAction: string, combatLog: string[], shownExplanations: ExplanationId[]): string => {
@@ -6,7 +8,7 @@ export const getCombatTurnPrompt = (puppet: Puppet, enemy: Enemy, companions: Co
         : '';
         
     const companionData = companions.length > 0
-        ? `- Đồng Đội:\n${companions.map(c => `  - ${c.name} (HP: ${c.stats.hp}/${c.stats.maxHp}, Tấn công: ${c.stats.attack}, Phòng thủ: ${c.stats.defense})`).join('\n')}`
+        ? `- Đồng Đội (${companions.length}):\n${companions.map(c => `  - ${c.name} (HP: ${c.stats.hp}/${c.stats.maxHp}, Tấn công: ${c.stats.attack}, Phòng thủ: ${c.stats.defense})`).join('\n')}\n- LƯU Ý: Sự hiện diện của ${companions.length} đồng đội gây nhiễu loạn, làm giảm nhẹ hiệu quả (Cộng Hưởng) của con rối chính.`
         : '- Đồng Đội: Không có.';
 
     return `
@@ -46,6 +48,8 @@ export const getCombatTurnPrompt = (puppet: Puppet, enemy: Enemy, companions: Co
 
         **7. Tối Ưu Hóa Chiến Thuật (Kẻ Thù & Đồng Đội):**
         - Họ phải có các hành động ngoài 'Tấn Công' và phải phản ứng với tình hình.
+        
+        **8. Khả Năng Thu Phục (Subduable):** Khi cập nhật trạng thái kẻ thù trong \`updatedEnemy\`, hãy xác định xem nó có thể bị thu phục hay không. Nếu nó là một cỗ máy được chế tạo (ví dụ: Vệ Binh Dây Cót, Automaton), hãy đặt \`subduable: true\`. Nếu nó là một quái vật sinh học-cơ khí gớm ghiếc hoặc một thực thể Tà Năng thuần túy, hãy đặt \`subduable: false\`.
 
         **Dữ Liệu Chiến Trường:**
         - Con Rối: ${puppet.name} (HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tấn công: ${puppet.stats.attack}, Phòng thủ: ${puppet.stats.defense}, Cộng Hưởng: ${puppet.stats.resonance}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy})

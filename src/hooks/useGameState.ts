@@ -1,8 +1,8 @@
 
 
 import { useState, useCallback, useEffect } from 'react';
-import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item } from '../types';
-import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint } from '../services/storyService';
+import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item, Puppet, Enemy } from '../types';
+import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint, generatePostCombatSegment } from '../services/storyService';
 import { handleCombatTurn } from '../services/combatService';
 import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../services/workshopService';
 import * as saveService from '../services/saveService';
@@ -47,6 +47,7 @@ const initialState: GameState = {
     psyche: 100,
     maxPsyche: 100,
     inventory: [],
+    lastDefeatedEnemy: null,
 };
 
 export const useGameState = () => {
@@ -145,6 +146,166 @@ export const useGameState = () => {
         }
     };
 
+    const processNextSegment = async (nextSegment: StorySegment) => {
+         const newClues = [...gameState.clues];
+        if (nextSegment.newClues) {
+            nextSegment.newClues.forEach(newClue => { if (!newClues.find(c => c.id === newClue.id)) { newClues.push(newClue); } });
+        }
+
+        const newShownExplanations = new Set(gameState.shownExplanations);
+        if (nextSegment.explanation) { newShownExplanations.add(nextSegment.explanation.id); }
+
+        // Handle component inventory
+        const newComponentInventory = [...gameState.componentInventory];
+        if (nextSegment.newComponent) {
+            const componentId = nextSegment.newComponent.id;
+            const alreadyInInventory = newComponentInventory.some(c => c.id === componentId);
+            const alreadyEquipped = gameState.puppet?.equippedComponents.some(c => c.id === componentId);
+
+            if (!alreadyInInventory && !alreadyEquipped) {
+                newComponentInventory.push(nextSegment.newComponent);
+            }
+        }
+        
+        // Handle item inventory
+        const newItemInventory = [...gameState.inventory];
+        if (nextSegment.newItems) {
+            nextSegment.newItems.forEach(newItem => {
+                const existingItem = newItemInventory.find(i => i.id === newItem.id);
+                if (existingItem) {
+                    existingItem.quantity += newItem.quantity;
+                } else {
+                    newItemInventory.push(newItem);
+                }
+            });
+        }
+        if (nextSegment.updatedItems) {
+            nextSegment.updatedItems.forEach(updatedItem => {
+                const item = newItemInventory.find(i => i.id === updatedItem.id);
+                if (item) {
+                    item.quantity += updatedItem.quantityChange;
+                }
+            });
+        }
+
+
+        const newSideQuests = [...gameState.sideQuests];
+        if (nextSegment.newQuests) { newSideQuests.forEach(q => { if (!newSideQuests.find(sq => sq.id === q.id)) newSideQuests.push(q); }); }
+        if (nextSegment.updatedQuests) {
+            nextSegment.updatedQuests.forEach(uq => { const idx = newSideQuests.findIndex(q => q.id === uq.id); if (idx > -1) newSideQuests[idx].status = uq.status; });
+        }
+
+        const newCompanions = [...gameState.companions, ...(nextSegment.newCompanion ? [nextSegment.newCompanion] : [])];
+        
+        let finalPuppetState = gameState.puppet; // start with old state
+        const companionCount = gameState.companions.length;
+        const resonancePenalty = companionCount * 5;
+
+        if (nextSegment.updatedPuppet) {
+            const puppetFromAI = nextSegment.updatedPuppet;
+            const newBaseResonance = puppetFromAI.stats.resonance + resonancePenalty;
+            finalPuppetState = {
+                ...puppetFromAI,
+                stats: {
+                    ...puppetFromAI.stats,
+                    resonance: newBaseResonance
+                }
+            };
+        }
+        
+        if (finalPuppetState) {
+            finalPuppetState.stats.resonance = Math.max(0, Math.min(100, finalPuppetState.stats.resonance + (nextSegment.resonanceChange || 0)));
+            finalPuppetState.mechanicalEssence += nextSegment.essenceGained || 0;
+            if (nextSegment.newMemoryFragment && !finalPuppetState.memoryFragments.find(f => f.id === nextSegment.newMemoryFragment!.id)) finalPuppetState.memoryFragments.push(nextSegment.newMemoryFragment);
+            if (nextSegment.newMutation && !finalPuppetState.mutations.find(m => m.id === nextSegment.newMutation!.id)) finalPuppetState.mutations.push(nextSegment.newMutation);
+        }
+
+        const newWorldState = { ...gameState.worldState, ...nextSegment.updatedWorldState };
+        
+        const currentNPCs = [...gameState.npcs];
+        const updatedNPCsFromStory = nextSegment.newOrUpdatedNPCs || [];
+
+        if (updatedNPCsFromStory.length > 0) {
+            const mindUpdatePromises = updatedNPCsFromStory.map(partialNpc => {
+                const existingNpc = currentNPCs.find(n => n.id === partialNpc.id);
+                const mergedForContext = { ...existingNpc, ...partialNpc } as NPC;
+                
+                setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+                return generateNpcMindUpdate(mergedForContext, nextSegment.scene, lastAction?.payload as string || "Diễn biến câu chuyện");
+            });
+            
+            const mindUpdates = await Promise.all(mindUpdatePromises);
+            
+            updatedNPCsFromStory.forEach((partialNpc, index) => {
+                const mindUpdate = mindUpdates[index];
+                partialNpc.trangThai = mindUpdate.trangThai;
+                if (mindUpdate.updatedTuongTacCuoi) {
+                    partialNpc.tuongTacCuoi = mindUpdate.updatedTuongTacCuoi;
+                }
+            });
+        }
+
+        updatedNPCsFromStory.forEach(updNPC => {
+            const idx = currentNPCs.findIndex(n => n.id === updNPC.id);
+            if (idx > -1) {
+                currentNPCs[idx] = { ...currentNPCs[idx], ...updNPC };
+            } else {
+                currentNPCs.push(updNPC as NPC);
+            }
+        });
+        
+        const newLoreEntries = [...gameState.loreEntries];
+        if (nextSegment.newLoreEntries) {
+            nextSegment.newLoreEntries.forEach(l => { if (!newLoreEntries.find(le => le.id === l.id)) newLoreEntries.push(l); });
+        }
+
+        const newHistory = [...gameState.storyHistory, nextSegment];
+        let newLoreSummaries = [...gameState.loreSummaries];
+
+        if (newHistory.length > 1 && newHistory.length % 5 === 0) {
+            setGameState(prev => ({ ...prev, apiCalls: prev.apiCalls + 1 }));
+            try {
+                const summaryText = await generateLoreSummary(newHistory);
+                newLoreSummaries.push({ id: `summary-${newHistory.length}`, turnNumber: newHistory.length, summary: summaryText });
+            } catch(e) { console.error("Could not generate summary", e)}
+        }
+        
+        const newFactionRelations = {...gameState.factionRelations};
+        if (nextSegment.updatedFactionRelations) {
+            for (const faction in nextSegment.updatedFactionRelations) {
+                newFactionRelations[faction] = (newFactionRelations[faction] || 0) + nextSegment.updatedFactionRelations[faction];
+            }
+        }
+        
+        const maxPsycheWithPenalty = gameState.maxPsyche - (newCompanions.length * 10);
+        const newPsyche = Math.max(0, Math.min(maxPsycheWithPenalty, gameState.psyche + (nextSegment.psycheChange || 0)));
+
+        setGameState(prev => ({
+            ...prev,
+            currentSegment: nextSegment,
+            storyHistory: newHistory,
+            puppet: finalPuppetState,
+            enemy: nextSegment.enemy || null,
+            stage: nextSegment.enemy ? GameStage.COMBAT : GameStage.PLAYING,
+            isLoading: false,
+            clues: newClues,
+            shownExplanations: newShownExplanations,
+            componentInventory: newComponentInventory,
+            sideQuests: newSideQuests,
+            companions: newCompanions,
+            worldState: newWorldState,
+            npcs: currentNPCs,
+            loreEntries: newLoreEntries,
+            loreSummaries: newLoreSummaries,
+            kimLenh: prev.kimLenh + (nextSegment.kimLenhChange || 0),
+            dauAnDongThau: prev.dauAnDongThau + (nextSegment.dauAnDongThauChange || 0),
+            factionRelations: newFactionRelations,
+            inventory: newItemInventory.filter(i => i.quantity > 0),
+            psyche: newPsyche,
+            lastDefeatedEnemy: null,
+        }));
+        setLastAction(null);
+    }
 
     const handleChoice = useCallback(async (choice: string) => {
         if (!gameState.currentSegment) return;
@@ -157,167 +318,51 @@ export const useGameState = () => {
         setLastAction({ type: 'choice', payload: choice });
         setGameState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
-            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
-            const nextSegment = await generateNextStorySegment(
-                gameState.puppetMasterName,
-                gameState.puppet,
-                gameState.storyHistory,
-                choice,
-                gameState.clues,
-                gameState.mainQuest,
-                gameState.sideQuests,
-                gameState.companions,
-                Array.from(gameState.shownExplanations),
-                startingScenario,
-                gameState.customWorldPrompt,
-                gameState.npcs,
-                gameState.worldState,
-                gameState.loreEntries,
-                gameState.factionRelations,
-                gameState.difficulty
-            );
+            const isPostCombatChoice = choice === 'Tháo dỡ lấy linh kiện' || choice === 'Thực hiện Nghi Thức Thu Phục';
 
-            const newClues = [...gameState.clues];
-            if (nextSegment.newClues) {
-                nextSegment.newClues.forEach(newClue => { if (!newClues.find(c => c.id === newClue.id)) { newClues.push(newClue); } });
-            }
-
-            const newShownExplanations = new Set(gameState.shownExplanations);
-            if (nextSegment.explanation) { newShownExplanations.add(nextSegment.explanation.id); }
-
-            // Handle component inventory
-            const newComponentInventory = [...gameState.componentInventory];
-            if (nextSegment.newComponent) {
-                const componentId = nextSegment.newComponent.id;
-                const alreadyInInventory = newComponentInventory.some(c => c.id === componentId);
-                const alreadyEquipped = gameState.puppet?.equippedComponents.some(c => c.id === componentId);
-
-                if (!alreadyInInventory && !alreadyEquipped) {
-                    newComponentInventory.push(nextSegment.newComponent);
+            const companionCount = gameState.companions.length;
+            const resonancePenalty = companionCount * 5;
+            const effectivePuppet = gameState.puppet ? {
+                ...gameState.puppet,
+                stats: {
+                    ...gameState.puppet.stats,
+                    resonance: Math.max(0, gameState.puppet.stats.resonance - resonancePenalty),
                 }
-            }
+            } : null;
             
-            // Handle item inventory
-            const newItemInventory = [...gameState.inventory];
-            if (nextSegment.newItems) {
-                nextSegment.newItems.forEach(newItem => {
-                    const existingItem = newItemInventory.find(i => i.id === newItem.id);
-                    if (existingItem) {
-                        existingItem.quantity += newItem.quantity;
-                    } else {
-                        newItemInventory.push(newItem);
-                    }
-                });
-            }
-            if (nextSegment.updatedItems) {
-                nextSegment.updatedItems.forEach(updatedItem => {
-                    const item = newItemInventory.find(i => i.id === updatedItem.id);
-                    if (item) {
-                        item.quantity += updatedItem.quantityChange;
-                    }
-                });
-            }
+            let nextSegment: StorySegment;
 
-
-            const newSideQuests = [...gameState.sideQuests];
-            if (nextSegment.newQuests) { newSideQuests.forEach(q => { if (!newSideQuests.find(sq => sq.id === q.id)) newSideQuests.push(q); }); }
-            if (nextSegment.updatedQuests) {
-                nextSegment.updatedQuests.forEach(uq => { const idx = newSideQuests.findIndex(q => q.id === uq.id); if (idx > -1) newSideQuests[idx].status = uq.status; });
-            }
-
-            const newCompanions = [...gameState.companions, ...(nextSegment.newCompanion ? [nextSegment.newCompanion] : [])];
-            
-            let updatedPuppet = nextSegment.updatedPuppet || gameState.puppet;
-            if (updatedPuppet) {
-                updatedPuppet.stats.resonance = Math.max(0, Math.min(100, updatedPuppet.stats.resonance + (nextSegment.resonanceChange || 0)));
-                updatedPuppet.mechanicalEssence += nextSegment.essenceGained || 0;
-                if (nextSegment.newMemoryFragment && !updatedPuppet.memoryFragments.find(f => f.id === nextSegment.newMemoryFragment!.id)) updatedPuppet.memoryFragments.push(nextSegment.newMemoryFragment);
-                if (nextSegment.newMutation && !updatedPuppet.mutations.find(m => m.id === nextSegment.newMutation!.id)) updatedPuppet.mutations.push(nextSegment.newMutation);
+            if (isPostCombatChoice && gameState.lastDefeatedEnemy) {
+                setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+                nextSegment = await generatePostCombatSegment(
+                    effectivePuppet,
+                    gameState.lastDefeatedEnemy,
+                    choice
+                );
+            } else {
+                setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+                nextSegment = await generateNextStorySegment(
+                    gameState.puppetMasterName,
+                    effectivePuppet,
+                    gameState.storyHistory,
+                    choice,
+                    gameState.clues,
+                    gameState.mainQuest,
+                    gameState.sideQuests,
+                    gameState.companions,
+                    Array.from(gameState.shownExplanations),
+                    startingScenario,
+                    gameState.customWorldPrompt,
+                    gameState.npcs,
+                    gameState.worldState,
+                    gameState.loreEntries,
+                    gameState.factionRelations,
+                    gameState.difficulty
+                );
             }
 
-            const newWorldState = { ...gameState.worldState, ...nextSegment.updatedWorldState };
-            
-            const currentNPCs = [...gameState.npcs];
-            const updatedNPCsFromStory = nextSegment.newOrUpdatedNPCs || [];
+            await processNextSegment(nextSegment);
 
-            if (updatedNPCsFromStory.length > 0) {
-                const mindUpdatePromises = updatedNPCsFromStory.map(partialNpc => {
-                    const existingNpc = currentNPCs.find(n => n.id === partialNpc.id);
-                    const mergedForContext = { ...existingNpc, ...partialNpc } as NPC;
-                    
-                    setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
-                    return generateNpcMindUpdate(mergedForContext, nextSegment.scene, choice);
-                });
-                
-                const mindUpdates = await Promise.all(mindUpdatePromises);
-                
-                updatedNPCsFromStory.forEach((partialNpc, index) => {
-                    const mindUpdate = mindUpdates[index];
-                    partialNpc.trangThai = mindUpdate.trangThai;
-                    if (mindUpdate.updatedTuongTacCuoi) {
-                        partialNpc.tuongTacCuoi = mindUpdate.updatedTuongTacCuoi;
-                    }
-                });
-            }
-
-            updatedNPCsFromStory.forEach(updNPC => {
-                const idx = currentNPCs.findIndex(n => n.id === updNPC.id);
-                if (idx > -1) {
-                    currentNPCs[idx] = { ...currentNPCs[idx], ...updNPC };
-                } else {
-                    currentNPCs.push(updNPC as NPC);
-                }
-            });
-            
-            const newLoreEntries = [...gameState.loreEntries];
-            if (nextSegment.newLoreEntries) {
-                nextSegment.newLoreEntries.forEach(l => { if (!newLoreEntries.find(le => le.id === l.id)) newLoreEntries.push(l); });
-            }
-
-            const newHistory = [...gameState.storyHistory, nextSegment];
-            let newLoreSummaries = [...gameState.loreSummaries];
-
-            if (newHistory.length > 1 && newHistory.length % 5 === 0) {
-                setGameState(prev => ({ ...prev, apiCalls: prev.apiCalls + 1 }));
-                try {
-                    const summaryText = await generateLoreSummary(newHistory);
-                    newLoreSummaries.push({ id: `summary-${newHistory.length}`, turnNumber: newHistory.length, summary: summaryText });
-                } catch(e) { console.error("Could not generate summary", e)}
-            }
-            
-            const newFactionRelations = {...gameState.factionRelations};
-            if (nextSegment.updatedFactionRelations) {
-                for (const faction in nextSegment.updatedFactionRelations) {
-                    newFactionRelations[faction] = (newFactionRelations[faction] || 0) + nextSegment.updatedFactionRelations[faction];
-                }
-            }
-            
-            const newPsyche = Math.max(0, Math.min(gameState.maxPsyche, gameState.psyche + (nextSegment.psycheChange || 0)));
-
-            setGameState(prev => ({
-                ...prev,
-                currentSegment: nextSegment,
-                storyHistory: newHistory,
-                puppet: updatedPuppet,
-                enemy: nextSegment.enemy || null,
-                stage: nextSegment.enemy ? GameStage.COMBAT : GameStage.PLAYING,
-                isLoading: false,
-                clues: newClues,
-                shownExplanations: newShownExplanations,
-                componentInventory: newComponentInventory,
-                sideQuests: newSideQuests,
-                companions: newCompanions,
-                worldState: newWorldState,
-                npcs: currentNPCs,
-                loreEntries: newLoreEntries,
-                loreSummaries: newLoreSummaries,
-                kimLenh: prev.kimLenh + (nextSegment.kimLenhChange || 0),
-                dauAnDongThau: prev.dauAnDongThau + (nextSegment.dauAnDongThauChange || 0),
-                factionRelations: newFactionRelations,
-                inventory: newItemInventory.filter(i => i.quantity > 0),
-                psyche: newPsyche,
-            }));
-            setLastAction(null);
         } catch (error) {
             console.error(error);
             setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
@@ -327,55 +372,95 @@ export const useGameState = () => {
     const handleCombatAction = async (action: string) => {
         if (!gameState.puppet || !gameState.enemy) return;
         setLastAction({ type: 'combat', payload: action });
+        const defeatedEnemy = { ...gameState.enemy };
         setGameState(prev => ({ ...prev, isLoading: true, error: null, mentalShock: null, aberrantEnergyLeak: null }));
         try {
+            const companionCount = gameState.companions.length;
+            const resonancePenalty = companionCount * 5;
+            const effectivePuppet = {
+                ...gameState.puppet,
+                stats: {
+                    ...gameState.puppet.stats,
+                    resonance: Math.max(0, gameState.puppet.stats.resonance - resonancePenalty),
+                }
+            };
+
             setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
-            const result = await handleCombatTurn(gameState.puppet, gameState.enemy, gameState.companions, action, gameState.combatLog, Array.from(gameState.shownExplanations));
+            const result = await handleCombatTurn(effectivePuppet, gameState.enemy, gameState.companions, action, gameState.combatLog, Array.from(gameState.shownExplanations));
             const newLog = [...gameState.combatLog, result.combatLogEntry];
+
+            // Re-apply the resonance penalty to get the new base resonance
+            const puppetFromAI = result.updatedPuppet;
+            const newBaseResonance = puppetFromAI.stats.resonance + resonancePenalty;
+            const finalPuppetAfterTurn = {
+                ...puppetFromAI,
+                stats: {
+                    ...puppetFromAI.stats,
+                    resonance: newBaseResonance
+                }
+            };
+            
             if (result.isCombatOver) {
                 if (result.outcome === 'win') {
-                    const finalPuppetState = result.updatedPuppet;
-                    finalPuppetState.mechanicalEssence += result.essenceGainedOnWin || 0;
-                    
-                    const newInventory = [...gameState.inventory];
-                    if (result.newItemsOnWin) {
-                        result.newItemsOnWin.forEach(newItem => {
-                            const existingItem = newInventory.find(i => i.id === newItem.id);
-                            if (existingItem) {
-                                existingItem.quantity += newItem.quantity;
-                            } else {
-                                newInventory.push(newItem);
-                            }
-                        });
-                    }
+                    if (defeatedEnemy.subduable) {
+                         const postCombatSegment: StorySegment = {
+                            scene: `Cỗ máy ${defeatedEnemy.name} đã ngừng hoạt động, tia sáng trong mắt kính của nó vụt tắt, nhưng cấu trúc của nó vẫn còn nguyên vẹn. Một cơ hội hiện ra từ trong đống đổ nát.`,
+                            choices: ['Tháo dỡ lấy linh kiện', 'Thực hiện Nghi Thức Thu Phục'],
+                         };
+                         setGameState(prev => ({
+                            ...prev,
+                            lastDefeatedEnemy: defeatedEnemy,
+                            enemy: null,
+                            combatLog: [],
+                            currentSegment: postCombatSegment,
+                            storyHistory: [...prev.storyHistory, postCombatSegment],
+                            stage: GameStage.PLAYING,
+                            isLoading: false,
+                         }));
+                    } else {
+                        const finalPuppetState = { ...finalPuppetAfterTurn }; // Use the already corrected puppet
+                        finalPuppetState.mechanicalEssence += result.essenceGainedOnWin || 0;
+                        
+                        const newInventory = [...gameState.inventory];
+                        if (result.newItemsOnWin) {
+                            result.newItemsOnWin.forEach(newItem => {
+                                const existingItem = newInventory.find(i => i.id === newItem.id);
+                                if (existingItem) {
+                                    existingItem.quantity += newItem.quantity;
+                                } else {
+                                    newInventory.push(newItem);
+                                }
+                            });
+                        }
 
-                    const victorySegment: StorySegment = {
-                        scene: `Sau một trận chiến ác liệt, ${gameState.enemy.name} cuối cùng đã bị đánh bại.`,
-                        choices: ['Tiếp tục'],
-                        updatedPuppet: finalPuppetState,
-                        essenceGained: result.essenceGainedOnWin || 0,
-                        newItems: result.newItemsOnWin || [],
-                    };
-                    setGameState(prev => ({
-                        ...prev,
-                        puppet: finalPuppetState,
-                        enemy: null,
-                        combatLog: [],
-                        currentSegment: victorySegment,
-                        storyHistory: [...prev.storyHistory, victorySegment],
-                        stage: GameStage.PLAYING,
-                        isLoading: false,
-                        companions: result.updatedCompanions || prev.companions,
-                        dauAnDongThau: prev.dauAnDongThau + (result.dauAnDongThauGainedOnWin || 0),
-                        inventory: newInventory.filter(i => i.quantity > 0),
-                    }));
+                        const victorySegment: StorySegment = {
+                            scene: `Sau một trận chiến ác liệt, ${gameState.enemy.name} cuối cùng đã bị đánh bại.`,
+                            choices: ['Tiếp tục'],
+                            updatedPuppet: finalPuppetState,
+                            essenceGained: result.essenceGainedOnWin || 0,
+                            newItems: result.newItemsOnWin || [],
+                        };
+                        setGameState(prev => ({
+                            ...prev,
+                            puppet: finalPuppetState,
+                            enemy: null,
+                            combatLog: [],
+                            currentSegment: victorySegment,
+                            storyHistory: [...prev.storyHistory, victorySegment],
+                            stage: GameStage.PLAYING,
+                            isLoading: false,
+                            companions: result.updatedCompanions || prev.companions,
+                            dauAnDongThau: prev.dauAnDongThau + (result.dauAnDongThauGainedOnWin || 0),
+                            inventory: newInventory.filter(i => i.quantity > 0),
+                        }));
+                    }
                 } else {
                     setGameState(prev => ({ ...prev, isLoading: false, stage: GameStage.GAME_OVER, error: `Bạn đã bị ${gameState.enemy?.name} đánh bại.` }));
                 }
             } else {
                 setGameState(prev => ({ 
                     ...prev, 
-                    puppet: result.updatedPuppet, 
+                    puppet: finalPuppetAfterTurn, 
                     enemy: result.updatedEnemy, 
                     combatLog: newLog, 
                     isLoading: false, 

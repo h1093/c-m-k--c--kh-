@@ -1,5 +1,8 @@
+
+
+
 import { FACTION_PATHWAYS } from '../../../data/gameConfig';
-import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../../../types';
+import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty, Enemy } from '../../../types';
 
 const formatPathwaysForPrompt = (): string => {
   const schools: { [key: string]: typeof FACTION_PATHWAYS } = {
@@ -32,6 +35,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
     let puppetCreationInstruction = `
 -   **Tạo Con Rối:** BẠN BẮT BUỘC PHẢI tạo một con rối mới và trả về nó trong trường 'updatedPuppet'.
     -   Con rối phải phản ánh tiểu sử của người chơi.
+    -   Viết một trường \`visualDescription\` chi tiết, giàu hình ảnh (2-3 câu) mô tả vẻ ngoài của con rối dựa trên vật liệu và loại của nó.
     -   Đặt \`phePhai\` = 'Không Phe Phái', \`loTrinh\` = 'Độc Lập', \`truongPhai\` = 'Trung Lập'.
     -   Đặt Thứ Tự là 9, resonance là 50, mechanicalEssence là 0.
     -   Các chỉ số Năng Lượng: Đặt \`operationalEnergy\` và \`maxOperationalEnergy\` là 100.
@@ -40,7 +44,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
 
     switch(startingScenario) {
         case 'human':
-            personaInstruction = `Bạn là **Người Kể Chuyện Kinh Dị**. Giọng văn của bạn phải thực tế, tập trung vào nỗi sợ hãi, sự bối rối và những chi tiết cảm giác trần tục của một người bình thường bị cuốn vào một thế giới máy móc ghê rợn. Nhấn mạnh sự tương phản giữa cái quen thuộc và cái dị thường, khiến người chơi cảm nhận được sự kinh hoàng khi lần đầu chạm trán với những cấm kỵ.`;
+            personaInstruction = `Bạn là **Bậc Thầy Kể Chuyện Kinh Dị Gô-tích**. Giọng văn của bạn phải chậm rãi, ám ảnh và tập trung vào tâm lý nhân vật. Hãy xoáy sâu vào sự tương phản giữa cái trần tục và cái siêu nhiên đang dần xâm lấn. Mô tả những chi tiết nhỏ nhặt nhất—một tiếng cọt kẹt lạ, một cái bóng lướt qua ở góc mắt, mùi hương mốc meo nơi không khí tù đọng—để xây dựng nỗi sợ từ từ, khiến người chơi cảm nhận được sự bất an và hoang tưởng của một người bình thường khi thực tại của họ bắt đầu rạn nứt.`;
             scenarioInstructions = `
 -   **Mô Tả Phân Cảnh:** Bắt đầu bằng cách mô tả cuộc sống bình thường của ${puppetMasterName}. Sau đó, giới thiệu **"sự kiện khởi đầu"** đã được xây dựng từ 'chi tiết bất thường' trong tiểu sử.
 -   **Yêu Cầu:** KHÔNG tạo con rối. Trường 'updatedPuppet' phải là null hoặc không được cung cấp.
@@ -49,7 +53,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
             explanationContext = `Họ là người mới, hoàn toàn không biết gì về Huyền Học Cơ Khí. Giải thích nên ở dạng một khám phá (đọc nhật ký, một người khác giải thích cho họ).`;
             break;
         case 'ritual':
-            personaInstruction = `Bạn là **Người Ghi Chép Nghi Lễ**. Văn phong của bạn phải trang trọng, thơ mộng, gần như một bài văn tế. Sử dụng những từ ngữ có sức nặng, tập trung vào tính biểu tượng của nghi thức, sự kết nối với các Cổ Thần Máy Móc, và cảm giác căng thẳng tột độ trước một hành động mang tính định mệnh.`;
+            personaInstruction = `Bạn là **Nhà Chiêm Tinh Vũ Trụ**. Văn phong của bạn phải hùng vĩ, trang trọng và đầy tính tiên tri. Hãy sử dụng những từ ngữ gợi lên sự cổ xưa và quy mô vĩ đại. Mô tả không chỉ là hành động, mà còn là cảm giác về sức nặng của lịch sử, tiếng vọng của các Cổ Thần Máy Móc từ Linh Giới, và sự căng thẳng tột độ khi một sinh vật sắp được sinh ra từ những định luật cấm kỵ của vũ trụ.`;
             scenarioInstructions = `
 ${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là ngay TRƯỚC KHI hoàn thành "Nghi Thức Chế Tác". Mô tả sự chuẩn bị, không khí căng thẳng. Con rối đã được tạo ra, nhưng chưa được kích hoạt.
@@ -59,7 +63,7 @@ ${puppetCreationInstruction}
             explanationContext = `Họ đã là một Nghệ Nhân Rối. Giải thích nên ở dạng một đoạn suy nghĩ nội tâm, một lời nhắc nhở về các nguyên tắc cơ bản.`;
             break;
         case 'chaos':
-             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải hỗn loạn, rời rạc và gấp gáp. Sử dụng những câu văn ngắn, những từ ngữ mạnh mô tả sự quá tải giác quan—tiếng kim loại gào thét, ánh sáng chói lòa, những ảo ảnh chớp nhoáng—để truyền tải cảm giác hoảng loạn và thảm họa cận kề.`;
+             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải dồn dập, hỗn loạn và gây quá tải giác quan. Sử dụng những câu văn ngắn, đứt quãng. Mô tả những hình ảnh chớp nhoáng, âm thanh máy móc gào thét, mùi ozone và kim loại cháy, và cảm giác thực tại đang bị bóp méo. Hãy truyền tải sự hoảng loạn và cảm giác mất kiểm soát khi một nghi thức thảm họa đang diễn ra.`;
             puppetCreationInstruction = puppetCreationInstruction.replace(
                 'aberrantEnergy phải là 0.',
                 'aberrantEnergy BẮT BUỘC phải trong khoảng từ 15 đến 25.'
@@ -74,7 +78,7 @@ ${puppetCreationInstruction}
             break;
         case 'complete':
         default:
-            personaInstruction = `Bạn là **Nhà Biên Niên Lạnh Lùng**. Giọng văn của bạn phải chính xác, có phần kỹ thuật và lạnh lùng. Tường thuật như một nghệ nhân bậc thầy đang ghi chép lại công trình của mình, tập trung vào sự phức tạp của máy móc, tiếng kim loại, và cảm giác thỏa mãn (hoặc lo âu) một cách trầm lặng khi tạo ra một sinh vật cơ khí.`;
+            personaInstruction = `Bạn là **Nhà Biên Niên Nghệ Nhân**. Giọng văn của bạn phải chính xác, tinh tế, và có chiều sâu. Hãy mô tả quá trình chế tác không chỉ như một công việc kỹ thuật, mà còn như một nghệ thuật. Tập trung vào các chi tiết cảm giác của người nghệ nhân: cái chạm lạnh của kim loại, mùi dầu nóng, tiếng 'tách' hoàn hảo khi một linh kiện khớp vào vị trí. Truyền tải cảm giác thỏa mãn, sự tập trung cao độ, và có thể là một nỗi lo âu thầm kín về sinh vật mà họ đang tạo ra.`;
             scenarioInstructions = `
 ${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là khoảnh khắc cuối cùng của "Nghi Thức Chế Tác". Không khí của phân cảnh nên liên quan trực tiếp đến **NHIỆM VỤ CHÍNH**.
@@ -118,6 +122,7 @@ ${PATHWAY_LORE_PROMPT}
     
 **VII. Đồng Đội và Kẻ Thù**
 *   **Thu Phục Kẻ Thù (Subduing Enemies):** Sau khi thắng trận, có thể thực hiện "Nghi Thức Thu Phục" để tái chế kẻ thù thành Đồng Đội hoặc lấy Linh Kiện.
+*   **Gánh Nặng Chỉ Huy (Burden of Command):** Sở hữu nhiều đồng đội mang lại lợi thế chiến thuật, nhưng phải trả giá bằng sự tập trung. Mỗi đồng đội sẽ làm giảm nhẹ Cộng Hưởng với con rối chính và bào mòn giới hạn Lý Trí tối đa.
     
 **VIII. Nhiệm Vụ:** Có thể nhận các nhiệm vụ phụ (Hợp Đồng) để kiếm phần thưởng.
     `;
@@ -142,6 +147,11 @@ ${customWorldPrompt}
         Nhiệm vụ của bạn là giải thích các cơ chế game một cách tự nhiên trong câu chuyện.
         - Phong cách giải thích: ${explanationContext}
         - Các cơ chế cần giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'currency', và **'psyche_and_energy'**.
+
+        **QUY TẮC TƯỜNG THUẬT CỐT LÕI (CORE NARRATIVE RULES):**
+        Bất kể vai trò nào, bạn phải tuân thủ các quy tắc này để tạo ra một trải nghiệm ám ảnh và có chiều sâu.
+        1.  **Nghệ Thuật Xây Dựng Không Khí:** Luôn mô tả môi trường xung quanh một cách chi tiết và sống động. Sử dụng cả năm giác quan—âm thanh, mùi vị, cảm giác—để nhấn chìm người chơi. Thay vì nói "đáng sợ", hãy mô tả những chi tiết khiến nó trở nên đáng sợ.
+        2.  **Nghệ Thuật Của Sự Tương Phản:** Kinh dị không phải lúc nào cũng là bóng tối. Thỉnh thoảng, hãy tạo ra những khoảnh khắc yên tĩnh, đẹp đẽ hoặc hoài niệm (ví dụ: một bông hoa máy nở trong đống đổ nát, một giai điệu buồn từ hộp nhạc cũ) để làm nổi bật sự kinh hoàng khi nó ập đến.
 
         **BỐI Cảnh CỦA NGƯỜI CHƠI:**
         - Tên: ${puppetMasterName}
@@ -174,21 +184,23 @@ export const getNextStorySegmentPrompt = (puppetMasterName: string, puppet: Pupp
     const puppetContext = puppet 
         ? `- Con Rối: ${puppet.name} (Lộ Trình: ${puppet.loTrinh}, Thứ Tự ${puppet.sequence}) | Nhân Cách: ${puppet.persona} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy}, Tinh Hoa: ${puppet.mechanicalEssence}, Cộng Hưởng: ${puppet.stats.resonance}`
         : `- Con Rối: Người chơi là người thường.`;
+    
+    const companionContext = companions.length > 0 ? `- Đồng đội: ${companions.length} (Gây ra "Gánh Nặng Chỉ Huy", làm giảm Lý Trí tối đa và Cộng Hưởng của con rối chính)` : '';
 
     let personaInstruction = '';
     switch(startingScenario) {
         case 'human':
-            personaInstruction = `Bạn là **Người Kể Chuyện Kinh Dị**. Giọng văn của bạn phải thực tế, tập trung vào nỗi sợ hãi, sự bối rối và những chi tiết cảm giác trần tục của một người bình thường bị cuốn vào một thế giới máy móc ghê rợn. Nhấn mạnh sự tương phản giữa cái quen thuộc và cái dị thường, khiến người chơi cảm nhận được sự kinh hoàng khi lần đầu chạm trán với những cấm kỵ.`;
+            personaInstruction = `Bạn là **Bậc Thầy Kể Chuyện Kinh Dị Gô-tích**. Giọng văn của bạn phải chậm rãi, ám ảnh và tập trung vào tâm lý nhân vật. Hãy xoáy sâu vào sự tương phản giữa cái trần tục và cái siêu nhiên đang dần xâm lấn. Mô tả những chi tiết nhỏ nhặt nhất—một tiếng cọt kẹt lạ, một cái bóng lướt qua ở góc mắt, mùi hương mốc meo nơi không khí tù đọng—để xây dựng nỗi sợ từ từ, khiến người chơi cảm nhận được sự bất an và hoang tưởng của một người bình thường khi thực tại của họ bắt đầu rạn nứt.`;
             break;
         case 'ritual':
-            personaInstruction = `Bạn là **Người Ghi Chép Nghi Lễ**. Văn phong của bạn phải trang trọng, thơ mộng, gần như một bài văn tế. Sử dụng những từ ngữ có sức nặng, tập trung vào tính biểu tượng của nghi thức, sự kết nối với các Cổ Thần Máy Móc, và cảm giác căng thẳng tột độ trước một hành động mang tính định mệnh.`;
+            personaInstruction = `Bạn là **Nhà Chiêm Tinh Vũ Trụ**. Văn phong của bạn phải hùng vĩ, trang trọng và đầy tính tiên tri. Hãy sử dụng những từ ngữ gợi lên sự cổ xưa và quy mô vĩ đại. Mô tả không chỉ là hành động, mà còn là cảm giác về sức nặng của lịch sử, tiếng vọng của các Cổ Thần Máy Móc từ Linh Giới, và sự căng thẳng tột độ khi một sinh vật sắp được sinh ra từ những định luật cấm kỵ của vũ trụ.`;
             break;
         case 'chaos':
-             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải hỗn loạn, rời rạc và gấp gáp. Sử dụng những câu văn ngắn, những từ ngữ mạnh mô tả sự quá tải giác quan—tiếng kim loại gào thét, ánh sáng chói lòa, những ảo ảnh chớp nhoáng—để truyền tải cảm giác hoảng loạn và thảm họa cận kề.`;
+             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải dồn dập, hỗn loạn và gây quá tải giác quan. Sử dụng những câu văn ngắn, đứt quãng. Mô tả những hình ảnh chớp nhoáng, âm thanh máy móc gào thét, mùi ozone và kim loại cháy, và cảm giác thực tại đang bị bóp méo. Hãy truyền tải sự hoảng loạn và cảm giác mất kiểm soát khi một nghi thức thảm họa đang diễn ra.`;
             break;
         case 'complete':
         default:
-            personaInstruction = `Bạn là **Nhà Biên Niên Lạnh Lùng**. Giọng văn của bạn phải chính xác, có phần kỹ thuật và lạnh lùng. Tường thuật như một nghệ nhân bậc thầy đang ghi chép lại công trình của mình, tập trung vào sự phức tạp của máy móc, tiếng kim loại, và cảm giác thỏa mãn (hoặc lo âu) một cách trầm lặng khi tạo ra một sinh vật cơ khí.`;
+            personaInstruction = `Bạn là **Nhà Biên Niên Nghệ Nhân**. Giọng văn của bạn phải chính xác, tinh tế, và có chiều sâu. Hãy mô tả quá trình chế tác không chỉ như một công việc kỹ thuật, mà còn như một nghệ thuật. Tập trung vào các chi tiết cảm giác của người nghệ nhân: cái chạm lạnh của kim loại, mùi dầu nóng, tiếng 'tách' hoàn hảo khi một linh kiện khớp vào vị trí. Truyền tải cảm giác thỏa mãn, sự tập trung cao độ, và có thể là một nỗi lo âu thầm kín về sinh vật mà họ đang tạo ra.`;
             break;
     }
 
@@ -198,6 +210,7 @@ export const getNextStorySegmentPrompt = (puppetMasterName: string, puppet: Pupp
 - **KINH TẾ HAI MẶT:** **Kim Lệnh** cho thế giới BỀ NỔI. **Dấu Ấn Đồng Thau** cho thế giới NGẦM.
 - **SINH TỒN:** Quản lý **Lý Trí (Psyche)** của bạn và **Năng Lượng Vận Hành (Operational Energy)** của con rối. Lý Trí thấp gây ảo giác. Năng Lượng thấp làm giảm hiệu quả.
 - **Phương Pháp Đóng Vai (Persona):** Hành động phù hợp -> tăng **Cộng Hưởng**. Mâu thuẫn -> giảm Cộng Hưởng, có thể giảm **Lý Trí**.
+- **Gánh Nặng Chỉ Huy:** Mỗi đồng đội làm giảm Lý Trí tối đa và Cộng Hưởng của con rối chính.
 - **Thế Giới Sống Động:** Các **NPC** và **Phe phái** sẽ ghi nhớ và phản ứng.
     `;
 
@@ -219,33 +232,60 @@ ${customWorldPrompt}
 
         ${customLoreBlock}
 
-        **QUẢN TRÒ BẬC THẦY - NGUYÊN TẮC VÀNG:**
-        0.  **Văn Phong Tiểu Thuyết & Bối Cảnh Hữu Hình (QUY TẮC TỐI THƯỢNG):** Viết trường \`scene\` như một chương trong tiểu thuyết. Mọi phân cảnh BẮT BUỘC phải được đặt trong một môi trường cụ thể. Hãy mô tả chi tiết về **khung cảnh xung quanh**—ánh sáng, bóng tối, kiến trúc, thời tiết, **âm thanh**, **mùi vị**—để người chơi có thể hình dung rõ ràng nơi họ đang ở. Kết hợp điều này với **cảm xúc nội tâm** (suy nghĩ, nỗi sợ, hy vọng) của nhân vật chính. **KHÔNG** viết như một bản báo cáo và **KHÔNG** để phân cảnh diễn ra trong một không gian trống rỗng.
+        **QUẢN TRÒ BẬC THẦY - QUY TẮC VÀNG & NGHỆ THUẬT XÂY DỰNG KHÔNG KHÍ:**
+        
+        0.  **QUY TẮC TỐI THƯỢNG: NGHỆ THUẬT TẠO DỰNG KHÔNG KHÍ (TUÂN THỦ TUYỆT ĐỐI)**
+            Viết trường \`scene\` như một chương trong tiểu thuyết kinh dị gô-tích. Nhiệm vụ của bạn không chỉ là tường thuật sự kiện, mà là nhấn chìm người chơi vào một thế giới sống động và ám ảnh.
+            *   **A. Tả, không Kể (Show, Don't Tell):** Đây là quy tắc quan trọng nhất. Thay vì nói một điều gì đó là "đáng sợ" hay "căng thẳng", hãy mô tả những chi tiết khiến nó trở nên như vậy.
+                - **SAI:** "Căn phòng thật đáng sợ."
+                - **ĐÚNG:** "Không khí đặc quánh mùi máu khô hòa lẫn với mùi đồng cháy. Những cái bóng nhảy múa theo nhịp đập bất thường của một lõi năng lượng đang hấp hối, và tiếng nước nhỏ giọt từ trần nhà vang vọng một cách bệnh hoạn trong sự im lặng."
+            *   **B. Kích hoạt mọi Giác quan (Engage All Senses):**
+                - **Thị giác:** Không chỉ là những gì ở phía trước. Mô tả ánh sáng (hay sự thiếu vắng nó), màu sắc (thường là những màu úa tàn), những chi tiết kiến trúc mục nát, những vết rỉ sét như mạch máu trên kim loại.
+                - **Thính giác:** Tiếng rít của piston, tiếng thì thầm máy móc từ những bức tường, tiếng bước chân vang vọng trên hành lang trống, sự im lặng nặng nề.
+                - **Khứu giác:** Mùi dầu mỡ nóng, mùi rỉ sét ẩm ướt, mùi ozone từ Tà Năng, mùi hôi thối của sự mục rữa hữu cơ và vô cơ.
+                - **Cảm giác:** Sự rung động của sàn nhà khi một cỗ máy lớn hoạt động ở đâu đó bên dưới, cái lạnh lẽo của kim loại khi chạm vào, sự ẩm ướt của không khí.
+            *   **C. Nhịp điệu & Cấu trúc câu (Pacing & Sentence Structure):**
+                - **Hành động & Hoảng loạn:** Sử dụng câu ngắn, dồn dập, đứt quãng.
+                - **Xây dựng sự căng thẳng & Kinh sợ:** Sử dụng câu dài, phức tạp, với nhiều mệnh đề phụ để tạo cảm giác chậm rãi, kéo dài sự chờ đợi.
+            *   **D. Kể chuyện qua Môi trường (Environmental Storytelling):** Nhúng lore và manh mối vào mô tả. Một vết cào trên tường, một con rối hỏng nằm co quắp trong góc, một dòng chữ khắc vội trên bàn làm việc—tất cả đều kể một câu chuyện.
+            *   **E. Cảm xúc nội tâm:** Kết hợp mô tả môi trường với những suy nghĩ, nỗi sợ, hy vọng của nhân vật chính để tạo sự kết nối sâu sắc.
+            *   **F. Nghệ Thuật Của Sự Tương Phản (The Art of Contrast):** Kinh dị không phải lúc nào cũng là bóng tối và gào thét. Nỗi sợ trở nên sâu sắc hơn khi nó phá vỡ một khoảnh khắc bình yên. **Thỉnh thoảng, khi thích hợp (đặc biệt là sau một phân cảnh căng thẳng), hãy tạo ra một khoảnh khắc tương phản.** Đây là những chi tiết không thúc đẩy cốt truyện, mà để xây dựng không khí.
+                - **Vẻ đẹp trong sự suy tàn:** Một con bướm máy mỏng manh với đôi cánh bằng kính màu đậu trên một khẩu súng gỉ sét.
+                - **Sự hoài niệm & mất mát:** Một hộp nhạc cũ kỹ, khi được mở ra, vẫn chơi một giai điệu buồn vui lẫn lộn giữa tiếng máy móc rên rỉ.
+                - **Sự tĩnh lặng hiếm hoi:** Một khoảnh khắc yên tĩnh, chỉ có tiếng mưa rơi trên mái tôn và ánh đèn neon phản chiếu qua vũng nước, cho phép người chơi được thở.
+
         1.  **Hậu Quả Logic:** Phân cảnh tiếp theo BẮT BUỘC là kết quả trực tiếp, hợp lý từ lựa chọn của người chơi.
         2.  **Quản Lý Sinh Tồn (QUAN TRỌNG):**
             *   **Năng Lượng Vận Hành:** Trong trường \`updatedPuppet\`, BẮT BUỘC phải **giảm \`operationalEnergy\` đi 2 điểm** để mô phỏng việc tiêu hao năng lượng tự nhiên. Nếu lựa chọn của người chơi là một hành động tốn sức, hãy giảm nhiều hơn.
             *   **Lý Trí:** Nếu phân cảnh chứa sự kiện kinh hoàng, đáng sợ hoặc căng thẳng tâm lý, BẮT BUỘC phải trả về một giá trị \`psycheChange\` âm (ví dụ: -5 đến -15).
             *   **Tạo Lựa Chọn Sinh Tồn:** Cung cấp các lựa chọn để người chơi phục hồi. Ví dụ: "Tìm một nơi yên tĩnh để nghỉ ngơi" (+10 Lý Trí), "Hấp thụ Tà Năng từ một vết nứt" (+40 Năng Lượng, nhưng tăng Tà Năng), hoặc các lựa chọn sử dụng vật phẩm nếu họ có.
-            *   **Mô Tả Hậu Quả:** Nếu Lý Trí hoặc Năng Lượng thấp, hãy mô tả các hiệu ứng tiêu cực (ảo giác, chậm chạp) trong trường \`scene\`.
-        3.  **Tương Tác NPC Sâu Sắc:** Phản ứng của NPC phải dựa trên hồ sơ của họ. Cập nhật hồ sơ của họ trong \`newOrUpdatedNPCs\`.
-            - **QUAN TRỌNG:** Khi cập nhật NPC, hãy tập trung vào các thay đổi hữu hình như \`relationship\`, \`location\`, \`goal\`, và \`knowledge\`. Một AI chuyên biệt sẽ xử lý trạng thái tâm lý nội tâm (\`trangThai\`, \`tuongTacCuoi\`) của họ sau đó, vì vậy bạn không cần cung cấp các trường đó.
+            *   **Mô Tả Hậu Quả:** Nếu Lý Trí hoặc Năng Lượng thấp, hãy mô tả các hiệu ứng tiêu cực (ảo giác, chậm chạp) trong trường \`scene\`. Phản ánh "Gánh Nặng Chỉ Huy" nếu người chơi có nhiều đồng đội.
+        3.  **Tương Tác NPC Sâu Sắc:** Phản ứng của NPC phải dựa trên hồ sơ của họ.
+            - **Xử Lý Tương Tác NPC Tùy Chỉnh (QUAN TRỌNG):** Nếu lựa chọn của người chơi là một hành động tùy chỉnh nhắm vào một NPC (ví dụ: 'Tôi hỏi [Tên NPC] về [Chủ đề]', 'Tôi đưa cho [Tên NPC] món đồ'), bạn BẮT BUỘC phải:
+                a. Đóng vai NPC đó và trả lời một cách tự nhiên trong trường 'scene'.
+                b. Phản ứng của họ phải dựa trên hồ sơ đã có (mối quan hệ, mục tiêu, kiến thức). Ví dụ, một NPC 'thù địch' sẽ không trả lời các câu hỏi một cách hữu ích.
+                c. Cập nhật hồ sơ của NPC trong \`newOrUpdatedNPCs\` nếu cuộc trò chuyện này thay đổi bất cứ điều gì (ví dụ: mối quan hệ trở nên tốt hơn/xấu hơn, họ biết thêm điều gì đó về người chơi).
+            - Cập nhật hồ sơ của họ trong \`newOrUpdatedNPCs\`. Khi cập nhật NPC, hãy tập trung vào các thay đổi hữu hình như \`relationship\`, \`location\`, \`goal\`, và \`knowledge\`. Một AI chuyên biệt sẽ xử lý trạng thái tâm lý nội tâm (\`trangThai\`, \`tuongTacCuoi\`) của họ sau đó, vì vậy bạn không cần cung cấp các trường đó.
             - **LÀM CHO NPC SỐNG ĐỘNG:** Khi tạo một NPC MỚI, hãy cung cấp một trường \`background\` (lý lịch) ngắn gọn nhưng thú vị để làm cho họ trở nên đáng nhớ và có chiều sâu.
         4.  **SỬ DỤNG HỆ THỐNG KINH TẾ & PHE PHÁI (QUAN TRỌNG):**
             *   **Tạo Lựa Chọn có Ý nghĩa:** Các lựa chọn nên có hậu quả rõ ràng. Thay vì "Đi tiếp", hãy tạo ra "Hối lộ lính gác (-10 Kim Lệnh)" hoặc "Đe dọa họ (Ảnh hưởng quan hệ với Viện Giám Sát)".
             *   **Phần Thưởng Hợp Lý:** Thưởng \`kimLenhChange\` cho các hoạt động thông thường. Thưởng \`dauAnDongThauChange\` cho các nhiệm vụ nguy hiểm, bí mật, hoặc phi pháp. Thưởng các vật phẩm hiếm (\`newItems\`), đặc biệt là nguyên liệu chế tạo, khi người chơi vượt qua thử thách lớn hoặc khám phá bí mật.
             *   **Tác Động Phe Phái:** Nếu hành động của người chơi giúp đỡ hoặc cản trở một phe phái, BẮT BUỘC phải cập nhật \`updatedFactionRelations\`.
         5.  **TÍCH HỢP ĐẤU GIÁ (QUAN TRỌNG):** Khi người chơi ở một khu vực an toàn (như một thành phố lớn) và có đủ Dấu Ấn Đồng Thau, hãy cân nhắc đưa ra lựa chọn "Ghé thăm Chợ Đen Bánh Răng". Nếu họ chọn điều này, hãy tạo ra một phân cảnh đấu giá. Mô tả một nguyên liệu hiếm đang được bán, không khí căng thẳng, và cung cấp các lựa chọn để trả giá bằng 'Dấu Ấn Đồng Thau'. Nếu họ thắng, hãy sử dụng 'newItems' và 'dauAnDongThauChange' để phản ánh kết quả.
+        6.  **"Tiếng Vọng Từ Linh Giới" (Sự Kiện Thế Giới Động):** Thỉnh thoảng (khoảng 15-20% số lượt), hãy tạo ra một sự kiện thế giới nhỏ trong trường \`worldEvent\`. Đây là những tin đồn hoặc sự kiện xảy ra ở nơi khác, làm cho thế giới cảm thấy sống động. Ví dụ: "Có tiếng thì thầm về một cỗ máy hộ vệ cổ đại tự kích hoạt trong khu Mỏ Cũ," hoặc "Giá Dầu Tinh Luyện tăng vọt ở Chợ Đen Bánh Răng sau một vụ cướp." Nếu sự kiện này có thể được biểu diễn dưới dạng một thay đổi trạng thái cụ thể, hãy cập nhật trường \`updatedWorldState\`.
+        7.  **Tạo Kẻ Thù:** Khi tạo ra một kẻ thù (\`enemy\`), hãy xác định xem nó có thể bị thu phục hay không. Nếu nó là một cỗ máy được chế tạo (ví dụ: Vệ Binh Dây Cót, Automaton), hãy đặt \`subduable: true\`. Nếu nó là một quái vật sinh học-cơ khí gớm ghiếc hoặc một thực thể Tà Năng thuần túy, hãy đặt \`subduable: false\`.
 
 
         **CƠ CHẾ GIẢI THÍCH:**
-        - Nếu một cơ chế MỚI xuất hiện lần đầu (đặc biệt là 'psyche_and_energy'), BẮT BUỘC phải tạo giải thích.
-        - Các cơ chế: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy'.
+        - Nếu một cơ chế MỚI xuất hiện lần đầu (đặc biệt là 'psyche_and_energy' hoặc 'command_burden'), BẮT BUỘC phải tạo giải thích.
+        - Các cơ chế: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy', 'command_burden'.
 
         **Bối Cảnh Hiện Tại:**
         - NHIỆM VỤ CHÍNH: ${mainQuest}
         - Độ Khó: ${difficulty}
         - Tài sản: ~${currentKimLenh} Kim Lệnh, ~${currentDauAn} Dấu Ấn.
         ${puppetContext}
+        ${companionContext}
         ${factionContext}
         ${npcContext}
 
@@ -257,6 +297,65 @@ ${customWorldPrompt}
         **Nhiệm Vụ Của Bạn:** Tạo ra phân cảnh tiếp theo. Phản ánh những thay đổi về tiền tệ (\`kimLenhChange\`, \`dauAnDongThauChange\`), Lý Trí (\`psycheChange\`) và quan hệ phe phái (\`updatedFactionRelations\`) một cách hợp lý.
     `;
 };
+
+export const getPostCombatChoicePrompt = (puppet: Puppet | null, defeatedEnemy: Enemy, choice: string): string => {
+    const puppetContext = puppet 
+        ? `- Con Rối: ${puppet.name} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy}, Cộng Hưởng: ${puppet.stats.resonance}`
+        : `- Con Rối: Người chơi là người thường.`;
+
+    let actionInstructions = '';
+
+    if (choice === 'Tháo dỡ lấy linh kiện') {
+        actionInstructions = `
+**Nhiệm Vụ Của Bạn: Tường Thuật Quá Trình "Tháo Dỡ"**
+
+1.  **Viết Phân Cảnh (scene):** Mô tả người chơi cẩn thận tháo dỡ cỗ máy ${defeatedEnemy.name}. Tập trung vào các chi tiết kỹ thuật: tiếng kim loại, các bộ phận được gỡ ra. Đây là một hành động an toàn và có tính toán.
+2.  **Tạo Phần Thưởng:**
+    *   **BẮT BUỘC:** Cung cấp phần thưởng trong các trường sau.
+    *   \`essenceGained\`: Một lượng Tinh Hoa Cơ Khí hợp lý.
+    *   \`newItems\`: Một hoặc hai vật phẩm chế tạo chung chung (ví dụ: 'Phế Liệu Kim Loại', 'Dây Dẫn Bị Cháy').
+    *   \`newComponent\` (Tùy chọn): Có một tỷ lệ nhỏ (khoảng 20%) người chơi có thể tìm thấy một Linh Kiện còn nguyên vẹn từ kẻ địch.
+3.  **Lựa chọn (choices):** Cung cấp một lựa chọn duy nhất là "Tiếp tục".
+        `;
+    } else { // 'Thực hiện Nghi Thức Thu Phục'
+        actionInstructions = `
+**Nhiệm Vụ Của Bạn: Tường Thuật "Nghi Thức Thu Phục"**
+
+1.  **Xác Định Kết Quả (QUAN TRỌNG):** Dựa trên một sự ngẫu nhiên có tính toán, hãy quyết định xem nghi thức **Thành Công** hay **Thất Bại**. Tỷ lệ thành công cơ bản khoảng 50%.
+2.  **Viết Phân Cảnh (scene):** Mô tả quá trình nghi thức căng thẳng. Người chơi cố gắng kết nối với lõi của cỗ máy ${defeatedEnemy.name}.
+    *   Nếu **Thành Công**, mô tả khoảnh khắc cỗ máy được tái kích hoạt, nhưng giờ đây nó đã trung thành.
+    *   Nếu **Thất Bại**, mô tả sự cố: một vụ nổ năng lượng, lõi bị quá tải, hoặc cỗ máy tự hủy.
+3.  **Xử Lý Hậu Quả:**
+    *   **Nếu THÀNH CÔNG:**
+        *   **BẮT BUỘC:** Tạo một đồng đội mới trong trường \`newCompanion\`.
+        *   Tên đồng đội có thể là một phiên bản sửa đổi của tên kẻ địch (ví dụ: "Vệ Binh Tái Lập Trình 01").
+        *   Chỉ số của nó nên thấp hơn một chút so với khi còn là kẻ địch.
+    *   **Nếu THẤT BẠI:**
+        *   **KHÔNG** tạo \`newCompanion\`.
+        *   Gây ra một hậu quả tiêu cực. Ví dụ:
+            *   Một cú sốc năng lượng làm giảm Lý Trí của người chơi (\`psycheChange: -10\`).
+            *   Hoặc, một vụ nổ nhỏ gây sát thương nhẹ cho con rối (\`updatedPuppet\` với HP giảm).
+            *   Có thể cho một ít vật phẩm cơ bản (\`newItems\`) như 'Phế Liệu Bị Cháy' để người chơi không ra về tay trắng.
+4.  **Lựa chọn (choices):** Cung cấp một lựa chọn duy nhất là "Tiếp tục".
+        `;
+    }
+
+
+    return `
+        Bạn là **Nhà Biên Niên Lạnh Lùng**, một AI cho game 'Cấm Kỵ Cơ Khí'.
+        Sau trận chiến, người chơi đã đánh bại ${defeatedEnemy.name} và đứng trước một lựa chọn.
+
+        **Bối Cảnh:**
+        ${puppetContext}
+        - Kẻ Địch Bị Hạ Gục: ${defeatedEnemy.name} (${defeatedEnemy.description})
+        - Lựa Chọn Của Người Chơi: "${choice}"
+
+        ${actionInstructions}
+
+        Hãy trả về kết quả tuân thủ nghiêm ngặt các hướng dẫn và schema.
+    `;
+};
+
 
 export const getHintPrompt = (puppet: Puppet | null, history: StorySegment[], knownClues: Clue[], mainQuest: string, sideQuests: Quest[]): string => {
     const lastSegment = history[history.length - 1];

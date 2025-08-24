@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item } from '../../types';
 
@@ -104,6 +105,12 @@ interface PuppetStatusProps {
 const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem, onShowLore }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
 
+  const companionCount = companions.length;
+  const psychePenalty = companionCount * 10;
+  const resonancePenalty = companionCount * 5;
+  const effectiveMaxPsyche = maxPsyche - psychePenalty;
+  const effectiveResonance = Math.max(0, puppet.stats.resonance - resonancePenalty);
+
   const renderContent = () => {
     switch (activeView) {
         case 'stats':
@@ -114,17 +121,30 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, 
                             <StatBar value={puppet.stats.hp} maxValue={puppet.stats.maxHp} label="Độ Bền" color="bg-gradient-to-r from-red-600 to-red-500" glowColor="#f87171" />
                             <StatBar value={puppet.stats.operationalEnergy} maxValue={puppet.stats.maxOperationalEnergy} label="Năng Lượng Vận Hành" color="bg-gradient-to-r from-yellow-600 to-yellow-500" glowColor="#f59e0b" tooltip="Nhiên liệu cho Tâm Cơ Luân. Năng lượng thấp sẽ làm giảm hiệu quả chiến đấu." />
                             <StatBar value={puppet.stats.aberrantEnergy} maxValue={puppet.stats.maxAberrantEnergy} label="Tà Năng" color="bg-gradient-to-r from-purple-600 to-purple-500" glowColor="#c084fc" tooltip="Năng lượng hỗn loạn. Nếu quá cao, nó có thể gây ra đột biến không mong muốn." />
-                            <StatBar value={puppet.stats.resonance} maxValue={100} label="Cộng Hưởng" color="bg-gradient-to-r from-slate-500 to-slate-400" glowColor="#94a3b8" tooltip="Mức độ đồng điệu với 'Nhân Cách'. Cộng hưởng cao giúp tăng hiệu quả chiến đấu." />
+                            <StatBar 
+                                value={effectiveResonance} 
+                                maxValue={100} 
+                                label="Cộng Hưởng" 
+                                color="bg-gradient-to-r from-slate-500 to-slate-400" 
+                                glowColor="#94a3b8" 
+                                tooltip={companionCount > 0 
+                                    ? `Mỗi đồng đội sẽ làm giảm sự tập trung của bạn, gây nhiễu loạn kết nối với con rối chính. Hiện tại: -${resonancePenalty} Cộng Hưởng.`
+                                    : "Mức độ đồng điệu với 'Nhân Cách'. Cộng hưởng cao giúp tăng hiệu quả chiến đấu."
+                                } 
+                            />
                         </div>
                     </Section>
                     <Section title="Trạng Thái Nghệ Nhân" titleColor="text-sky-400">
                         <StatBar 
                             value={psyche} 
-                            maxValue={maxPsyche} 
+                            maxValue={effectiveMaxPsyche} 
                             label="Lý Trí" 
                             color="bg-gradient-to-r from-sky-500 to-sky-400" 
                             glowColor="#38bdf8" 
-                            tooltip="Sự ổn định tinh thần của bạn. Nếu xuống quá thấp, thực tại có thể bắt đầu rạn nứt." 
+                            tooltip={companionCount > 0
+                                ? `Việc chỉ huy nhiều đồng đội gây áp lực lên tâm trí của bạn, làm giảm Lý Trí tối đa. Hiện tại: -${psychePenalty} Lý Trí Tối Đa.`
+                                : "Sự ổn định tinh thần của bạn. Nếu xuống quá thấp, thực tại có thể bắt đầu rạn nứt."
+                            }
                         />
                     </Section>
                      <Section title="Thuộc Tính Chiến Đấu">
@@ -219,7 +239,24 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, 
                 </Section>
             </div>
         );
-        case 'design': return (<div className="animate-fade-in"><Section title="Bản Thiết Kế"><div className="text-sm bg-black/30 p-3 space-y-1"><p>Phe Phái: {puppet.phePhai}</p><p>Lộ Trình: {puppet.loTrinh}</p><p>Trường Phái: {puppet.truongPhai}</p><p>Vật Liệu: {puppet.material}</p><p className="pt-1 border-t border-red-500/10">Nhân Cách: <span className="italic text-red-300">{puppet.persona}</span></p></div></Section></div>);
+        case 'design': return (
+            <div className="animate-fade-in">
+                <Section title="Bản Thiết Kế">
+                    <div className="text-sm bg-black/30 p-3 space-y-1">
+                        <p><span className="text-gray-400">Phe Phái:</span> {puppet.phePhai}</p>
+                        <p><span className="text-gray-400">Lộ Trình:</span> {puppet.loTrinh}</p>
+                        <p><span className="text-gray-400">Trường Phái:</span> {puppet.truongPhai}</p>
+                        <p><span className="text-gray-400">Vật Liệu:</span> {puppet.material}</p>
+                        <p className="pt-2 mt-2 border-t border-red-500/10"><span className="text-gray-400">Nhân Cách:</span> <span className="italic text-red-300">{puppet.persona}</span></p>
+                    </div>
+                </Section>
+                 {puppet.visualDescription && (
+                    <Section title="Mô Tả Trực Quan">
+                        <p className="text-sm text-gray-300 bg-black/30 p-3 mt-2 italic border border-gray-700/50">{puppet.visualDescription}</p>
+                    </Section>
+                )}
+            </div>
+        );
         default: return null;
     }
   }

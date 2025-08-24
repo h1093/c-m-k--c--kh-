@@ -1,10 +1,11 @@
 
+
 import { generateContentWithSchema } from './ai/aiService';
-import { getInitialStoryPrompt, getNextStorySegmentPrompt, getHintPrompt } from './ai/prompts/chroniclerPrompts';
+import { getInitialStoryPrompt, getNextStorySegmentPrompt, getHintPrompt, getPostCombatChoicePrompt } from './ai/prompts/chroniclerPrompts';
 import { getLoreSummaryPrompt } from './ai/prompts/archivistPrompts';
 import { getBiographyGenerationPrompt } from './ai/prompts/creatorPrompts';
 import { storySegmentSchema, loreSummarySchema, biographySchema, npcMindSchema, hintSchema } from './ai/schemas';
-import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../types';
+import type { StorySegment, Puppet, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty, Enemy } from '../types';
 
 
 export const generateInitialStory = async (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, customWorldPrompt: string | null, difficulty: Difficulty): Promise<StorySegment> => {
@@ -16,6 +17,11 @@ export const generateNextStorySegment = async (puppetMasterName: string, puppet:
     const prompt = getNextStorySegmentPrompt(puppetMasterName, puppet, history, choice, knownClues, mainQuest, sideQuests, companions, shownExplanations, startingScenario, customWorldPrompt, npcs, worldState, loreEntries, factionRelations, difficulty);
     return await generateContentWithSchema<StorySegment>(prompt, storySegmentSchema);
 };
+
+export const generatePostCombatSegment = async (puppet: Puppet | null, defeatedEnemy: Enemy, choice: string): Promise<StorySegment> => {
+    const prompt = getPostCombatChoicePrompt(puppet, defeatedEnemy, choice);
+    return await generateContentWithSchema<StorySegment>(prompt, storySegmentSchema);
+}
 
 export const generateLoreSummary = async (history: StorySegment[]): Promise<string> => {
     // Summarize the last 5 segments

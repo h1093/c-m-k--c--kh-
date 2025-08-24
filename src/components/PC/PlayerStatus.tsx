@@ -113,6 +113,10 @@ const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w
 
 const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, psyche, maxPsyche, inventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onShowLore }) => {
     const [activeView, setActiveView] = useState<PlayerView>('bio');
+    
+    const companionCount = companions.length;
+    const psychePenalty = companionCount * 10;
+    const effectiveMaxPsyche = maxPsyche - psychePenalty;
 
     const renderContent = () => {
         switch (activeView) {
@@ -129,7 +133,17 @@ const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, 
                 return (
                     <div className="animate-fade-in space-y-4">
                         <Section title="Trạng Thái Tinh Thần">
-                           <StatBar value={psyche} maxValue={maxPsyche} label="Lý Trí" color="bg-gradient-to-r from-sky-500 to-sky-400" glowColor="#38bdf8" tooltip="Sự ổn định tinh thần của bạn. Nếu xuống quá thấp, thực tại có thể bắt đầu rạn nứt." />
+                           <StatBar 
+                                value={psyche} 
+                                maxValue={effectiveMaxPsyche} 
+                                label="Lý Trí" 
+                                color="bg-gradient-to-r from-sky-500 to-sky-400" 
+                                glowColor="#38bdf8" 
+                                tooltip={companionCount > 0 
+                                    ? `Việc chỉ huy nhiều đồng đội gây áp lực lên tâm trí của bạn, làm giảm Lý Trí tối đa. Hiện tại: -${psychePenalty} Lý Trí Tối Đa.`
+                                    : "Sự ổn định tinh thần của bạn. Nếu xuống quá thấp, thực tại có thể bắt đầu rạn nứt."
+                                } 
+                           />
                         </Section>
                         <Section title="Tiểu Sử">
                             {hasStructuredBio ? (

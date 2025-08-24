@@ -1,4 +1,5 @@
 
+
 import { Type } from "@google/genai";
 
 export const puppetAbilitySchema = {
@@ -177,6 +178,7 @@ export const puppetSchema = {
         persona: { type: Type.STRING, description: "Nhân Cách hay 'phương pháp đóng vai' cốt lõi của con rối, mà người chơi nên cố gắng tuân theo."},
         sequence: { type: Type.INTEGER, description: "Thứ Tự/cấp bậc hiện tại của con rối, ví dụ: 9." },
         sequenceName: { type: Type.STRING, description: "Tên của Thứ Tự hiện tại, ví dụ: 'Học Việc Sắt'." },
+        visualDescription: { type: Type.STRING, description: "Một mô tả trực quan chi tiết, giàu hình ảnh về con rối dựa trên các thành phần, vật liệu và đột biến hiện tại của nó." },
         stats: {
             type: Type.OBJECT,
             properties: {
@@ -221,11 +223,31 @@ export const explanationSchema = {
     type: Type.OBJECT,
     description: "Một đoạn giải thích về một cơ chế game mới, được lồng ghép vào câu chuyện. Chỉ bao gồm khi một cơ chế được giới thiệu lần đầu.",
     properties: {
-        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy'." },
+        id: { type: Type.STRING, description: "ID của cơ chế được giải thích: 'resonance_and_persona', 'aberrant_energy', 'mechanical_essence', 'combat', 'sequences', 'currency', 'psyche_and_energy', 'command_burden'." },
         title: { type: Type.STRING, description: "Tiêu đề của phần giải thích, ví dụ: 'Về Cộng Hưởng và Nhân Cách'." },
         text: { type: Type.STRING, description: "Nội dung giải thích chi tiết, được viết theo phong cách phù hợp với bối cảnh." }
     }
 };
+
+const enemySchema = {
+    type: Type.OBJECT,
+    description: "Nếu phân cảnh này bắt đầu một cuộc chiến, hãy mô tả kẻ thù ở đây. Nếu không, hãy bỏ qua.",
+    properties: {
+        name: { type: Type.STRING },
+        description: { type: Type.STRING },
+        stats: {
+            type: Type.OBJECT,
+            properties: {
+                hp: { type: Type.INTEGER },
+                maxHp: { type: Type.INTEGER },
+                attack: { type: Type.INTEGER },
+                defense: { type: Type.INTEGER },
+            }
+        },
+        subduable: { type: Type.BOOLEAN, description: "True nếu kẻ thù này là một cỗ máy có thể được thu phục sau khi bị đánh bại." }
+    }
+};
+
 
 export const storySegmentSchema = {
     type: Type.OBJECT,
@@ -255,23 +277,7 @@ export const storySegmentSchema = {
             },
             description: "Danh sách các manh mối mới mà người chơi đã khám phá trong phân cảnh này. Có thể trống."
         },
-        enemy: {
-            type: Type.OBJECT,
-            description: "Nếu phân cảnh này bắt đầu một cuộc chiến, hãy mô tả kẻ thù ở đây. Nếu không, hãy bỏ qua.",
-            properties: {
-                name: { type: Type.STRING },
-                description: { type: Type.STRING },
-                stats: {
-                    type: Type.OBJECT,
-                    properties: {
-                        hp: { type: Type.INTEGER },
-                        maxHp: { type: Type.INTEGER },
-                        attack: { type: Type.INTEGER },
-                        defense: { type: Type.INTEGER },
-                    }
-                }
-            }
-        },
+        enemy: enemySchema,
         essenceGained: {
             type: Type.INTEGER,
             description: "Lượng 'Tinh Hoa Cơ Khí' người chơi nhận được khi hoàn thành phân cảnh này (nếu có). Thường dành cho các khám phá quan trọng hoặc giải quyết vấn đề một cách thông minh."
@@ -372,7 +378,8 @@ export const combatTurnSchema = {
                         attack: { type: Type.INTEGER },
                         defense: { type: Type.INTEGER },
                     }
-                }
+                },
+                subduable: { type: Type.BOOLEAN, description: "True nếu kẻ thù này là một cỗ máy có thể được thu phục sau khi bị đánh bại." }
             },
             required: ["name", "description", "stats"]
         },

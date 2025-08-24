@@ -1,3 +1,4 @@
+
 import type { Puppet, ExplanationId, Component, Item } from '../../../types';
 import { FACTION_PATHWAYS } from '../../../data/gameConfig';
 
@@ -95,6 +96,7 @@ export const getComponentInstallPrompt = (puppet: Puppet, component: Component):
 
         **Dữ liệu phân tích:**
         - Con rối: ${puppet.name}
+        - Mô tả trực quan hiện tại: "${puppet.visualDescription || 'Chưa có mô tả chi tiết.'}"
         - Linh kiện cần lắp: ${component.name} (Loại: ${component.type})
         - Mô tả linh kiện: "${component.description}"
 
@@ -104,7 +106,8 @@ export const getComponentInstallPrompt = (puppet: Puppet, component: Component):
             a.  Tạo một bản sao của đối tượng con rối được cung cấp.
             b.  Thêm linh kiện \`${component.name}\` vào mảng \`equippedComponents\`.
             c.  **Áp dụng các thay đổi chỉ số:** Đọc kỹ mô tả của linh kiện và áp dụng chính xác các thay đổi chỉ số (ví dụ: +3 Tấn công, -1 Phòng thủ, +5 HP Tối đa) vào đối tượng \`updatedPuppet\`. Hãy cực kỳ cẩn thận và chính xác.
-            d.  Trả về đối tượng \`updatedPuppet\` đã được cập nhật hoàn chỉnh.
+            d.  **Cập nhật Mô tả Trực quan (visualDescription):** Dựa trên linh kiện mới được lắp và mô tả trực quan cũ của con rối, hãy viết lại một trường \`visualDescription\` mới, mô tả con rối giờ trông như thế nào với bộ phận mới này. Hãy sáng tạo và chi tiết.
+            e.  Trả về đối tượng \`updatedPuppet\` đã được cập nhật hoàn chỉnh.
 
         **Ví dụ về logic áp dụng chỉ số:**
         - Nếu mô tả là "Tăng 3 điểm Tấn công", bạn phải cập nhật \`stats.attack\` lên +3.

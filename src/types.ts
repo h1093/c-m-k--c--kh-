@@ -1,4 +1,5 @@
 
+
 export interface PuppetAbility {
   name: string;
   description: string;
@@ -84,6 +85,7 @@ export interface Enemy {
     attack: number;
     defense: number;
   };
+  subduable?: boolean; // True nếu kẻ thù này là máy móc và có thể thu phục
 }
 
 export interface Puppet {
@@ -96,6 +98,7 @@ export interface Puppet {
   persona: string; // Nhân Cách, "phương pháp đóng vai" của con rối.
   sequence: number; // Thứ Tự, ví dụ: 9, 8
   sequenceName: string; // Tên của Thứ Tự, ví dụ: "Học Việc", "Nhà Chiêm Tinh Dây Cót"
+  visualDescription?: string; // Mô tả trực quan do AI tạo ra
   stats: {
     hp: number;
     maxHp: number;
@@ -122,7 +125,7 @@ export interface Puppet {
   equippedComponents: Component[];
 }
 
-export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences' | 'currency' | 'psyche_and_energy';
+export type ExplanationId = 'resonance_and_persona' | 'aberrant_energy' | 'mechanical_essence' | 'combat' | 'sequences' | 'currency' | 'psyche_and_energy' | 'command_burden';
 
 export interface Explanation {
   id: ExplanationId;
@@ -247,6 +250,7 @@ export interface GameState {
   companions: Companion[];
   mentalShock: string | null;
   aberrantEnergyLeak: string | null;
+  lastDefeatedEnemy: Enemy | null;
   
   // Economy
   kimLenh: number; // Tiền tệ thế giới bề nổi
@@ -263,7 +267,7 @@ export interface GameState {
   worldState: { [key: string]: string };
   loreEntries: LoreEntry[];
   loreSummaries: LoreSummary[];
-  factionRelations: FactionRelations; // Mối quan hệ của người chơi với các phe phái
+  factionRelations: FactionRelations;
   difficulty: Difficulty;
   apiCalls: number;
 }
