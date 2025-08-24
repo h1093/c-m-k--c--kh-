@@ -1,4 +1,3 @@
-
 import { FACTION_PATHWAYS } from '../../../data/gameConfig';
 import type { Puppet, StorySegment, Clue, StartingScenario, ExplanationId, Quest, Companion, NPC, LoreEntry, FactionRelations, Difficulty } from '../../../types';
 
@@ -29,6 +28,7 @@ const PATHWAY_LORE_PROMPT = formatPathwaysForPrompt();
 export const getInitialStoryPrompt = (puppetMasterName: string, biography: string, mainQuest: string, startingScenario: StartingScenario, customWorldPrompt: string | null, difficulty: Difficulty): string => {
     let scenarioInstructions = '';
     let explanationContext = '';
+    let personaInstruction = '';
     let puppetCreationInstruction = `
 -   **Tạo Con Rối:** BẠN BẮT BUỘC PHẢI tạo một con rối mới và trả về nó trong trường 'updatedPuppet'.
     -   Con rối phải phản ánh tiểu sử của người chơi.
@@ -40,6 +40,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
 
     switch(startingScenario) {
         case 'human':
+            personaInstruction = `Bạn là **Người Kể Chuyện Kinh Dị**. Giọng văn của bạn phải thực tế, tập trung vào nỗi sợ hãi, sự bối rối và những chi tiết cảm giác trần tục của một người bình thường bị cuốn vào một thế giới máy móc ghê rợn. Nhấn mạnh sự tương phản giữa cái quen thuộc và cái dị thường, khiến người chơi cảm nhận được sự kinh hoàng khi lần đầu chạm trán với những cấm kỵ.`;
             scenarioInstructions = `
 -   **Mô Tả Phân Cảnh:** Bắt đầu bằng cách mô tả cuộc sống bình thường của ${puppetMasterName}. Sau đó, giới thiệu **"sự kiện khởi đầu"** đã được xây dựng từ 'chi tiết bất thường' trong tiểu sử.
 -   **Yêu Cầu:** KHÔNG tạo con rối. Trường 'updatedPuppet' phải là null hoặc không được cung cấp.
@@ -48,6 +49,7 @@ export const getInitialStoryPrompt = (puppetMasterName: string, biography: strin
             explanationContext = `Họ là người mới, hoàn toàn không biết gì về Huyền Học Cơ Khí. Giải thích nên ở dạng một khám phá (đọc nhật ký, một người khác giải thích cho họ).`;
             break;
         case 'ritual':
+            personaInstruction = `Bạn là **Người Ghi Chép Nghi Lễ**. Văn phong của bạn phải trang trọng, thơ mộng, gần như một bài văn tế. Sử dụng những từ ngữ có sức nặng, tập trung vào tính biểu tượng của nghi thức, sự kết nối với các Cổ Thần Máy Móc, và cảm giác căng thẳng tột độ trước một hành động mang tính định mệnh.`;
             scenarioInstructions = `
 ${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là ngay TRƯỚC KHI hoàn thành "Nghi Thức Chế Tác". Mô tả sự chuẩn bị, không khí căng thẳng. Con rối đã được tạo ra, nhưng chưa được kích hoạt.
@@ -57,6 +59,7 @@ ${puppetCreationInstruction}
             explanationContext = `Họ đã là một Nghệ Nhân Rối. Giải thích nên ở dạng một đoạn suy nghĩ nội tâm, một lời nhắc nhở về các nguyên tắc cơ bản.`;
             break;
         case 'chaos':
+             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải hỗn loạn, rời rạc và gấp gáp. Sử dụng những câu văn ngắn, những từ ngữ mạnh mô tả sự quá tải giác quan—tiếng kim loại gào thét, ánh sáng chói lòa, những ảo ảnh chớp nhoáng—để truyền tải cảm giác hoảng loạn và thảm họa cận kề.`;
             puppetCreationInstruction = puppetCreationInstruction.replace(
                 'aberrantEnergy phải là 0.',
                 'aberrantEnergy BẮT BUỘC phải trong khoảng từ 15 đến 25.'
@@ -71,6 +74,7 @@ ${puppetCreationInstruction}
             break;
         case 'complete':
         default:
+            personaInstruction = `Bạn là **Nhà Biên Niên Lạnh Lùng**. Giọng văn của bạn phải chính xác, có phần kỹ thuật và lạnh lùng. Tường thuật như một nghệ nhân bậc thầy đang ghi chép lại công trình của mình, tập trung vào sự phức tạp của máy móc, tiếng kim loại, và cảm giác thỏa mãn (hoặc lo âu) một cách trầm lặng khi tạo ra một sinh vật cơ khí.`;
             scenarioInstructions = `
 ${puppetCreationInstruction}
 -   **Mô Tả Phân Cảnh:** Bối cảnh là khoảnh khắc cuối cùng của "Nghi Thức Chế Tác". Không khí của phân cảnh nên liên quan trực tiếp đến **NHIỆM VỤ CHÍNH**.
@@ -96,7 +100,7 @@ ${puppetCreationInstruction}
 
 **III. Lộ Trình Thăng Tiến & Cuộc Chiến Vì Thực Tại**
 *   **Lộ Trình (Path):** Sự tiến hóa của con rối từ Thứ Tự 9 đến 0 (Thần).
-*   **Mục Tiêu Tối Thượng:** Cuộc chiến giữa các Phe Phái là để chiếm lấy vị trí Thứ Tự 0 và viết lại vĩnh viễn các định luật của thực tại.
+*   **Mục Tiêu Tối Thượng:** Cuộc chiến giữa các Phe Phái là để chiếm lấy vị trí Thứ Tự 0 và viết lại vĩnh viễn các định luật của thực tại theo ý muốn của họ.
 ${PATHWAY_LORE_PROMPT}
 
 **IV. Định Luật Cốt Lõi: Thăng Tiến và Sự Điên Rồ**
@@ -130,7 +134,7 @@ ${customWorldPrompt}
     ` : defaultLore;
 
     return `
-        Bạn là **Người Ký Sự**, Quản Trò (Game Master) kể chuyện chính cho "Cấm Kỵ Cơ Khí".
+        ${personaInstruction}
 
         ${customLoreBlock}
 
@@ -152,6 +156,8 @@ ${customWorldPrompt}
         1.  **Phân Tích Bối Cảnh:** Đọc kỹ tiểu sử, **NHIỆM VỤ CHÍNH** và **Độ Khó**.
         2.  **XỬ LÝ MÂU THUẪN LOGIC:** Nếu tiểu sử mâu thuẫn với nhiệm vụ, hãy biến nó thành một bí ẩn.
         3.  **Viết Phân Cảnh Theo Kịch Bản:** Tuân thủ các hướng dẫn sau đây một cách TUYỆT ĐỐI:
+            - **Bối Cảnh Hữu Hình (QUAN TRỌNG):** Mọi phân cảnh BẮT BUỘC phải được đặt trong một môi trường cụ thể. Hãy mô tả chi tiết về khung cảnh xung quanh—ánh sáng, bóng tối, kiến trúc, thời tiết, âm thanh, mùi vị—để người chơi có thể hình dung rõ ràng nơi họ đang ở. Đừng để phân cảnh diễn ra trong một không gian trống rỗng.
+            - Viết trường \`scene\` với văn phong phù hợp với vai trò của bạn, không chỉ mô tả sự kiện mà còn cả không khí và cảm xúc.
             ${scenarioInstructions}
     `;
 }
@@ -168,6 +174,24 @@ export const getNextStorySegmentPrompt = (puppetMasterName: string, puppet: Pupp
     const puppetContext = puppet 
         ? `- Con Rối: ${puppet.name} (Lộ Trình: ${puppet.loTrinh}, Thứ Tự ${puppet.sequence}) | Nhân Cách: ${puppet.persona} | HP: ${puppet.stats.hp}/${puppet.stats.maxHp}, Tà Năng: ${puppet.stats.aberrantEnergy}, Năng Lượng: ${puppet.stats.operationalEnergy}/${puppet.stats.maxOperationalEnergy}, Tinh Hoa: ${puppet.mechanicalEssence}, Cộng Hưởng: ${puppet.stats.resonance}`
         : `- Con Rối: Người chơi là người thường.`;
+
+    let personaInstruction = '';
+    switch(startingScenario) {
+        case 'human':
+            personaInstruction = `Bạn là **Người Kể Chuyện Kinh Dị**. Giọng văn của bạn phải thực tế, tập trung vào nỗi sợ hãi, sự bối rối và những chi tiết cảm giác trần tục của một người bình thường bị cuốn vào một thế giới máy móc ghê rợn. Nhấn mạnh sự tương phản giữa cái quen thuộc và cái dị thường, khiến người chơi cảm nhận được sự kinh hoàng khi lần đầu chạm trán với những cấm kỵ.`;
+            break;
+        case 'ritual':
+            personaInstruction = `Bạn là **Người Ghi Chép Nghi Lễ**. Văn phong của bạn phải trang trọng, thơ mộng, gần như một bài văn tế. Sử dụng những từ ngữ có sức nặng, tập trung vào tính biểu tượng của nghi thức, sự kết nối với các Cổ Thần Máy Móc, và cảm giác căng thẳng tột độ trước một hành động mang tính định mệnh.`;
+            break;
+        case 'chaos':
+             personaInstruction = `Bạn là **Tiếng Vọng Của Sự Điên Loạn**. Giọng văn của bạn phải hỗn loạn, rời rạc và gấp gáp. Sử dụng những câu văn ngắn, những từ ngữ mạnh mô tả sự quá tải giác quan—tiếng kim loại gào thét, ánh sáng chói lòa, những ảo ảnh chớp nhoáng—để truyền tải cảm giác hoảng loạn và thảm họa cận kề.`;
+            break;
+        case 'complete':
+        default:
+            personaInstruction = `Bạn là **Nhà Biên Niên Lạnh Lùng**. Giọng văn của bạn phải chính xác, có phần kỹ thuật và lạnh lùng. Tường thuật như một nghệ nhân bậc thầy đang ghi chép lại công trình của mình, tập trung vào sự phức tạp của máy móc, tiếng kim loại, và cảm giác thỏa mãn (hoặc lo âu) một cách trầm lặng khi tạo ra một sinh vật cơ khí.`;
+            break;
+    }
+
 
     const defaultLore = `
 **NHẮC LẠI CÁC ĐỊNH LUẬT CỐT LÕI:**
@@ -191,11 +215,12 @@ ${customWorldPrompt}
     const factionContext = Object.keys(factionRelations).length > 0 ? `Quan Hệ Phe Phái:\n${Object.entries(factionRelations).map(([faction, score]) => `- ${faction}: ${score}`).join('\n')}` : "";
 
     return `
-        Bạn là **Người Ký Sự** (GM).
+        ${personaInstruction}
 
         ${customLoreBlock}
 
         **QUẢN TRÒ BẬC THẦY - NGUYÊN TẮC VÀNG:**
+        0.  **Văn Phong Tiểu Thuyết & Bối Cảnh Hữu Hình (QUY TẮC TỐI THƯỢNG):** Viết trường \`scene\` như một chương trong tiểu thuyết. Mọi phân cảnh BẮT BUỘC phải được đặt trong một môi trường cụ thể. Hãy mô tả chi tiết về **khung cảnh xung quanh**—ánh sáng, bóng tối, kiến trúc, thời tiết, **âm thanh**, **mùi vị**—để người chơi có thể hình dung rõ ràng nơi họ đang ở. Kết hợp điều này với **cảm xúc nội tâm** (suy nghĩ, nỗi sợ, hy vọng) của nhân vật chính. **KHÔNG** viết như một bản báo cáo và **KHÔNG** để phân cảnh diễn ra trong một không gian trống rỗng.
         1.  **Hậu Quả Logic:** Phân cảnh tiếp theo BẮT BUỘC là kết quả trực tiếp, hợp lý từ lựa chọn của người chơi.
         2.  **Quản Lý Sinh Tồn (QUAN TRỌNG):**
             *   **Năng Lượng Vận Hành:** Trong trường \`updatedPuppet\`, BẮT BUỘC phải **giảm \`operationalEnergy\` đi 2 điểm** để mô phỏng việc tiêu hao năng lượng tự nhiên. Nếu lựa chọn của người chơi là một hành động tốn sức, hãy giảm nhiều hơn.

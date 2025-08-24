@@ -1,4 +1,3 @@
-
 import type { Puppet, ExplanationId, Component, Item } from '../../../types';
 import { FACTION_PATHWAYS } from '../../../data/gameConfig';
 
@@ -38,7 +37,7 @@ export const getWorkshopPrompt = (puppet: Puppet, shownExplanations: Explanation
         - Bản Nâng Cấp Kỹ Năng Tiềm Năng: ${availableSkill ? `"${availableSkill.name}: ${availableSkill.description}"` : "Không có trong kho lưu trữ."}
 
         **Nhiệm Vụ Của Bạn:**
-        1.  **Viết Đoạn Mô Tả (scene):** Tạo một đoạn văn ngắn (2-3 câu) mô tả quá trình Nghệ Nhân Rối chuẩn bị Tinh Luyện. Sử dụng thuật ngữ kỹ thuật. Mô tả âm thanh của các bánh răng, ánh sáng từ lõi năng lượng, và cảm giác của năng lượng đang được hiệu chỉnh. Nếu Tà Năng cao (>30), hãy mô tả các dấu hiệu bất ổn.
+        1.  **Viết Đoạn Mô Tả (scene):** Tạo một đoạn văn giàu hình ảnh, mang tính tường thuật như tiểu thuyết (3-4 câu) mô tả quá trình Nghệ Nhân Rối chuẩn bị Tinh Luyện. Hãy mô tả một cách chi tiết và sống động về môi trường xưởng chế tác: mùi dầu mỡ nóng, tiếng rít của kim loại, những đống phế liệu trong góc, ánh sáng lập lòe từ một lõi năng lượng hở, và cảm giác tập trung cao độ của người nghệ nhân. Nếu Tà Năng cao (>30), hãy mô tả các dấu hiệu bất ổn trong môi trường.
         2.  **Đề Xuất Các Hướng Tinh Luyện (options):** Cung cấp một danh sách gồm 3 lựa chọn nâng cấp cân bằng và hợp lý về mặt kỹ thuật. Trong phần mô tả của mỗi lựa chọn, hãy đề cập đến việc tiêu thụ Tinh Hoa và nguyên liệu (nếu có).
             *   **QUAN TRỌNG (Giao Thức An Toàn): Nếu độ nhiễu loạn (Tà Năng) từ 30 trở lên, một trong ba lựa chọn BẮT BUỘC phải là lựa chọn 'purge' (Thanh Tẩy).**
             *   **Lựa chọn 1 (Tích Hợp Kỹ Năng hoặc Tối Ưu Hóa):** Nếu có kỹ năng trong \`abilityPool\` (\`availableSkill\`), ưu tiên tạo một lựa chọn để tích hợp mô-đun kỹ năng đó. Nếu không, thay thế bằng một lựa chọn tối ưu hóa chỉ số (ví dụ: Tấn Công).
@@ -100,7 +99,7 @@ export const getComponentInstallPrompt = (puppet: Puppet, component: Component):
         - Mô tả linh kiện: "${component.description}"
 
         **Nhiệm vụ của bạn:**
-        1.  **Viết đoạn mô tả (scene):** Tạo một đoạn văn (2-3 câu) mô tả quá trình người chơi cẩn thận lắp ráp linh kiện ${component.name} vào con rối. Mô tả âm thanh, các chi tiết cơ khí, và cách con rối phản ứng khi linh kiện được kích hoạt.
+        1.  **Viết đoạn mô tả (scene):** Tạo một đoạn văn giàu hình ảnh, mang tính tường thuật như tiểu thuyết (3-4 câu) mô tả quá trình người chơi cẩn thận lắp ráp linh kiện ${component.name} vào con rối. Tập trung vào các chi tiết cảm giác: cái chạm lạnh của kim loại, tiếng 'tách' khi linh kiện vào đúng vị trí, và cách con rối phản ứng (rung nhẹ, đèn sáng lên) khi linh kiện được kích hoạt.
         2.  **Cập nhật con rối (updatedPuppet):**
             a.  Tạo một bản sao của đối tượng con rối được cung cấp.
             b.  Thêm linh kiện \`${component.name}\` vào mảng \`equippedComponents\`.
