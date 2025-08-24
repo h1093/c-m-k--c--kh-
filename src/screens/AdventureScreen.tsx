@@ -1,3 +1,5 @@
+
+
 import React, { useState, useRef } from 'react';
 import type { GameState, StartingScenario } from '../types';
 import PuppetStatus from '../components/PC/PuppetStatus';
@@ -19,11 +21,13 @@ interface AdventureScreenProps {
     onExitToMenu: () => void;
     onRetry: () => void;
     onUseItem: (itemId: string) => void;
+    onShowLore: () => void;
+    onGoToApiSetup: () => void;
     turnCount: number;
     apiCalls: number;
 }
 
-const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, onUseItem, turnCount, apiCalls }) => {
+const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingScenario, onChoice, onEnterWorkshop, onRestart, onSaveGame, onExitToMenu, onRetry, onUseItem, onShowLore, onGoToApiSetup, turnCount, apiCalls }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
     const choicesRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +56,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     kimLenh={gameState.kimLenh}
                     dauAnDongThau={gameState.dauAnDongThau}
                     onUseItem={onUseItem}
+                    onShowLore={onShowLore}
                 />
                 : <PlayerStatus
                     name={gameState.puppetMasterName}
@@ -70,6 +75,7 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     kimLenh={gameState.kimLenh}
                     dauAnDongThau={gameState.dauAnDongThau}
                     inventory={gameState.inventory}
+                    onShowLore={onShowLore}
                 />
             }
             {gameState.clues.length > 0 && <ClueJournal clues={gameState.clues} />}
@@ -103,9 +109,14 @@ const AdventureScreen: React.FC<AdventureScreenProps> = ({ gameState, startingSc
                     {gameState.error && (
                         <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-center animate-fade-in">
                              <p className="text-red-400 animate-pulse">Lỗi: {gameState.error}</p>
-                             <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
-                                 Thử Lại
-                             </button>
+                             <div className="flex justify-center gap-4 mt-3">
+                                <button onClick={onRetry} className="ui-button text-sm py-1 px-4">
+                                    Thử Lại
+                                </button>
+                                <button onClick={onGoToApiSetup} className="ui-button text-sm py-1 px-4 bg-gray-700 border-gray-600 hover:bg-gray-600">
+                                    Đổi API Key
+                                </button>
+                             </div>
                          </div>
                     )}
                 </div>

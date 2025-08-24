@@ -1,6 +1,6 @@
+
 import React, { useState } from 'react';
 import type { Puppet, Component, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item } from '../../types';
-import CodexDisplay from '../UI/CodexDisplay';
 
 const InfoTooltip: React.FC<{ text: string }> = ({ text }) => (
   <div className="relative flex items-center group">
@@ -55,7 +55,7 @@ const EssenceIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5
 const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a.75.75 0 001.06 0l1.836-1.836a.75.75 0 011.06 1.06L11 7.127c.231.096.419.188.577.291a.75.75 0 010 1.164c-.158.103-.346-.195-.577-.291l2.252 2.252a.75.75 0 01-1.06 1.06l-1.836-1.836a.75.75 0 00-1.06 0l-1.836 1.836a.75.75 0 01-1.06-1.06l2.252-2.252c-.231-.096-.419-.188-.577-.291a.75.75 0 010-1.164z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM3 10a7 7 0 1114 0 7 7 0 01-14 0z" clipRule="evenodd" /></svg>;
 const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 10a1 1 0 00-1-1H2a1 1 0 000 2h1a1 1 0 001-1zm1 5a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm9-5a1 1 0 100 2h1a1 1 0 100-2h-1zM6 5a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm8 0a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm9 10a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM9 10a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-type PuppetView = 'stats' | 'skills' | 'components' | 'mutations' | 'memories' | 'design' | 'inventory' | 'quests' | 'companions' | 'npcs' | 'lore' | 'journal' | 'factions' | 'codex';
+type PuppetView = 'stats' | 'skills' | 'components' | 'mutations' | 'memories' | 'design' | 'inventory' | 'quests' | 'companions' | 'npcs' | 'lore' | 'journal' | 'factions';
 
 interface NavButtonProps { label: string; view: PuppetView; activeView: PuppetView; setActiveView: (view: PuppetView) => void; disabled?: boolean; }
 const NavButton: React.FC<NavButtonProps> = ({ label, view, activeView, setActiveView, disabled = false }) => (
@@ -98,9 +98,10 @@ interface PuppetStatusProps {
   dauAnDongThau: number;
   apiCalls: number;
   onUseItem: (itemId: string) => void;
+  onShowLore: () => void;
 }
 
-const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem }) => {
+const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, componentInventory, itemInventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onUseItem, onShowLore }) => {
   const [activeView, setActiveView] = useState<PuppetView>('stats');
 
   const renderContent = () => {
@@ -219,7 +220,6 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, 
             </div>
         );
         case 'design': return (<div className="animate-fade-in"><Section title="Bản Thiết Kế"><div className="text-sm bg-black/30 p-3 space-y-1"><p>Phe Phái: {puppet.phePhai}</p><p>Lộ Trình: {puppet.loTrinh}</p><p>Trường Phái: {puppet.truongPhai}</p><p>Vật Liệu: {puppet.material}</p><p className="pt-1 border-t border-red-500/10">Nhân Cách: <span className="italic text-red-300">{puppet.persona}</span></p></div></Section></div>);
-        case 'codex': return (<div className="animate-fade-in h-full"><CodexDisplay /></div>);
         default: return null;
     }
   }
@@ -252,11 +252,14 @@ const PuppetStatus: React.FC<PuppetStatusProps> = ({ puppet, psyche, maxPsyche, 
         <NavButton label="Ký Ức" view="memories" activeView={activeView} setActiveView={setActiveView} disabled={puppet.memoryFragments.length === 0} />
         <NavButton label="Đột Biến" view="mutations" activeView={activeView} setActiveView={setActiveView} disabled={puppet.mutations.length === 0} />
         <NavButton label="Thiết Kế" view="design" activeView={activeView} setActiveView={setActiveView} />
-        <NavButton label="Sổ Tay" view="codex" activeView={activeView} setActiveView={setActiveView} />
       </div>
       
       <div className="mt-2 flex-grow overflow-y-auto pr-2">
         {renderContent()}
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-red-500/20 flex-shrink-0">
+        <button onClick={onShowLore} className="ui-button w-full py-2">Mở Sổ Tay Tri Thức</button>
       </div>
 
     </aside>

@@ -15,6 +15,7 @@ const getInitialStage = (): GameStage => {
 
 const initialState: GameState = {
     stage: getInitialStage(),
+    previousStage: null,
     puppetMasterName: '',
     puppetMasterBiography: '',
     mainQuest: '',
@@ -572,6 +573,38 @@ export const useGameState = () => {
         }
     };
 
+    const handleShowLoreScreen = () => {
+        setGameState(prev => ({
+            ...prev,
+            previousStage: prev.stage,
+            stage: GameStage.LORE_SCREEN,
+        }));
+    };
+
+    const handleExitLoreScreen = () => {
+        setGameState(prev => ({
+            ...prev,
+            stage: prev.previousStage || GameStage.START_SCREEN, // Fallback to start screen
+            previousStage: null,
+        }));
+    };
+
+    const handleGoToApiSetup = () => {
+        setGameState(prev => ({
+            ...prev,
+            previousStage: prev.stage,
+            stage: GameStage.API_SETUP,
+        }));
+    };
+
+    const handleApiKeyProvided = () => {
+        setGameState(prev => ({
+            ...prev,
+            stage: prev.previousStage || GameStage.START_SCREEN,
+            previousStage: null,
+        }));
+    };
+
     return {
         gameState,
         setGameState,
@@ -592,5 +625,9 @@ export const useGameState = () => {
         handleExitToMenu,
         handleRetry,
         handleUseItem,
+        handleShowLoreScreen,
+        handleExitLoreScreen,
+        handleGoToApiSetup,
+        handleApiKeyProvided,
     };
 };

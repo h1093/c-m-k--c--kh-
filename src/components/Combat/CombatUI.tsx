@@ -1,3 +1,5 @@
+
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Puppet, Enemy, Explanation, Component, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item, Quest } from '../../types';
 import PuppetStatus from '../PC/PuppetStatus';
@@ -25,6 +27,8 @@ interface CombatUIProps {
     onSaveGame: () => void;
     onExitToMenu: () => void;
     onRetry: () => void;
+    onShowLore: () => void;
+    onGoToApiSetup: () => void;
     error: string | null;
     turnCount: number;
     apiCalls: number;
@@ -134,7 +138,7 @@ const CombatLog: React.FC<{ log: string[] }> = ({ log }) => {
 };
 
 
-const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, itemInventory, sideQuests, onUseItem, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, error, turnCount, apiCalls, kimLenh, dauAnDongThau, psyche, maxPsyche, mentalShock, aberrantEnergyLeak }) => {
+const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLog, onAction, isLoading, masterName, explanation, inventory, itemInventory, sideQuests, onUseItem, npcs, worldState, loreEntries, loreSummaries, factionRelations, onSaveGame, onExitToMenu, onRetry, onShowLore, onGoToApiSetup, error, turnCount, apiCalls, kimLenh, dauAnDongThau, psyche, maxPsyche, mentalShock, aberrantEnergyLeak }) => {
     const [isStatusPanelVisible, setIsStatusPanelVisible] = useState(false);
 
     const StatusPanel = () => (
@@ -156,6 +160,7 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
             kimLenh={kimLenh}
             dauAnDongThau={dauAnDongThau}
             onUseItem={onUseItem}
+            onShowLore={onShowLore}
         />
     );
 
@@ -202,9 +207,14 @@ const CombatUI: React.FC<CombatUIProps> = ({ puppet, enemy, companions, combatLo
                     {error && (
                         <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-center animate-fade-in">
                              <p className="text-red-400 animate-pulse">Lỗi: {error}</p>
-                             <button onClick={onRetry} className="ui-button text-sm py-1 px-4 mt-3">
-                                 Thử Lại
-                             </button>
+                             <div className="flex justify-center gap-4 mt-3">
+                                <button onClick={onRetry} className="ui-button text-sm py-1 px-4">
+                                    Thử Lại
+                                </button>
+                                <button onClick={onGoToApiSetup} className="ui-button text-sm py-1 px-4 bg-gray-700 border-gray-600 hover:bg-gray-600">
+                                    Đổi API Key
+                                </button>
+                             </div>
                          </div>
                     )}
                 </div>

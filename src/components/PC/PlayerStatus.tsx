@@ -1,11 +1,11 @@
 
 
 
+
 import React, { useState } from 'react';
 import { StartingScenario, Quest, Companion, NPC, LoreEntry, LoreSummary, FactionRelations, Item } from '../../types';
-import CodexDisplay from '../UI/CodexDisplay';
 
-type PlayerView = 'bio' | 'quests' | 'companions' | 'factions' | 'npcs' | 'lore' | 'journal' | 'codex' | 'inventory';
+type PlayerView = 'bio' | 'quests' | 'companions' | 'factions' | 'npcs' | 'lore' | 'journal' | 'inventory';
 
 const Section: React.FC<{ title: string; children: React.ReactNode; titleColor?: string; className?: string }> = ({ title, children, titleColor = "text-red-500", className = "" }) => (
     <div className={`ui-panel p-4 ${className}`}>
@@ -95,6 +95,7 @@ interface PlayerStatusProps {
   kimLenh: number;
   dauAnDongThau: number;
   apiCalls: number;
+  onShowLore: () => void;
 }
 
 const StatDisplay: React.FC<{ label: string; value: string | number; icon: React.ReactNode; className?: string; valueClassName?: string }> = ({ label, value, icon, className = '', valueClassName = '' }) => (
@@ -110,7 +111,7 @@ const StatDisplay: React.FC<{ label: string; value: string | number; icon: React
 const KimLenhIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.158-.103.346-.195.577-.291L6.75 4.75a.75.75 0 011.06-1.06l1.835 1.836a.75.75 0 001.06 0l1.836-1.836a.75.75 0 011.06 1.06L11 7.127c.231.096.419.188.577.291a.75.75 0 010 1.164c-.158.103-.346-.195-.577-.291l2.252 2.252a.75.75 0 01-1.06 1.06l-1.836-1.836a.75.75 0 00-1.06 0l-1.836 1.836a.75.75 0 01-1.06-1.06l2.252-2.252c-.231-.096-.419-.188-.577-.291a.75.75 0 010-1.164z" /><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM3 10a7 7 0 1114 0 7 7 0 01-14 0z" clipRule="evenodd" /></svg>;
 const DauAnIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 10a1 1 0 00-1-1H2a1 1 0 000 2h1a1 1 0 001-1zm1 5a1 1 0 011-1h2a1 1 0 110 2H6a1 1 0 01-1-1zm9-5a1 1 0 100 2h1a1 1 0 100-2h-1zM6 5a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm8 0a1 1 0 00-1 1v2a1 1 0 102 0V6a1 1 0 00-1-1zm9 10a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM9 10a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" /></svg>;
 
-const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, psyche, maxPsyche, inventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau }) => {
+const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, psyche, maxPsyche, inventory, sideQuests, companions, npcs, worldState, loreEntries, loreSummaries, factionRelations, kimLenh, dauAnDongThau, onShowLore }) => {
     const [activeView, setActiveView] = useState<PlayerView>('bio');
 
     const renderContent = () => {
@@ -190,7 +191,6 @@ const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, 
                     </div>
                 );
             case 'lore': return (<div className="animate-fade-in"><Section title="Tri Thức Đã Thu Thập">{loreEntries.map(l => <details key={l.id} className="bg-black/30 p-3 cursor-pointer mb-2"><summary className="font-semibold text-gray-200 list-none">{l.title}</summary><p className="italic mt-2 pt-2 border-t border-red-500/10 text-gray-400">{l.content}</p></details>)}</Section></div>);
-            case 'codex': return (<div className="animate-fade-in h-full"><CodexDisplay /></div>);
             default: return null;
         }
     };
@@ -218,11 +218,14 @@ const PlayerStatus: React.FC<PlayerStatusProps> = ({ name, biography, scenario, 
                 <NavButton label="Phe Phái" view="factions" activeView={activeView} setActiveView={setActiveView} disabled={Object.keys(factionRelations).length === 0} />
                 <NavButton label="Hồ Sơ" view="npcs" activeView={activeView} setActiveView={setActiveView} disabled={npcs.length === 0} />
                 <NavButton label="Tri Thức" view="lore" activeView={activeView} setActiveView={setActiveView} disabled={loreEntries.length === 0} />
-                <NavButton label="Sổ Tay" view="codex" activeView={activeView} setActiveView={setActiveView} />
             </div>
 
             <div className="mt-2 flex-grow overflow-y-auto pr-2">
                 {renderContent()}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-red-500/20 flex-shrink-0">
+                <button onClick={onShowLore} className="ui-button w-full py-2">Mở Sổ Tay Tri Thức</button>
             </div>
         </aside>
     );

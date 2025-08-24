@@ -217,6 +217,7 @@ export enum GameStage {
   COMBAT,
   GAME_OVER,
   WORKSHOP, // Giai đoạn nâng cấp con rối
+  LORE_SCREEN, // Màn hình tra cứu Sổ Tay Tri Thức
 }
 
 // Key là tên phe phái, value là điểm quan hệ từ -100 đến 100
@@ -226,6 +227,7 @@ export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
 
 export interface GameState {
   stage: GameStage;
+  previousStage: GameStage | null;
   puppetMasterName: string;
   puppetMasterBiography: string;
   mainQuest: string;
