@@ -1,5 +1,6 @@
 
 
+
 export interface PuppetAbility {
   name: string;
   description: string;
@@ -161,6 +162,7 @@ export interface StorySegment {
   
   // New Survival Mechanics
   psycheChange?: number; // Sự thay đổi về Lý Trí của người chơi
+  maxPsycheChange?: number; // Thay đổi vĩnh viễn Lý Trí tối đa
   newItems?: Item[];
   updatedItems?: { id: string; quantityChange: number }[];
 
@@ -179,6 +181,7 @@ export interface StorySegment {
   newOrUpdatedNPCs?: Partial<NPC>[];
   newLoreEntries?: LoreEntry[]; // Tri thức động mới được khám phá
   updatedFactionRelations?: { [faction: string]: number }; // Các thay đổi về mối quan hệ của người chơi với phe phái
+  abyssEchoOutcome?: 'success' | 'failure'; // Kết quả của sự kiện Tâm Ma
 }
 
 export interface CombatTurnResult {
@@ -221,6 +224,7 @@ export enum GameStage {
   GAME_OVER,
   WORKSHOP, // Giai đoạn nâng cấp con rối
   LORE_SCREEN, // Màn hình tra cứu Sổ Tay Tri Thức
+  ABYSS_ECHO, // Đối đầu "Tâm Ma"
 }
 
 // Key là tên phe phái, value là điểm quan hệ từ -100 đến 100
@@ -243,6 +247,7 @@ export interface GameState {
   error: string | null;
   clues: Clue[];
   workshopData: WorkshopData | null;
+  abyssEchoData: { scene: string; choices: string[] } | null; // Dữ liệu cho sự kiện Tâm Ma
   shownExplanations: Set<ExplanationId>;
   componentInventory: Component[];
   customWorldPrompt: string | null;

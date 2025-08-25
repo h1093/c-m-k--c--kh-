@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { GameStage } from './types';
 import { useGameState } from './hooks/useGameState';
@@ -12,6 +13,7 @@ import WorldCreation from './screens/WorldCreation';
 import AdventureScreen from './screens/AdventureScreen';
 import ApiKeySetup from './screens/ApiKeySetup';
 import CodexScreen from './screens/CodexScreen';
+import AbyssEchoScreen from './screens/AbyssEchoScreen';
 
 const App: React.FC = () => {
     const {
@@ -20,7 +22,7 @@ const App: React.FC = () => {
         handleChoice, handleCombatAction, handleEnterWorkshop, handleUpgrade,
         handleInstallComponent, handleExitWorkshop, restartGame, handleSaveGame, handleExitToMenu,
         handleRetry, handleUseItem, handleShowLoreScreen, handleExitLoreScreen,
-        handleGoToApiSetup, handleApiKeyProvided
+        handleGoToApiSetup, handleApiKeyProvided, handleResolveAbyssEcho
     } = useGameState();
 
     const handleLoadGame = () => {
@@ -79,13 +81,19 @@ const App: React.FC = () => {
                     onExit={handleExitWorkshop}
                     onRetry={handleRetry}
                 />
+            case GameStage.ABYSS_ECHO:
+                return <AbyssEchoScreen
+                    data={gameState.abyssEchoData}
+                    isLoading={gameState.isLoading}
+                    onChoice={handleResolveAbyssEcho}
+                />;
             default:
                 return <p>Trạng thái không xác định</p>;
         }
     };
 
     return (
-        <main className="h-screen w-screen bg-black">
+        <main className={`h-screen w-screen bg-black ${gameState.stage === GameStage.ABYSS_ECHO ? 'abyss-active' : ''}`}>
             <div className="h-full w-full">
                 {gameState.isLoading && (gameState.stage === GameStage.PLAYING || gameState.stage === GameStage.CREATION) ? (
                     <div className="flex flex-col items-center justify-center h-full">

@@ -1,5 +1,6 @@
 
 
+
 import { Type } from "@google/genai";
 
 export const puppetAbilitySchema = {
@@ -298,6 +299,10 @@ export const storySegmentSchema = {
             type: Type.INTEGER,
             description: "Sự thay đổi về Lý Trí (Psyche) của người chơi. Âm khi gặp sự kiện kinh hoàng, dương khi nghỉ ngơi hoặc thực hiện hành động 'tiếp đất'."
         },
+        maxPsycheChange: {
+            type: Type.INTEGER,
+            description: "Sự thay đổi vĩnh viễn về Lý Trí Tối Đa của người chơi. Thường là hậu quả tiêu cực của một sự kiện tâm linh."
+        },
         newItems: {
             type: Type.ARRAY,
             items: itemSchema,
@@ -355,6 +360,10 @@ export const storySegmentSchema = {
                 }
             },
             additionalProperties: { type: Type.INTEGER }
+        },
+        abyssEchoOutcome: {
+            type: Type.STRING,
+            description: "Chỉ bao gồm trong phản hồi của một sự kiện 'Tiếng Vọng Từ Vực Thẳm'. Đặt là 'success' nếu người chơi vượt qua, 'failure' nếu họ thất bại."
         }
     },
     required: ["scene", "choices"]
@@ -440,4 +449,20 @@ export const componentInstallSchema = {
         updatedPuppet: puppetSchema,
     },
     required: ["scene", "updatedPuppet"]
+};
+
+export const abyssEchoSceneSchema = {
+    type: Type.OBJECT,
+    properties: {
+        scene: {
+            type: Type.STRING,
+            description: "Một đoạn văn siêu thực, giàu hình ảnh, mô tả cuộc tấn công tâm lý. Nó nên xoáy sâu vào tiểu sử, nhân cách con rối, và các sự kiện gần đây."
+        },
+        choices: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Một danh sách gồm 3 lựa chọn để người chơi phản ứng với ảo ảnh. Ví dụ: Chống cự, Chấp nhận, Phân tích."
+        }
+    },
+    required: ["scene", "choices"]
 };

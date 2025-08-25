@@ -1,10 +1,11 @@
 
 
+
 import { useState, useCallback, useEffect } from 'react';
 import { GameState, GameStage, UpgradeOption, StartingScenario, ExplanationId, Component, StorySegment, LoreSummary, Difficulty, NPC, Item, Puppet, Enemy } from '../types';
 import { generateInitialStory, generateNextStorySegment, generateLoreSummary, generateNpcMindUpdate, generateHint, generatePostCombatSegment } from '../services/storyService';
 import { handleCombatTurn } from '../services/combatService';
-import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet } from '../services/workshopService';
+import { generateWorkshopOptions, generateNewSequenceName, installComponentOnPuppet, triggerAbyssEcho, resolveAbyssEcho } from '../services/workshopService';
 import * as saveService from '../services/saveService';
 import { apiKeyManager } from '../services/ai/aiClient';
 import { FACTION_PATHWAYS } from '../data/gameConfig';
@@ -28,6 +29,7 @@ const initialState: GameState = {
     error: null,
     clues: [],
     workshopData: null,
+    abyssEchoData: null,
     shownExplanations: new Set<ExplanationId>(),
     componentInventory: [],
     customWorldPrompt: null,
@@ -277,7 +279,8 @@ export const useGameState = () => {
             }
         }
         
-        const maxPsycheWithPenalty = gameState.maxPsyche - (newCompanions.length * 10);
+        const newMaxPsyche = gameState.maxPsyche + (nextSegment.maxPsycheChange || 0);
+        const maxPsycheWithPenalty = newMaxPsyche - (newCompanions.length * 10);
         const newPsyche = Math.max(0, Math.min(maxPsycheWithPenalty, gameState.psyche + (nextSegment.psycheChange || 0)));
 
         setGameState(prev => ({
@@ -301,6 +304,7 @@ export const useGameState = () => {
             dauAnDongThau: prev.dauAnDongThau + (nextSegment.dauAnDongThauChange || 0),
             factionRelations: newFactionRelations,
             inventory: newItemInventory.filter(i => i.quantity > 0),
+            maxPsyche: newMaxPsyche,
             psyche: newPsyche,
             lastDefeatedEnemy: null,
         }));
@@ -478,7 +482,34 @@ export const useGameState = () => {
 
     const handleEnterWorkshop = async () => {
         if (!gameState.puppet) return;
-        setLastAction({ type: 'enterWorkshop', payload: null });
+
+        const puppet = gameState.puppet;
+        const triggerThreshold = 30;
+        const aberrantEnergyRange = puppet.stats.maxAberrantEnergy - triggerThreshold;
+        const currentAberrantEnergy = puppet.stats.aberrantEnergy - triggerThreshold;
+        const triggerChance = aberrantEnergyRange > 0 ? currentAberrantEnergy / aberrantEnergyRange : 0;
+    
+        if (puppet.stats.aberrantEnergy > triggerThreshold && Math.random() < triggerChance) {
+            setLastAction({ type: 'enterWorkshop.abyss', payload: null });
+            setGameState(prev => ({ ...prev, isLoading: true, error: null }));
+            try {
+                setGameState(prev => ({ ...prev, apiCalls: prev.apiCalls + 1 }));
+                const echoData = await triggerAbyssEcho(puppet, gameState.puppetMasterBiography, gameState.storyHistory);
+                setGameState(prev => ({
+                    ...prev,
+                    stage: GameStage.ABYSS_ECHO,
+                    abyssEchoData: echoData,
+                    isLoading: false,
+                }));
+                setLastAction(null);
+            } catch (error) {
+                console.error(error);
+                setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
+            }
+            return; 
+        }
+
+        setLastAction({ type: 'enterWorkshop.normal', payload: null });
         setGameState(prev => ({ ...prev, stage: GameStage.WORKSHOP, isLoading: true, error: null }));
         try {
             setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
@@ -599,6 +630,20 @@ export const useGameState = () => {
         setGameState(prev => ({ ...prev, stage: GameStage.PLAYING, workshopData: null, error: null }));
     };
 
+    const handleResolveAbyssEcho = async (choice: string) => {
+        if (!gameState.puppet) return;
+        setLastAction({ type: 'resolveAbyssEcho', payload: choice });
+        setGameState(prev => ({ ...prev, isLoading: true, error: null, abyssEchoData: null }));
+        try {
+            setGameState(prev => ({...prev, apiCalls: prev.apiCalls + 1}));
+            const resultSegment = await resolveAbyssEcho(gameState.puppet, choice, gameState.psyche);
+            await processNextSegment(resultSegment);
+        } catch (error) {
+            console.error(error);
+            setGameState(prev => ({ ...prev, isLoading: false, error: error instanceof Error ? error.message : String(error) }));
+        }
+    };
+
     const restartGame = () => {
         setGameState(initialState);
     };
@@ -641,7 +686,8 @@ export const useGameState = () => {
             case 'combat':
                 handleCombatAction(lastAction.payload as string);
                 break;
-            case 'enterWorkshop':
+            case 'enterWorkshop.normal':
+            case 'enterWorkshop.abyss':
                 handleEnterWorkshop();
                 break;
             case 'getHint':
@@ -652,6 +698,9 @@ export const useGameState = () => {
                 break;
             case 'installComponent':
                 handleInstallComponent(lastAction.payload as Component);
+                break;
+            case 'resolveAbyssEcho':
+                handleResolveAbyssEcho(lastAction.payload as string);
                 break;
             default:
                 console.error('Unknown action type for retry:', lastAction.type);
@@ -714,5 +763,6 @@ export const useGameState = () => {
         handleExitLoreScreen,
         handleGoToApiSetup,
         handleApiKeyProvided,
+        handleResolveAbyssEcho,
     };
 };

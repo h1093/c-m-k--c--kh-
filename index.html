@@ -53,195 +53,157 @@
         background-color: var(--color-bg-dark);
         color: var(--color-text-light);
         /* Add a subtle noise background for horror effect */
-        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJhbSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZHRoPSIxMDAlIiBmaWx0ZXI9InVybCgjYW0pIiBvcGFjaXR5PSIwLjA1NSIvPjwvc3ZnPg==');
-      }
-      
-      .font-cinzel {
-        font-family: var(--font-display), serif;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJhbSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzAwMCIvPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWx0ZXI9InVybCgjYW0pIiBvcGFjaXR5PSIwLjEiLz48L3N2Zz4=');
       }
 
-      /* Animations */
-      @keyframes text-glow {
-        0%, 100% { text-shadow: 0 0 5px var(--color-primary-red), 0 0 10px var(--color-primary-red); }
-        50% { text-shadow: 0 0 10px var(--color-primary-red), 0 0 20px var(--color-primary-red); }
-      }
-       @keyframes fade-in {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .animate-fade-in {
-        animation: fade-in 0.5s ease-out forwards;
-      }
+      .font-cinzel { font-family: var(--font-display); }
 
-       .save-toast {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--color-bg-medium);
-        color: var(--color-primary-red);
-        padding: 12px 24px;
-        border: 1px solid var(--color-primary-red-dark);
-        box-shadow: 0 0 15px rgba(127, 29, 29, 0.3);
-        z-index: 100;
-        animation: fade-in-out 3s ease-in-out forwards;
-      }
-      
-      @keyframes glow-yellow {
-        0%, 100% { text-shadow: 0 0 4px #fef08a, 0 0 8px #fef08a; }
-        50% { text-shadow: 0 0 8px #fde047, 0 0 16px #fde047; }
-      }
-      .animate-glow-yellow {
-        animation: glow-yellow 2s ease-in-out infinite;
-      }
-      @keyframes glow-purple {
-        0%, 100% { text-shadow: 0 0 4px #c084fc, 0 0 8px #c084fc; }
-        50% { text-shadow: 0 0 8px #a855f7, 0 0 16px #a855f7; }
-      }
-      .animate-glow-purple {
-        animation: glow-purple 2s ease-in-out infinite;
-      }
-
-      @keyframes fade-in-out {
-        0% { opacity: 0; transform: translate(-50%, 20px); }
-        15% { opacity: 1; transform: translate(-50%, 0); }
-        85% { opacity: 1; transform: translate(-50%, 0); }
-        100% { opacity: 0; transform: translate(-50%, 20px); }
-      }
-
-      @keyframes glitch {
-        0% { transform: translate(0); text-shadow: 0 0 5px #c084fc, 0 0 10px #c084fc; }
-        10% { transform: translate(-2px, 2px); }
-        20% { transform: translate(2px, -2px); }
-        30% { transform: translate(-2px, -2px); }
-        40% { transform: translate(2px, 2px); }
-        50% { transform: translate(0); }
-        60% { transform: translate(-2px, 2px); opacity: 0.8; }
-        70% { transform: translate(2px, -2px); }
-        80% { transform: translate(-2px, -2px); }
-        90% { transform: translate(2px, 2px); }
-        100% { transform: translate(0); text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7; }
-      }
-      .animate-glitch {
-        animation: glitch 0.5s cubic-bezier(.25, .46, .45, .94) both infinite;
-      }
-
-      @keyframes fade-in-out-long {
-        0% { opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { opacity: 0; }
-      }
-      .animate-fade-in-out-long {
-        animation: fade-in-out-long 5s ease-in-out forwards;
-      }
-      
-      @keyframes fade-in-out-hint {
-        0% { opacity: 0; transform: translate(-50%, -20px); }
-        8% { opacity: 1; transform: translate(-50%, 0); }
-        92% { opacity: 1; transform: translate(-50%, 0); }
-        100% { opacity: 0; transform: translate(-50%, -20px); }
-      }
-      .hint-toast {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: var(--color-bg-medium);
-        color: #fde047; /* yellow for hint */
-        padding: 12px 24px;
-        border: 1px solid #ca8a04; /* darker yellow */
-        box-shadow: 0 0 15px rgba(253, 224, 71, 0.3);
-        z-index: 100;
-        animation: fade-in-out-hint 8s ease-in-out forwards;
-        max-width: 80%;
-        text-align: center;
-      }
-
-
-      /* General UI element styling */
       .ui-panel {
-        background-color: rgba(10, 10, 10, 0.8);
+        background-color: rgba(10, 10, 10, 0.6);
         border: 1px solid rgba(185, 28, 28, 0.2);
-        backdrop-filter: blur(5px);
-        box-shadow: 0 0 15px rgba(127, 29, 29, 0.1), inset 0 0 10px rgba(0,0,0,0.5);
-        border-radius: 0px; /* Sharp edges for horror */
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 32px 0 rgba(185, 28, 28, 0.1);
       }
+
+      .ui-input {
+        background-color: #0a0a0a;
+        border: 1px solid #4b5563;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      .ui-input:focus {
+        outline: none;
+        border-color: var(--color-primary-red);
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.3);
+      }
+
       .ui-button {
         background-color: var(--color-primary-red-dark);
+        border: 1px solid var(--color-primary-red);
         color: var(--color-text-light);
         font-family: var(--font-display);
-        border: 1px solid var(--color-primary-red);
-        transition: all 0.3s ease;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 0 5px rgba(185, 28, 28, 0.5), inset 0 0 5px rgba(185, 28, 28, 0.3);
-        border-radius: 0px;
+        letter-spacing: 0.1em;
+        transition: all 0.3s ease;
       }
+
       .ui-button:hover:not(:disabled) {
         background-color: var(--color-primary-red);
-        color: var(--color-bg-dark);
-        box-shadow: 0 0 15px var(--color-primary-red), inset 0 0 10px rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(185, 28, 28, 0.5);
         transform: translateY(-2px);
       }
       .ui-button:disabled {
         background-color: var(--color-text-dark);
-        border-color: var(--color-text-dark);
+        border-color: #374151;
         cursor: not-allowed;
-        opacity: 0.6;
-      }
-      .ui-input {
-        background-color: var(--color-bg-medium);
-        border: 1px solid var(--color-primary-red-dark);
-        color: var(--color-text-light);
-        transition: all 0.3s ease;
-        border-radius: 0px;
-      }
-      .ui-input:focus {
-        outline: none;
-        border-color: var(--color-primary-red);
-        box-shadow: 0 0 10px rgba(185, 28, 28, 0.7);
-      }
-
-      /* Tooltip */
-      .tooltip {
-        visibility: hidden;
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        z-index: 10;
-        margin-bottom: 8px;
-        width: max-content;
-        max-width: 250px;
-        transform: translateX(-50%);
-        border-radius: 0px;
-        background-color: var(--color-bg-medium);
-        padding: 8px 12px;
-        font-family: var(--font-primary);
-        font-size: 12px;
-        font-weight: normal;
-        text-transform: none;
-        color: var(--color-text-light);
-        opacity: 0;
-        box-shadow: 0 0 15px rgba(0,0,0,0.5);
-        transition: opacity 0.3s;
-        border: 1px solid var(--color-primary-red-dark);
-        pointer-events: none;
-        text-align: center;
-      }
-      .group:hover .tooltip {
-        visibility: visible;
-        opacity: 1;
       }
       
+      .save-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(185, 28, 28, 0.9);
+        color: white;
+        padding: 10px 20px;
+        border: 1px solid #ef4444;
+        z-index: 1000;
+        animation: fade-in-out 3s forwards;
+      }
+
+      .hint-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 300px;
+        background-color: rgba(10,10,10,0.9);
+        color: #f3f4f6;
+        padding: 15px;
+        border: 1px solid #b91c1c;
+        z-index: 1000;
+        animation: slide-in-out 8s forwards ease-in-out;
+        box-shadow: 0 0 20px rgba(185, 28, 28, 0.4);
+      }
+
+      .tooltip {
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--color-bg-dark);
+        color: var(--color-text-medium);
+        padding: 8px 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        z-index: 10;
+        font-family: var(--font-primary);
+        font-size: 0.8rem;
+        border: 1px solid var(--color-primary-red-dark);
+        pointer-events: none;
+      }
+      .group:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .animate-fade-in {
+        animation: fade-in 0.8s ease-out forwards;
+      }
+      .animate-fade-in-out-long {
+          animation: fade-in-out 4s forwards;
+      }
+      .animate-glitch {
+        animation: glitch 1s linear infinite;
+      }
+
+      @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fade-in-out {
+          0%, 100% { opacity: 0; }
+          10%, 90% { opacity: 1; }
+      }
+      @keyframes slide-in-out {
+          0% { transform: translateX(110%); }
+          10%, 90% { transform: translateX(0); }
+          100% { transform: translateX(110%); }
+      }
+      @keyframes glitch{
+        2%,64%{ transform: translate(2px,0) skew(0deg); }
+        4%,60%{ transform: translate(-2px,0) skew(0deg); }
+        62%{ transform: translate(0,0) skew(5deg); }
+      }
+      
+      /* Abyss Echo Screen Effects */
+      .abyss-active {
+        animation: abyss-pulse 2.5s infinite ease-in-out;
+      }
+      .abyss-active::after {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background: radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(10, 0, 0, 0.8) 100%);
+          pointer-events: none;
+          z-index: 9998;
+      }
+      .abyss-glitch-text {
+        animation: glitch 1.5s linear infinite;
+      }
+
+      @keyframes abyss-pulse {
+        0% { filter: brightness(1) contrast(1); }
+        50% { filter: brightness(0.8) contrast(1.2); }
+        100% { filter: brightness(1) contrast(1); }
+      }
+
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.1.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.15.0",
     "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
     "react/": "https://esm.sh/react@^19.1.1/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.14.0"
+    "react": "https://esm.sh/react@^19.1.1"
   }
 }
 </script>
